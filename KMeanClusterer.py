@@ -4,6 +4,7 @@ import copy
 import random
 import sys
 
+
 class KMeansClusterer(VectorSpaceClusterer):
     """
     The K-means clusterer starts with k arbitrary chosen means then allocates
@@ -59,7 +60,7 @@ class KMeansClusterer(VectorSpaceClusterer):
         assert not initial_means or len(initial_means) == num_means
         self._means = initial_means
         assert repeats >= 1
-        assert not (initial_means and repeats > 1)
+        # assert not (initial_means and repeats > 1)
         self._repeats = repeats
         self._rng = rng if rng else random.Random()
         self._avoid_empty_clusters = avoid_empty_clusters
@@ -154,12 +155,18 @@ class KMeansClusterer(VectorSpaceClusterer):
         return difference
 
     def _centroid(self, cluster, mean):
+        print("in centroid hi everyone")
+        # print(type(cluster), type(mean))
+        # print(cluster[0])
+        # print(mean[0])
         if self._avoid_empty_clusters:
             centroid = copy.copy(mean)
             for vector in cluster:
                 centroid += vector
+            print(centroid)
             return centroid / (1 + len(cluster))
         else:
+            # todo: cluster is empty and needs to re-run. handle this in code
             if not len(cluster):
                 sys.stderr.write("Error: no centroid defined for empty cluster.\n")
                 sys.stderr.write(
@@ -169,7 +176,27 @@ class KMeansClusterer(VectorSpaceClusterer):
             centroid = copy.copy(cluster[0])
             for vector in cluster[1:]:
                 centroid += vector
+                print("vec type:", type(vector))
+            print(centroid)
+
             return centroid / len(cluster)
+
+        # if self._avoid_empty_clusters:
+        #     centroid = copy.copy(mean)
+        #     for vector in cluster:
+        #         centroid += vector
+        #     return centroid / (1 + len(cluster))
+        # else:
+        #     if not len(cluster):
+        #         sys.stderr.write("Error: no centroid defined for empty cluster.\n")
+        #         sys.stderr.write(
+        #             "Try setting argument 'avoid_empty_clusters' to True\n"
+        #         )
+        #         assert False
+        #     centroid = copy.copy(cluster[0])
+        #     for vector in cluster[1:]:
+        #         centroid += vector
+        #     return centroid / len(cluster)
 
     def __repr__(self):
         return "<KMeansClusterer means=%s repeats=%d>" % (self._means, self._repeats)

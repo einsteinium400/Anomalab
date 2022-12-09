@@ -5,20 +5,30 @@
 # URL: <https://www.nltk.org/>
 # For license information, see LICENSE.TXT
 
+# todo: handle exception of "no centroid defined for empty cluster." which means one cluster is empty
+import csv
+
 import numpy
 import pandas as pd
 from math import sqrt
 from KMeanClusterer import *
 
 K = 3  # number of means
-iterations=10 #number of iterations for kmeans
+ITERATIONS = 10  # number of iterations for kmeans
+FILE_NAME = "dataset1/lymphography.csv"  # name of csv file
 
-#################################################################################
 
 def csv_to_numpy(file_name):
-    return pd.read_csv(file_name, header=None).values
+    with open(file_name, 'r') as read_obj:
+        # Return a reader object which will
+        # iterate over lines in the given csvfile
+        csv_reader = csv.reader(read_obj)
+        # convert string to list
+        list_of_csv = list(csv_reader)
+        new_lst = [[int(x) for x in inner] for inner in list_of_csv]
+        return new_lst
 
-
+# distance function
 def hamming(vec1, vec2):
     pass
 
@@ -35,34 +45,11 @@ def euclidean_distance(u, v):
 #################################################################################
 
 def demo():
-    # example from figure 14.9, page 517, Manning and Schutze
-
-    # from nltk.cluster import KMeansClusterer, euclidean_distance
-
-    #vectors is a list of numpy arrays
-    vectors = [numpy.array(f) for f in [[2, 1], [1, 3], [4, 7], [6, 7]]]
-
-    means = [[4, 3], [5, 5], [4, 5]]  # todo: correlated to k, choose randomly from the list.
-
-    clusterer = KMeansClusterer(K, euclidean_distance, initial_means=means)
-
-    clusters = clusterer.cluster(vectors, True, trace=True)
-
-    print("Clustered:", vectors)
-    print("As:", clusters)
-    print("Means:", clusterer.means())
-    print()
-
-
+    means = [[3, 3], [1, 2], [4, 2]]  # todo: correlated to k, choose randomly from the list.
     vectors = [numpy.array(f) for f in [[3, 3], [1, 2], [4, 2], [4, 0], [2, 3], [3, 1]]]
 
-
-
     print("vectors:", vectors)
-    # test k-means using the euclidean distance metric, 2 means and repeat
-    # clustering 10 times with random seeds
-
-    clusterer = KMeansClusterer(K, euclidean_distance, repeats=iterations)
+    clusterer = KMeansClusterer(K, euclidean_distance, repeats=ITERATIONS, initial_means=means)
     clusters = clusterer.cluster(vectors, True)
     print("Clustered:", vectors)
     print("As:", clusters)
