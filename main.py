@@ -6,19 +6,27 @@
 # For license information, see LICENSE.TXT
 
 # todo: handle exception of "no centroid defined for empty cluster." which means one cluster is empty
+# todo: make sure there are no duplicates in input
+# todo: complete accuracy test
 import csv
-
-import numpy
-import pandas as pd
-from math import sqrt
 from KMeanClusterer import *
+from DistanceFunctions import *
 
-K = 3  # number of means
-ITERATIONS = 10  # number of iterations for kmeans
-FILE_NAME = "dataset1/lymphography.csv"  # name of csv file
+# number of means. USER SETS THIS VALUE IN UI
+K = 4
+# name of unlabeled csv file
+UNLABELED_FILE_NAME = "dataset1/lymphography.csv"
+# name of labeled file name
+LABLED_FILE_NAME = "dataset1/something.csv"
+
+# max value for each feature by index
+MEAN_VALUES = [4, 2, 2, 2, 2, 2, 2, 2, 4, 4, 3, 4, 4, 8, 3, 2, 2, 8]
+# True means categorical value. False means numeric value.
+TYPE_OF_FIELDS = [True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True,
+                  True, True]
 
 
-def csv_to_numpy(file_name):
+def csv_to_nested_list(file_name):
     with open(file_name, 'r') as read_obj:
         # Return a reader object which will
         # iterate over lines in the given csvfile
@@ -28,40 +36,52 @@ def csv_to_numpy(file_name):
         new_lst = [[int(x) for x in inner] for inner in list_of_csv]
         return new_lst
 
-# distance function
-def hamming(vec1, vec2):
-    pass
+
+# the label should be the last feature!
+def test_accuracy(clusterer, unlabeled_data_file, labeled_data_file):
+    unlabeled_samples = csv_to_nested_list(unlabeled_data_file)
+    labeled_samples = csv_to_nested_list(labeled_data_file)
+    print("stiff")
+    print(unlabeled_samples)
+    print(labeled_samples)
+    algorithm_result = []
+    for unlabeled_sample, labeled_sample in zip(unlabeled_samples, labeled_samples):
+        vector = numpy.array(unlabeled_sample)
+        result = clusterer.classify(vector)
+        # append sample with the model result label
+        unlabeled_sample.append(result)
+        # append sample with actual label
+        unlabeled_sample.append(labeled_sample[-1])
+        algorithm_result.append(unlabeled_sample)
+    print(algorithm_result) #todo: מיכאל זו הרשימה שהאיבר האחרון זה הקטלוג האמיתי והאיבר לפני אחרון זה קטלוג מהמודל
+
+    # this might be unnecessary
+    # write labeled results in file
+    myFile = open('output.csv', 'w')
+    writer = csv.writer(myFile)
+    for data_list in algorithm_result:
+        writer.writerow(data_list)
+    myFile.close()
 
 
-def euclidean_distance(u, v):
-    """
-    Returns the euclidean distance between vectors u and v. This is equivalent
-    to the length of the vector (u - v).
-    """
-    diff = u - v
-    return sqrt(numpy.dot(diff, diff))
-
-
-#################################################################################
-
-def demo():
-    means = [[3, 3], [1, 2], [4, 2]]  # todo: correlated to k, choose randomly from the list.
-    vectors = [numpy.array(f) for f in [[3, 3], [1, 2], [4, 2], [4, 0], [2, 3], [3, 1]]]
-
+def main():
+    vectors = [numpy.array(f) for f in csv_to_nested_list(UNLABELED_FILE_NAME)]
     print("vectors:", vectors)
-    clusterer = KMeansClusterer(K, euclidean_distance, repeats=ITERATIONS, initial_means=means)
+    clusterer = KMeansClusterer(num_means=K, distance=hamming, repeats=3, mean_values=MEAN_VALUES,
+                                type_of_fields=TYPE_OF_FIELDS)
     clusters = clusterer.cluster(vectors, True)
     print("Clustered:", vectors)
     print("As:", clusters)
     print("Means:", clusterer.means())
-    print()
+
+    test_accuracy(clusterer, UNLABELED_FILE_NAME, LABLED_FILE_NAME)
 
     # classify a new vector
-    vector = numpy.array([3, 3])
-    print("classify(%s):" % vector, end=" ")
-    print(clusterer.classify(vector))
+    # vector = numpy.array([3, 3])
+    # print("classify(%s):" % vector, end=" ")
+    # print(clusterer.classify(vector))
     print()
 
 
 if __name__ == "__main__":
-    demo()
+    main()

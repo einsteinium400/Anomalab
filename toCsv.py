@@ -1,34 +1,22 @@
+
+
 import csv
+def csv_to_numpy(file_name):
+    with open(file_name, 'r') as read_obj:
+        # Return a reader object which will
+        # iterate over lines in the given csvfile
+        csv_reader = csv.reader(read_obj)
+        # convert string to list
+        list_of_csv = list(csv_reader)
+        new_lst = [[int(x) for x in inner] for inner in list_of_csv]
+        return new_lst
 
-import numpy
 
-vectors = [numpy.array(f) for f in [[2, 1], [1, 3], [4, 7], [6, 7]]]
-print(vectors)
-print(type(vectors))
-print(vectors[1])
-print(type(vectors[1]))
-with open('dataset1/lymphography.csv', 'r') as read_obj:
-    # Return a reader object which will
-    # iterate over lines in the given csvfile
-    csv_reader = csv.reader(read_obj)
 
-    # convert string to list
-    list_of_csv = list(csv_reader)
+unlabeled_samples = csv_to_numpy("dataset1/something.csv")
+labeled_samples = csv_to_numpy("dataset1/lymphography.csv")
 
-    print(list_of_csv)
-
-    new_lst = [[int(x) for x in inner] for inner in list_of_csv]
-    print(new_lst)
-
-# def csv_to_numpy():
-#     return numpy.loadtxt('dataset1/lymphography.csv', delimiter=',')
-#
-#
-#
-#
-# a = csv_to_numpy()
-# b=map(zip, a)
-# print("b", b)
-# print(b[1])
-# print(csv_to_numpy())
-# print(type(csv_to_numpy()))
+algorithm_result = []
+for (u,v) in zip(unlabeled_samples,labeled_samples):
+    print(u)
+    print(v)
