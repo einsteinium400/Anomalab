@@ -16,8 +16,8 @@ from DistanceFunctions import *
 K = 4
 # name of unlabeled csv file
 UNLABELED_FILE_NAME = "dataset1/lymphography.csv"
-# name of labeled file name
-LABLED_FILE_NAME = "dataset1/something.csv"
+# name of labeled file name. label is last coloumn
+LABLED_FILE_NAME = "dataset1/labeled_data.csv"
 
 # max value for each feature by index
 MEAN_VALUES = [4, 2, 2, 2, 2, 2, 2, 2, 4, 4, 3, 4, 4, 8, 3, 2, 2, 8]
