@@ -9,8 +9,12 @@
 # todo: make sure there are no duplicates in input
 # todo: complete accuracy test
 import csv
+
+import numpy
+
 from KMeanClusterer import *
 from DistanceFunctions import *
+from ClassIntegrator import *
 
 # number of means. USER SETS THIS VALUE IN UI
 K = 4
@@ -53,7 +57,7 @@ def test_accuracy(clusterer, unlabeled_data_file, labeled_data_file):
         # append sample with actual label
         unlabeled_sample.append(labeled_sample[-1])
         algorithm_result.append(unlabeled_sample)
-    print(algorithm_result) #todo: מיכאל זו הרשימה שהאיבר האחרון זה הקטלוג האמיתי והאיבר לפני אחרון זה קטלוג מהמודל
+    # print(algorithm_result) #todo: מיכאל זו הרשימה שהאיבר האחרון זה הקטלוג האמיתי והאיבר לפני אחרון זה קטלוג מהמודל
 
     # this might be unnecessary
     # write labeled results in file
@@ -62,6 +66,8 @@ def test_accuracy(clusterer, unlabeled_data_file, labeled_data_file):
     for data_list in algorithm_result:
         writer.writerow(data_list)
     myFile.close()
+
+    return algorithm_result
 
 
 def main():
@@ -74,7 +80,9 @@ def main():
     print("As:", clusters)
     print("Means:", clusterer.means())
 
-    test_accuracy(clusterer, UNLABELED_FILE_NAME, LABLED_FILE_NAME)
+    result = test_accuracy(clusterer, UNLABELED_FILE_NAME, LABLED_FILE_NAME)
+
+    classIntegrator(result)
 
     # classify a new vector
     # vector = numpy.array([3, 3])
