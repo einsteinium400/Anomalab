@@ -1,0 +1,9 @@
+env
+env/*
+.idea
+pyvenv.cfg
+.vscode
+.idea/misc.xml
+.idea/anomalab.iml
+__pycache__/KMeanClusterer.cpython-39.pyc
+output.csv
