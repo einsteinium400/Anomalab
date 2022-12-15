@@ -1,12 +1,5 @@
-# Natural Language Toolkit: K-Means Clusterer
-#
-# Copyright (C) 2001-2022 NLTK Project
-# Author: Trevor Cohn <tacohn@cs.mu.oz.au>
-# URL: <https://www.nltk.org/>
-# For license information, see LICENSE.TXT
-
 # todo: handle exception of "no centroid defined for empty cluster." which means one cluster is empty
-# todo: make sure there are no duplicates in input
+# todo: make sure there are no duplicates in input -- I DON'T SEE PROBLEN IN IT
 # todo: complete accuracy test
 import csv
 
@@ -16,18 +9,18 @@ from KMeanClusterer import *
 from DistanceFunctions import *
 from ClassIntegrator import *
 
-# number of means. USER SETS THIS VALUE IN UI
-K = 4
+# number of means.
+K = 4   #todo: need to be defined by elbow algorithm
 # name of unlabeled csv file
-UNLABELED_FILE_NAME = "dataset1/lymphography.csv"
+UNLABELED_FILE_NAME = "dataset1/lymphography.csv"   #todo: need to be find by DATA ANALYST
 # name of labeled file name. label is last coloumn
-LABLED_FILE_NAME = "dataset1/labeled_data.csv"
+LABLED_FILE_NAME = "dataset1/labeled_data.csv"  #todo: should be determant during running
 
 # max value for each feature by index
-MEAN_VALUES = [4, 2, 2, 2, 2, 2, 2, 2, 4, 4, 3, 4, 4, 8, 3, 2, 2, 8]
+MEAN_VALUES = [4, 2, 2, 2, 2, 2, 2, 2, 4, 4, 3, 4, 4, 8, 3, 2, 2, 8]    #todo: should be determent during running
 # True means categorical value. False means numeric value.
 TYPE_OF_FIELDS = [True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True,
-                  True, True]
+                  True, True]   #todo: should be determant by the user
 
 
 def csv_to_nested_list(file_name):
