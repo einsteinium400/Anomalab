@@ -1,5 +1,4 @@
 import json
-THRESHOLD = 10
 
 EXAMPLE_PREDICT = {
     "cluster": 0,
@@ -52,8 +51,7 @@ EXAMPLE_PREDICT = {
     ]
 }
 
-def parseResult(res):
-    return json.load(res)
+
 def fakePredict(sample):
     res = EXAMPLE_PREDICT
     return res['cluster'], res
@@ -62,9 +60,9 @@ def checkAnomaly(sample):
     cluster,predData = fakePredict(fakeSample)
     for clusterJson in predData['distance']:
         if clusterJson['cluster'] == cluster:
-            if(clusterJson['centroid_distance'] >= THRESHOLD):
+            if(abs(clusterJson['centroid_distance'] - clusterJson['mean_distance']) >= 3*clusterJson['deviation']):
                 print("ANOMALY")
             else:
-                print(clusterJson)
+                print("Not Anomaly")
 
 checkAnomaly(1)
