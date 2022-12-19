@@ -1,4 +1,15 @@
-__pycache__
 env
+env/*
 .idea
-venv
+pyvenv.cfg
+.vscode
+.idea/misc.xml
+.idea/anomalab.iml
+__pycache__/KMeanClusterer.cpython-39.pyc
+output.csv
+.idea/*
+__pycache__
+.idea/anomalab.iml
+.idea/misc.xml
+__pycache__/DistanceFunctions.cpython-39.pyc
+__pycache__/KMeanClusterer.cpython-39.pyc
