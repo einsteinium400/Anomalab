@@ -4,6 +4,8 @@ from KMeanClusterer import KMeansClusterer
 from DistanceFunctions import *
 from utils import *
 from Elbow import elbow_method
+from LoadUtils import loadItemFromJson
+from AnomalyPredict import *
 
 # name of labeled file name. label is last coloumn
 LABLED_FILE_NAME = "dataset1/labeled_data.csv"  #todo: should be determant during running
@@ -30,3 +32,12 @@ clusterer = KMeansClusterer(num_means=k, distance=mixed_distance, repeats=9, mea
 clusterer.cluster(mixed_data)
 
 clusterer.store_model("storage.json")
+
+sample = loadItemFromJson('dataSample.json')
+if(checkSampleForAnomaly(clusterer,sample)):
+    print("Anomaly Detected")
+
+else:
+    print("Regular data")
+
+

@@ -1,68 +1,27 @@
 import json
+import KMeanClusterer
+def checkAnomaly(clusterJson):
+    return abs(clusterJson['average_cluster_distance']  >= (3*clusterJson['variance'] + clusterJson['average_cluster_distance']))
 
-EXAMPLE_PREDICT = {
-    "cluster": 0,
-    "distance": [
-        {
-            "cluster": 0,
-            "centroid_distance": 10,
-            "mean_distance": 5,
-            "deviation":1,
-            "mean_point":[
-                0,4,3,2,1,0
-            ]
-        },
-        {
-            "cluster": 1,
-            "centroid_distance": 20,
-            "mean_distance": 5,
-            "deviation":1,
-            "mean_point":[
-                0,4,3,2,1,0
-            ]
-        },
-        {
-            "cluster": 2,
-            "centroid_distance": 20,
-            "mean_distance": 5,
-            "deviation":1,
-            "mean_point":[
-                0,4,3,2,1,0
-            ]
-        },
-        {
-            "cluster": 3,
-            "centroid_distance": 30,
-            "mean_distance": 5,
-            "deviation":1,
-            "mean_point":[
-                0,4,3,2,1,0
-            ]
-        },
-        {
-            "cluster": 4,
-            "centroid_distance": 40,
-            "mean_distance": 5,
-            "deviation":1,
-            "mean_point":[
-                0,4,3,2,1,0
-            ]
+def mergeClassifcationData(model,classifedClusterIndex,classifedClusterDistancesInfo):
+        classicationData = {
+            "classifiedCluster": classifedClusterIndex,
         }
-    ]
-}
+        modelData = model.getModelData()
+        classicationData['fullClusteringInfo'] = modelData
+        for cluster in classicationData['fullClusteringInfo']['clusters_info']:
+            for singleClassficationData in classifedClusterDistancesInfo:
+                if(cluster['cluster'] == singleClassficationData['cluster']):
+                    cluster['distance_from_centroid'] = singleClassficationData['distance']
+        return classicationData
 
-
-def fakePredict(sample):
-    res = EXAMPLE_PREDICT
-    return res['cluster'], res
-def checkAnomaly(sample):
+def checkSampleForAnomaly(model,sample):
     fakeSample = sample
-    cluster,predData = fakePredict(fakeSample)
-    for clusterJson in predData['distance']:
+    cluster,distances = model.classify_vectorspace(fakeSample)
+    predictionFullData = mergeClassifcationData(model,cluster,distances)
+    for clusterJson in predictionFullData['fullClusteringInfo']['clusters_info']:
         if clusterJson['cluster'] == cluster:
-            if(abs(clusterJson['centroid_distance'] - clusterJson['mean_distance']) >= 3*clusterJson['deviation']):
-                print("ANOMALY")
+            if(checkAnomaly(clusterJson)):
+                return True
             else:
-                print("Not Anomaly")
-
-checkAnomaly(1)
+                return False

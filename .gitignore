@@ -14,3 +14,4 @@ __pycache__
 __pycache__/DistanceFunctions.cpython-39.pyc
 __pycache__/KMeanClusterer.cpython-39.pyc
 venv
+__pycache__
