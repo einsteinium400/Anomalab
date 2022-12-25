@@ -1,7 +1,11 @@
 import json
 import KMeanClusterer
+
 def checkAnomaly(clusterJson):
-    return abs(clusterJson['average_cluster_distance']  >= (3*clusterJson['variance'] + clusterJson['average_cluster_distance']))
+    print("Distance form centroid: ", clusterJson['distance_from_centroid'])
+    print("variance: ", 3*clusterJson['variance'])
+    print("average_cluster_distance: ",clusterJson['average_cluster_distance'] )
+    return abs(clusterJson['distance_from_centroid']  >= (3*clusterJson['variance'] + clusterJson['average_cluster_distance']))
 
 def mergeClassifcationData(model,classifedClusterIndex,classifedClusterDistancesInfo):
         classicationData = {
@@ -18,6 +22,8 @@ def mergeClassifcationData(model,classifedClusterIndex,classifedClusterDistances
 def checkSampleForAnomaly(model,sample):
     fakeSample = sample
     cluster,distances = model.classify_vectorspace(fakeSample)
+    print(distances)
+    print("Cluster", cluster)
     predictionFullData = mergeClassifcationData(model,cluster,distances)
     for clusterJson in predictionFullData['fullClusteringInfo']['clusters_info']:
         if clusterJson['cluster'] == cluster:

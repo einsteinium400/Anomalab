@@ -2,7 +2,7 @@ import json
 
 import numpy as np
 
-import utils
+import Moudles.Utils.utils as utils
 
 
 class KMeansClusterer:
@@ -27,6 +27,7 @@ class KMeansClusterer:
         self._average_distance_list = []
         self._clusters_info = []
         self._model_json_info = 0
+
     def createClusterJson(self):
         jsonData = {
             "wcss_score_of_model":self._wcss
@@ -47,6 +48,7 @@ class KMeansClusterer:
             )
         jsonData['clusters_info'] = listObj
         self._model_json_info = jsonData
+
     def getModelData(self):
         return self._model_json_info
 

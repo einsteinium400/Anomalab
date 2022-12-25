@@ -1,11 +1,11 @@
 from matplotlib import pyplot as plt
 
-from KMeanClusterer import KMeansClusterer
-from DistanceFunctions import *
-from utils import *
-from Elbow import elbow_method
-from LoadUtils import loadItemFromJson
-from AnomalyPredict import *
+from Moudles.Clustring.KMeanClusterer import KMeansClusterer
+from Moudles.Functions.DistanceFunctions import *
+from Moudles.Utils.utils import *
+from Moudles.Clustring.Elbow import elbow_method
+from Moudles.Utils.LoadUtils import loadItemFromJson
+from Moudles.Anomaly.AnomalyPredict import *
 
 # name of labeled file name. label is last coloumn
 LABLED_FILE_NAME = "dataset1/labeled_data.csv"  #todo: should be determant during running
@@ -30,14 +30,25 @@ k=elbow_method(mixed_distance,mixed_data,MIXED_DATA_MEAN_VALUES,MIXED_DATA_TYPE_
 clusterer = KMeansClusterer(num_means=k, distance=mixed_distance, repeats=9, mean_values=MIXED_DATA_MEAN_VALUES,
                             type_of_fields=MIXED_DATA_TYPE_OF_FIELDS)
 clusterer.cluster(mixed_data)
-
 clusterer.store_model("storage.json")
+
+
+clusterer2 = KMeansClusterer(num_means=k, distance=hamming, repeats=9, mean_values=MIXED_DATA_MEAN_VALUES,
+                            type_of_fields=MIXED_DATA_TYPE_OF_FIELDS)
+clusterer2.cluster(mixed_data)
+clusterer2.store_model("storage2.json")
 
 sample = loadItemFromJson('dataSample.json')
 if(checkSampleForAnomaly(clusterer,sample)):
-    print("Anomaly Detected")
+    print("Cluster: Anomaly Detected")
 
 else:
-    print("Regular data")
+    print("Cluster: Regular data")
+
+if(checkSampleForAnomaly(clusterer2,sample)):
+    print("Cluster2: Anomaly Detected")
+
+else:
+    print("Cluster2: Regular data")
 
 

@@ -13,6 +13,7 @@ def loadItemFromJson(fileName):
     f.close()
 
     itemList = list()
+    itemList.append(data["rand"])
     itemList.append(data["lymphatics"])
     itemList.append(data["block of affere"])
     itemList.append(data["bl. of lymph. c"])
@@ -32,6 +33,5 @@ def loadItemFromJson(fileName):
     itemList.append(data["exclusion of no"])
     itemList.append(data["no. of nodes in"])
     itemList.append(data["class"])
-    itemList.append(data["rand"])
     return itemList
     

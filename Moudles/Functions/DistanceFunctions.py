@@ -1,6 +1,8 @@
 from math import sqrt
 import numpy
 
+class DistanceFunction:
+    pass
 
 def hamming(u, v, type_values):
     distance = 0
