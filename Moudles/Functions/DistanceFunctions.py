@@ -1,8 +1,19 @@
 from math import sqrt
 import numpy
+from abc import ABC, abstractmethod
 
 class DistanceFunction:
-    pass
+    def __init__(
+            self,
+            name  # Function name
+            ):
+            self._name = name
+    @abstractmethod
+    def calculate(self,u, v, type_values):
+        pass
+
+    def getName(self):
+        return self._name
 
 def hamming(u, v, type_values):
     distance = 0

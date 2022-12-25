@@ -1,5 +1,5 @@
 import json
-import KMeanClusterer
+from Moudles.Clustring.KMeanClusterer import KMeansClusterer
 
 def checkAnomaly(clusterJson):
     print("Distance form centroid: ", clusterJson['distance_from_centroid'])
