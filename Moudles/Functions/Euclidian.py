@@ -1,4 +1,5 @@
 import numpy
+from math import sqrt
 from Moudles.Functions.DistanceFunctions import DistanceFunction
 
 

@@ -23,7 +23,7 @@ def checkSampleForAnomaly(model,sample):
     fakeSample = sample
     cluster,distances = model.classify_vectorspace(fakeSample)
     print(distances)
-    print("Cluster", cluster)
+    print("Classifed Cluster", cluster)
     predictionFullData = mergeClassifcationData(model,cluster,distances)
     for clusterJson in predictionFullData['fullClusteringInfo']['clusters_info']:
         if clusterJson['cluster'] == cluster:
