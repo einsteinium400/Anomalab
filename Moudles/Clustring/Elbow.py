@@ -1,5 +1,5 @@
-from KMeanClusterer import KMeansClusterer
-from DistanceFunctions import *
+from Moudles.Clustring.KMeanClusterer import KMeansClusterer
+from Moudles.Functions.DistanceFunctions import *
 import matplotlib.pyplot as plt
 
 import numpy as np
@@ -11,10 +11,10 @@ def elbow_method(distance, data, mean_values, type_of_fields):
         clusterer = KMeansClusterer(num_means=k, distance=distance, repeats=9, mean_values=mean_values,
                                     type_of_fields=type_of_fields)
         clusterer.cluster(data)
-        print(clusterer.get_wcss())
-        print(clusterer.get_means())
-        print(clusterer.get_variance())
-        print(clusterer.get_average_distance_list())
+        # print(clusterer.get_wcss())
+        # print(clusterer.get_means())
+        # print(clusterer.get_variance())
+        # print(clusterer.get_average_distance_list())
         wcss.append(clusterer.get_wcss())
 
     # plotting the points
