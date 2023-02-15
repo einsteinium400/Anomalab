@@ -1,0 +1,21 @@
+<MyLayout>
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width, root.height
+
+        spacing: 20 # between buttons
+        padding: 50 # only from margins
+        
+        Button:
+            text: "Hello Miri!"
+        
+        Button:
+            text: "Hi World!"
+        
+        Button:
+            text: "Bye Miri!"
+            pos_hint: {'center_x': 0.5}
+            size_hint: (0.5, 0.5)
+            #width: 200      #FIXED
+            #height: 50      #FIXED
+
