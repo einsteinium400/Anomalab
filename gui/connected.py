@@ -3,7 +3,7 @@ from kivy.app import App
 from kivy.uix.screenmanager import Screen, SlideTransition
 from kivy.lang import Builder
 
-Builder.load_file('connected.kv')
+Builder.load_file('gui/connected.kv')
 
 class Connected(Screen):
     def disconnect(self):
