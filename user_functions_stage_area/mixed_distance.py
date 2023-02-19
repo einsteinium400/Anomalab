@@ -1,20 +1,3 @@
-from math import sqrt
-import numpy
-
-
-def hamming(u, v, type_values):
-    distance = 0
-    for i in range(len(u)):
-        if v[i] != u[i]:
-            distance += 1
-    return distance
-
-
-def euclidean_distance(u, v, type_values):
-    diff = u - v
-    return sqrt(numpy.dot(diff, diff))
-
-
 def mixed_distance(u, v, type_values):
     distance = 0
 
@@ -28,3 +11,4 @@ def mixed_distance(u, v, type_values):
             distance += abs(u[i] - v[i])
 
     return distance
+
