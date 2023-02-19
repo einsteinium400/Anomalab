@@ -1,32 +1,60 @@
-from matplotlib import pyplot as plt
+import os
+import pandas as pd
+from dotenv import load_dotenv
 
-from KMeanClusterer import KMeansClusterer
-from DistanceFunctions import *
-from utils import *
-from Elbow import elbow_method
+from Moudles.Databases.Dataset import Dataset
+from Moudles.Storage.StorageFactory import StorageFactory
+from Moudles.Storage.OperationsLocal import OperationsLocal
+from Moudles.Users.User import User
+from Moudles.Users.UsersController import UsersController
 
-# name of labeled file name. label is last coloumn
-LABLED_FILE_NAME = "dataset1/labeled_data.csv"
+load_dotenv()
+MY_ENV_VAR = os.getenv('STORAGE')
+# df1 = pd.read_csv('dataset2/adult.data2')
 
-# max value for each feature by index
-CATEGORICAL_DATA_MEAN_VALUES = [4, 2, 2, 2, 2, 2, 2, 2, 4, 4, 3, 4, 4, 8, 3, 2, 2, 8, 4]
-MIXED_DATA_MEAN_VALUES = [15, 4, 2, 2, 2, 2, 2, 2, 2, 4, 4, 3, 4, 4, 8, 3, 2, 2, 8, 4]
+# dataSet1 = Dataset('adult', df1)
+# # dataSet1 = Dataset('adult')
+# print(dataSet1._id)
+# print(dataSet1._name)
+# print(dataSet1._timeStamp)
+# print(dataSet1._bestModel)
+# print(dataSet1._featureNames)
+# dataSet1.AddImportantFeature('age')
+# print(dataSet1._importantFeatures)
+# # print(dataSet1._jsonData)
 
-# True means categorical value. False means numeric value.
-CATEGORIC_DATA_TYPE_OF_FIELDS = [True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True,
-                                 True, True, True]
+df2 = pd.read_csv('dataset1/dataWithHeaders.data')
+print(df2.values.tolist())
 
-MIXED_DATA_TYPE_OF_FIELDS = [False,True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True,
-                                 True, True, True]
+dataSet2 = Dataset('lympho', df2)
+# # dataSet2 = Dataset('lympho')
+print(dataSet2._id)
+print(dataSet2._name)
+print(dataSet2._timeStamp)
+print(dataSet2._bestModel)
+print(dataSet2._featureNames)
+dataSet2.AddImportantFeature('age')
+print(dataSet2._importantFeatures)
+print(dataSet2._jsonData)
 
-categoric_data = [numpy.array(f) for f in csv_to_nested_list("dataset1\labeled_data.csv")]
-mixed_data = [numpy.array(f) for f in csv_to_nested_list("dataset1\labeled_data_numeric.csv")]
+operationFactory = StorageFactory()
+saver = operationFactory.CreateOperationItem()
+# print(saver.getPath())
+# saver.Save(dataSet2._name, dataSet2._jsonData, "DATASET")
+data = saver.Load(dataSet2._name, "DATASET")
+print(data)
 
-# check elbow for mixed data
-k=elbow_method(mixed_distance,mixed_data,MIXED_DATA_MEAN_VALUES,MIXED_DATA_TYPE_OF_FIELDS)
+# myuser = User("mishasoni","456","regular")
+# myuser.SaveUser()
+# print(myuser.VerifyPassword("123"))
+# print(myuser.VerifyPassword("456"))
+# saver.Delete("mishasoni","USER")
 
-clusterer = KMeansClusterer(num_means=k, distance=mixed_distance, repeats=9, mean_values=MIXED_DATA_MEAN_VALUES,
-                            type_of_fields=MIXED_DATA_TYPE_OF_FIELDS)
-clusterer.cluster(mixed_data)
+# userController = UsersController()
+# userController.RegisterUser("noam","123",0)
+# userController.RegisterUser("misha","456",0)
+# print((userController.GetAllUsers()))
+# print(userController.DeleteUser("misha"))
+# print(userController.LoginUser("noam","123"))
+# print(userController.LoginUser("misha","123"))
 
-clusterer.store_model("storage.json")
