@@ -2,7 +2,8 @@ import json
 
 import numpy as np
 
-import utils
+import Moudles.Utils.utils as utils
+import Moudles.Functions.DistanceFunctions
 
 
 class KMeansClusterer:
@@ -25,22 +26,39 @@ class KMeansClusterer:
         self._wcss = None
         self._variance_list = []
         self._average_distance_list = []
+        self._clusters_info = []
+        self._model_json_info = 0
 
-    def store_model(self, filename):
+    def createClusterJson(self):
+        jsonData = {
+            "wcss_score_of_model":self._wcss,
+            "function": self._distance.getName()
+        }
         listObj = []
-        listObj.append({"wcss_score_of_model":self._wcss})
         for i in range(len(self._means)):
+            cluster_info_list = []
+            for item in self._clusters_info[i]:
+                cluster_info_list.append(item.tolist())
             listObj.append(
                 {
                     "cluster": i,
                     "average_cluster_distance": self._average_distance_list[i],
                     "variance": self._variance_list[i],
                     "mean": self._means[i].tolist(),
+                    "dataPoints":cluster_info_list
                 }
             )
+        jsonData['clusters_info'] = listObj
+        self._model_json_info = jsonData
+
+    def getModelData(self):
+        return self._model_json_info
+
+    def store_model(self, filename):
+        jsonData = self.getModelData()
 
         with open(filename, 'w') as json_file:
-            json.dump(listObj, json_file,
+            json.dump(jsonData, json_file,
                       indent=4,
                       separators=(',', ': '))
 
@@ -48,7 +66,6 @@ class KMeansClusterer:
     def cluster(self, vectors):
         # call abstract method to cluster the vectors
         self.cluster_vectorspace(vectors)
-    #
 
 
     # calculates the mean of a cluster
@@ -99,7 +116,7 @@ class KMeansClusterer:
         wcss = 0
         for index in range(len(clusters)):
             for vec in clusters[index]:
-                wcss += self._distance(vec, self._means[index],self._type_of_fields) ** 2
+                wcss += self._distance.calculate(vec, self._means[index],self._type_of_fields) ** 2
 
         self._wcss = wcss
 
@@ -112,14 +129,14 @@ class KMeansClusterer:
         for index in range(len(clusters)):
             self._average_distance_list[index] = 0
             for vec in clusters[index]:
-                self._average_distance_list[index] += self._distance(vec, self._means[index],self._type_of_fields)
+                self._average_distance_list[index] += self._distance.calculate(vec, self._means[index],self._type_of_fields)
             self._average_distance_list[index] /= len(clusters[index])
 
         # calculate variance
         for index in range(len(clusters)):
             self._variance_list[index] = 0
             for vec in clusters[index]:
-                distance_of_element_from_mean = self._distance(vec, self._means[index],self._type_of_fields)
+                distance_of_element_from_mean = self._distance.calculate(vec, self._means[index],self._type_of_fields)
 
                 self._variance_list[index] += (distance_of_element_from_mean - self._average_distance_list[index]) ** 2
             self._variance_list[index] /= len(clusters[index])
@@ -127,7 +144,7 @@ class KMeansClusterer:
     def _sum_distances(self, vectors1, vectors2):
         difference = 0.0
         for u, v in zip(vectors1, vectors2):
-            difference += self._distance(u, v,self._type_of_fields)
+            difference += self._distance.calculate(u, v,self._type_of_fields)
         return difference
 
     # cluster the data given to kmeans
@@ -171,7 +188,7 @@ class KMeansClusterer:
                 # the cluster means
                 clusters = [[] for m in range(self._num_means)]
                 for vector in vectors:
-                    index = self.classify_vectorspace(vector)
+                    index,distances = self.classify_vectorspace(vector)
                     clusters[index].append(vector)
 
                 # recalculate cluster means by computing the centroid of each cluster
@@ -190,17 +207,25 @@ class KMeansClusterer:
 
                     # calculate variance and average distance
                     self._variance_average_calculate(clusters)
-
+            self._clusters_info = clusters
+            self.createClusterJson()
         else:
             pass  # todo: return error here
-
+    
     def classify_vectorspace(self, vector):
         # finds the closest cluster centroid
         # returns that cluster's index
         best_distance = best_index = None
+        distances = []
         for index in range(len(self._means)):
             mean = self._means[index]
-            dist = self._distance(vector, mean,self._type_of_fields)
+            dist = self._distance.calculate(vector, mean,self._type_of_fields)
+            cluster_info = {
+                "cluster":index,
+                "distance": dist
+            }
+            distances.append(cluster_info)
             if best_distance is None or dist < best_distance:
                 best_index, best_distance = index, dist
-        return best_index
+        
+        return best_index,distances
