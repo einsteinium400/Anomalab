@@ -7,6 +7,9 @@ from gui.login import Login
 from gui.connected import Connected
 from gui.selectdataset import SelectDataset
 from gui.insertquery import InsertQuery
+from gui.regularresults import RegularResults
+from gui.dataanalystmenu import DataAnalystMenu
+from gui.datasetsmanager import DatasetsManager
 
 class AnomalabApp(App):
     username = StringProperty(None)
@@ -22,6 +25,9 @@ class AnomalabApp(App):
         manager.add_widget(Connected(name='connected'))
         manager.add_widget(SelectDataset(name='selectdataset'))
         manager.add_widget(InsertQuery(name='insertquery'))
+        manager.add_widget(RegularResults(name='regularresults'))
+        manager.add_widget(DataAnalystMenu(name='dataanalystmenu'))
+        manager.add_widget(DatasetsManager(name='datasetsmanager'))
 
          ##by default return the first widget to be added
         return manager

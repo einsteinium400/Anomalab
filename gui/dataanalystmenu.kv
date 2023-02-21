@@ -1,0 +1,37 @@
+#:kivy 2.1
+
+<DataAnalystMenu>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: [10,50,10,50]
+        spacing: 50
+
+        Image:
+            source: 'gui/images/logo.jpg'
+
+        Label:
+            id: header
+            text: "Data Analyst Menu"
+            font_size: 32
+            
+        GridLayout:
+            size: root.width - 10, root.height -10
+            cols: 2
+            Button:
+                text: 'Try Query'
+                font_size: 24
+                on_press: root.on_query()
+            Button:
+                text: 'Manage Datasets'
+                font_size: 24
+                on_press: root.on_datasets()
+            Button:
+                text: 'Manage Distance Functions'
+                font_size: 24
+                on_press: root.on_distancefunctions()
+            Button:
+                text: 'Update Models'
+                font_size: 24
+                on_press: root.on_models()
+
+        

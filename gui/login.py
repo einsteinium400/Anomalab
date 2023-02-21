@@ -23,13 +23,13 @@ class Login(Screen):
 
         ##PUT LOGIN FUNCTION
         ## TRY AND CATCH
-        app.usertype = 1
+        app.usertype = 2
         if (app.usertype > 0):
             self.manager.transition = SlideTransition(direction="left")
             if (app.usertype == 1):
                 self.manager.current = 'selectdataset'
             elif (app.usertype == 2):
-                self.manager.current = 'connected'
+                self.manager.current = 'dataanalystmenu'
             elif (app.usertype == 3):
                 self.manager.current = 'connected'
         else:

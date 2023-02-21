@@ -1,38 +1,28 @@
 #:kivy 2.1
 
-<InsertQuery>:
+<RegularResults>:
     BoxLayout:
         orientation: 'vertical'
         padding: [10,50,10,50]
         spacing: 50
-        id: layout
 
         Image:
             source: 'gui/images/logo.jpg'
 
-        Button:
-            id: load_button
-            text: "load form"
+        Label:
+            text: "Here come the results"
             font_size: 32
-            on_press: root.create_attributes_form()
-
-        GridLayout:
-            size: root.width - 10, root.height -10
-            cols: 2
-            id: attributes_box
-        
+            
         GridLayout:
             size: root.width - 10, root.height -10
             cols: 2
             Button:
-                text: 'Apply'
+                text: 'Another Query'
                 font_size: 24
                 on_press: root.on_apply()
             Button:
-                text: 'Back'
+                text: 'Choose Dataset'
                 font_size: 24
                 on_press: root.on_back()
-    
-    
 
         

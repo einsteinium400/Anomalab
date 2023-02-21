@@ -19,6 +19,7 @@ class InsertQuery(Screen):
     attributesRefs = []
     def create_attributes_form(self):
         ##HERE NEED TO READ ATTRIBUTES TABLE
+        self.ids.layout.remove_widget(self.ids.load_button)
         attributesNumber=3
         attributesNames=["attribute1","attribute2","attribute3"]
         attributeTypes=[0,0,1]
@@ -37,7 +38,7 @@ class InsertQuery(Screen):
         for i in range(len(self.attributesRefs)):
             print (self.attributesRefs[i].text),
         self.manager.transition = SlideTransition(direction="left")
-        self.manager.current = 'connected'
+        self.manager.current = 'regularresults'
         
 
     def on_back(self):
