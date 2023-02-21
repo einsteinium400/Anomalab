@@ -1,0 +1,265 @@
+#:kivy 2.1
+#:import Factory kivy.factory.Factory
+# ---1---
+<Login>:
+    name: "login"
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width, root.height
+        padding: [10,50,10,50]
+        spacing: 50
+        Image:
+            source: app.icon
+        MDLabel:
+            id: header
+            text: "LOGIN"
+            font_size: 40
+            halign: 'center'
+            padding_y: 15
+        MDTextField:
+            id: user_name
+            mode: "round"
+            hint_text: "username"
+            icon_right: "account"
+            size_hint_x: None
+            width: 200
+            font_size: 18
+            pos_hint: {"center_x": 0.5}
+        MDTextField:
+            id: user_pass
+            mode: "round"
+            hint_text: "password"
+            icon_right: "eye-off"
+            size_hint_x: None
+            width: 200
+            font_size: 18
+            pos_hint: {"center_x": 0.5}
+            password: True
+        MDRoundFlatButton:
+            text: "LOGIN"
+            font_size: 12
+            pos_hint: {"center_x": 0.5}
+            on_release: root.do_login(user_name.text, user_pass.text)
+# ---2---
+<ChooseDataset>:
+    name: "choosedataset"
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width, root.height
+        padding: [10,50,10,50]
+        spacing: 50
+        Image:
+            source: app.icon
+        MDLabel:
+            id: header
+            text: "CHOOSE DATASET"
+            font_size: 40
+            halign: 'center'
+            padding_y: 15
+# ---3---
+<Query>:
+    name: "query"
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width, root.height
+        padding: [10,50,10,50]
+        spacing: 50
+        Image:
+            source: app.icon
+        MDLabel:
+            id: header
+            text: "QUERY"
+            font_size: 40
+            halign: 'center'
+            padding_y: 15
+# ---4---
+<Results>:
+    name: "results"
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width, root.height
+        padding: [10,50,10,50]
+        spacing: 50
+        Image:
+            source: app.icon
+        MDLabel:
+            id: header
+            text: "RESULTS"
+            font_size: 40
+            halign: 'center'
+            padding_y: 15
+# ---5---
+<DataAnalystMenu>:
+    name: "dataanalysmenu"
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width, root.height
+        padding: [10,50,10,50]
+        spacing: 50
+        Image:
+            source: app.icon
+        MDLabel:
+            id: header
+            text: "ANALYST MENU"
+            font_size: 40
+            halign: 'center'
+            padding_y: 15
+        GridLayout:
+            size: root.width - 10, root.height -10
+            cols: 2
+            Button:
+                text: 'Try Query'
+                font_size: 24
+            Button:
+                text: 'Manage Datasets'
+                font_size: 24
+            Button:
+                text: 'Manage Distance Functions'
+                font_size: 24
+            Button:
+                text: 'Update Models'
+                font_size: 24
+# ---6---
+<ManageDatasets>:
+    name: "managedatasets"
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width, root.height
+        padding: [10,50,10,50]
+        spacing: 50
+        Image:
+            source: app.icon
+        MDLabel:
+            id: header
+            text: "MANAGE DATASETS"
+            font_size: 40
+            halign: 'center'
+            padding_y: 15
+# ---7---
+<CrudDatasets>:
+    name: "cruddatasets"
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width, root.height
+        padding: [10,50,10,50]
+        spacing: 50
+        Image:
+            source: app.icon
+        MDLabel:
+            id: header
+            text: "DATASET CRUD"
+            font_size: 40
+            halign: 'center'
+            padding_y: 15
+# ---8---
+<ManageDistanceFunctions>:
+    name: "managedistancefunctions"
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width, root.height
+        padding: [10,50,10,50]
+        spacing: 50
+        Image:
+            source: app.icon
+        MDLabel:
+            id: header
+            text: "DATASET CRUD"
+            font_size: 40
+            halign: 'center'
+            padding_y: 15
+# ---9---
+<CrudDistanceFunctions>:
+    name: "cruddistancefunctions"
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width, root.height
+        padding: [10,50,10,50]
+        spacing: 50
+        Image:
+            source: app.icon
+        MDLabel:
+            id: header
+            text: "DISTANCE FUNCTIONS CRUD"
+            font_size: 40
+            halign: 'center'
+            padding_y: 15
+# ---10---
+<UpdateModels>:
+    name: "updatemodels"
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width, root.height
+        padding: [10,50,10,50]
+        spacing: 50
+        Image:
+            source: app.icon
+        MDLabel:
+            id: header
+            text: "Update Models"
+            font_size: 40
+            halign: 'center'
+            padding_y: 15
+# ---11---
+<ManageUsers>:
+    name: "manageusers"
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width, root.height
+        padding: [10,50,10,50]
+        spacing: 50
+        Image:
+            source: app.icon
+        MDLabel:
+            id: header
+            text: "MANAGE USERS"
+            font_size: 40
+            halign: 'center'
+            padding_y: 15
+# ---12---
+<CrudUser>:
+    name: "cruduser"
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width, root.height
+        padding: [10,50,10,50]
+        spacing: 50
+        Image:
+            source: app.icon
+        MDLabel:
+            id: header
+            text: "USER CRUD"
+            font_size: 40
+            halign: 'center'
+            padding_y: 15
+# ---13---
+<ChooseModels>:
+    name: "choosemodels"
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width, root.height
+        padding: [10,50,10,50]
+        spacing: 50
+        Image:
+            source: app.icon
+        MDLabel:
+            id: header
+            text: "CHOOSE MODELS"
+            font_size: 40
+            halign: 'center'
+            padding_y: 15
+# ---14---
+<AnalystResults>:
+    name: "analystresults"
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width, root.height
+        padding: [10,50,10,50]
+        spacing: 50
+        Image:
+            source: app.icon
+        MDLabel:
+            id: header
+            text: "ANALYST RESULTS"
+            font_size: 40
+            halign: 'center'
+            padding_y: 15
