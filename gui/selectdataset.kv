@@ -1,0 +1,30 @@
+#:kivy 2.1
+
+<SelectDataset>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: [10,50,10,50]
+        spacing: 50
+
+        Image:
+            source: 'gui/images/logo.jpg'
+
+        Label:
+            id: header
+            text: "Choose Dataset"
+            font_size: 32
+
+        Spinner:
+            id: spinner_id
+            text: "Choose Dataset"
+            values: root.datasetsName
+
+        Label:
+            text: ''
+
+        Button:
+            text: 'Apply'
+            font_size: 24
+            on_press: root.on_apply(spinner_id.text)
+
+        

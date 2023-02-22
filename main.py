@@ -1,87 +1,60 @@
-# Natural Language Toolkit: K-Means Clusterer
-#
-# Copyright (C) 2001-2022 NLTK Project
-# Author: Trevor Cohn <tacohn@cs.mu.oz.au>
-# URL: <https://www.nltk.org/>
-# For license information, see LICENSE.TXT
+import os
+import pandas as pd
+from dotenv import load_dotenv
 
-# todo: handle exception of "no centroid defined for empty cluster." which means one cluster is empty
-# todo: make sure there are no duplicates in input
-# todo: complete accuracy test
-import csv
-from KMeanClusterer import *
-from DistanceFunctions import *
+from Moudles.Databases.Dataset import Dataset
+from Moudles.Storage.StorageFactory import StorageFactory
+from Moudles.Storage.OperationsLocal import OperationsLocal
+from Moudles.Users.User import User
+from Moudles.Users.UsersController import UsersController
 
-# number of means. USER SETS THIS VALUE IN UI
-K = 4
-# name of unlabeled csv file
-UNLABELED_FILE_NAME = "dataset1/lymphography.csv"
-# name of labeled file name. label is last coloumn
-LABLED_FILE_NAME = "dataset1/labeled_data.csv"
+load_dotenv()
+MY_ENV_VAR = os.getenv('STORAGE')
+# df1 = pd.read_csv('dataset2/adult.data2')
 
-# max value for each feature by index
-MEAN_VALUES = [4, 2, 2, 2, 2, 2, 2, 2, 4, 4, 3, 4, 4, 8, 3, 2, 2, 8]
-# True means categorical value. False means numeric value.
-TYPE_OF_FIELDS = [True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True,
-                  True, True]
+# dataSet1 = Dataset('adult', df1)
+# # dataSet1 = Dataset('adult')
+# print(dataSet1._id)
+# print(dataSet1._name)
+# print(dataSet1._timeStamp)
+# print(dataSet1._bestModel)
+# print(dataSet1._featureNames)
+# dataSet1.AddImportantFeature('age')
+# print(dataSet1._importantFeatures)
+# # print(dataSet1._jsonData)
 
+df2 = pd.read_csv('dataset1/dataWithHeaders.data')
+print(df2.values.tolist())
 
-def csv_to_nested_list(file_name):
-    with open(file_name, 'r') as read_obj:
-        # Return a reader object which will
-        # iterate over lines in the given csvfile
-        csv_reader = csv.reader(read_obj)
-        # convert string to list
-        list_of_csv = list(csv_reader)
-        new_lst = [[int(x) for x in inner] for inner in list_of_csv]
-        return new_lst
+dataSet2 = Dataset('lympho', df2)
+# # dataSet2 = Dataset('lympho')
+print(dataSet2._id)
+print(dataSet2._name)
+print(dataSet2._timeStamp)
+print(dataSet2._bestModel)
+print(dataSet2._featureNames)
+dataSet2.AddImportantFeature('age')
+print(dataSet2._importantFeatures)
+print(dataSet2._jsonData)
 
+operationFactory = StorageFactory()
+saver = operationFactory.CreateOperationItem()
+# print(saver.getPath())
+# saver.Save(dataSet2._name, dataSet2._jsonData, "DATASET")
+data = saver.Load(dataSet2._name, "DATASET")
+print(data)
 
-# the label should be the last feature!
-def test_accuracy(clusterer, unlabeled_data_file, labeled_data_file):
-    unlabeled_samples = csv_to_nested_list(unlabeled_data_file)
-    labeled_samples = csv_to_nested_list(labeled_data_file)
-    print("stiff")
-    print(unlabeled_samples)
-    print(labeled_samples)
-    algorithm_result = []
-    for unlabeled_sample, labeled_sample in zip(unlabeled_samples, labeled_samples):
-        vector = numpy.array(unlabeled_sample)
-        result = clusterer.classify(vector)
-        # append sample with the model result label
-        unlabeled_sample.append(result)
-        # append sample with actual label
-        unlabeled_sample.append(labeled_sample[-1])
-        algorithm_result.append(unlabeled_sample)
-    print(algorithm_result) #todo: מיכאל זו הרשימה שהאיבר האחרון זה הקטלוג האמיתי והאיבר לפני אחרון זה קטלוג מהמודל
+# myuser = User("mishasoni","456","regular")
+# myuser.SaveUser()
+# print(myuser.VerifyPassword("123"))
+# print(myuser.VerifyPassword("456"))
+# saver.Delete("mishasoni","USER")
 
-    # this might be unnecessary
-    # write labeled results in file
-    myFile = open('output.csv', 'w')
-    writer = csv.writer(myFile)
-    for data_list in algorithm_result:
-        writer.writerow(data_list)
-    myFile.close()
+#userController = UsersController()
+#userController.RegisterUser("noam","123",0)
+# userController.RegisterUser("misha","456",0)
+# print((userController.GetAllUsers()))
+# print(userController.DeleteUser("misha"))
+# print(userController.LoginUser("noam","123"))
+# print(userController.LoginUser("misha","123"))
 
-
-def main():
-    vectors = [numpy.array(f) for f in csv_to_nested_list(UNLABELED_FILE_NAME)]
-    print("vectors:", vectors)
-    clusterer = KMeansClusterer(num_means=K, distance=hamming, repeats=3, mean_values=MEAN_VALUES,
-                                type_of_fields=TYPE_OF_FIELDS)
-    clusters = clusterer.cluster(vectors, True)
-    print("Clustered:", vectors)
-    print("As:", clusters)
-    print("Means:", clusterer.means())
-
-    test_accuracy(clusterer, UNLABELED_FILE_NAME, LABLED_FILE_NAME)
-
-    # classify a new vector
-    # vector = numpy.array([3, 3])
-    # print("classify(%s):" % vector, end=" ")
-    # print(clusterer.classify(vector))
-    print()
-
-
-if __name__ == "__main__":
-    main()
