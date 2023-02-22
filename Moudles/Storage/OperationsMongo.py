@@ -34,7 +34,15 @@ class OperationsMongo(Operations.Operations):
         return collection.find_one(query)
 
     def Delete(self, name, type):
-        pass
+        collection = self.PROJECTDB[COLLECTION_DICT[type]]
+        query = {"name": name}
+        collection.delete_one(query)
 
     def GetList(self, type):
-        pass
+        collection = self.PROJECTDB[COLLECTION_DICT[type]]
+        mongoList = collection.find()
+
+        finalNamesList = []
+        for item in mongoList:
+            finalNamesList.append(item['name'])
+        return finalNamesList

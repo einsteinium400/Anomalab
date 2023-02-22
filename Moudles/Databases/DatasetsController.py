@@ -1,3 +1,4 @@
+from Moudles.Models.ModelController import ModelsController
 from Moudles.Storage.StorageFactory import StorageFactory
 from Moudles.Databases.Dataset import Dataset
 import pandas as pd
@@ -19,6 +20,10 @@ class DatasetsController:
         operationFactory = StorageFactory()
         self.storage = operationFactory.CreateOperationItem()
         return self.storage.GetList("DATASET")
+
+    def SetBestModel(self,databaseName,modelName):
+        modelsController = ModelsController()
+        self.GetDataset(databaseName).BestModel = modelsController.GetModel(modelName)
 
     def GetDataset(self, DatasetName):
         dataSetsList = self.GetAllDatasetsNamesList()

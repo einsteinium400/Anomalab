@@ -4,7 +4,6 @@ import os
 import uuid
 import pandas as pd
 import time
-from dotenv import load_dotenv
 
 from Moudles.Storage.StorageFactory import StorageFactory
 
@@ -45,12 +44,10 @@ class Dataset:
         else:
             self._name = name
             self._jsonData = self.LoadDataset()
-            print(self._jsonData)
-            print(type(self._jsonData))
             self._id = self._jsonData['id']
             self._timeStamp = self._jsonData['timestamp']
             self._featureNames = self._jsonData['featureNames']
-            self._data = self._jsonData.featureNames['data']
+            self._data = self._jsonData['data']
             self._importantFeatures = self._jsonData['featureNames']
             self._bestModel = self._jsonData['bestmodel']
         # left to put other things
