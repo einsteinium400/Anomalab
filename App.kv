@@ -1,265 +1,436 @@
 #:kivy 2.1
 #:import Factory kivy.factory.Factory
+
+# ---HEADER WIDGETS---
+<LogoImage@Image>:
+    source: app.logo
+    pos_hint: {"center_x": 0.5}
+<HeaderText@MDLabel>:
+    id: header
+    font_size: 40
+    halign: "center"
+# ---GENERAL INPUT
+<TextInput@MDTextField>:
+    mode: "round"
+    reuired: True
+    helper_text_mode: "on_error"
+    helper_text: "This field is required"
+    max_text_length: 30
+    multiline: False
+    hint_text: "color_mode = 'accent'"
+    color_mode: 'accent'
+# ---FOOTER BUTTONS
+<FooterButton@MDFillRoundFlatButton>:
+    font_size: 25
+# ---FORMS WIDGETS---
+
+# ---SECTIONS---
+<Window@MDFloatLayout>:
+    size: root.width, root.height
+<Header@MDBoxLayout>:
+    orientation: "vertical"
+    pos_hint: {"x":0, "top": 1}
+    size_hint: (1, 0.2)
+    spacing: 10
+    canvas.before:
+        Color:
+            rgba: (0,1,0,1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+<Main@MDBoxLayout>:
+    id: main
+    orientation: "vertical"
+    pos_hint: {"x":0, "top": 0.8}
+    size_hint: (1, 0.6)
+    spacing: 20
+    canvas.before:
+        Color:
+            rgba: (1,0,0,1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+<Footer@MDFloatLayout>:
+    id: footer
+    pos_hint: {"x":0, "top": 0.2}
+    size_hint: (1, 0.2)
+    canvas.before:
+        Color:
+            rgba: (0,0,1,1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+
 # ---1---
 <Login>:
     name: "login"
-    BoxLayout:
-        orientation: "vertical"
-        size: root.width, root.height
-        padding: [10,50,10,50]
-        spacing: 50
-        Image:
-            source: app.icon
-        MDLabel:
-            id: header
-            text: "LOGIN"
-            font_size: 40
-            halign: 'center'
-            padding_y: 15
-        MDTextField:
-            id: user_name
-            mode: "round"
-            hint_text: "username"
-            icon_right: "account"
-            size_hint_x: None
-            width: 200
-            font_size: 18
-            pos_hint: {"center_x": 0.5}
-        MDTextField:
-            id: user_pass
-            mode: "round"
-            hint_text: "password"
-            icon_right: "eye-off"
-            size_hint_x: None
-            width: 200
-            font_size: 18
-            pos_hint: {"center_x": 0.5}
-            password: True
-        MDRoundFlatButton:
-            text: "LOGIN"
-            font_size: 12
-            pos_hint: {"center_x": 0.5}
-            on_release: root.do_login(user_name.text, user_pass.text)
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                text: "Login"
+        Main:
+            padding: 0,0,0,(0.5*self.height)-60
+            MDTextField:
+                id: user_name
+                hint_text: "username"
+                logo_right: "account"
+                size_hint_x: 0.5
+                pos_hint: {"center_x": 0.5}
+                font_size: 25
+                               
+            MDTextField:
+                id: user_pass
+                hint_text: "password"
+                logo_right: "eye-off"
+                size_hint_x: 0.5
+                font_size: 25
+                pos_hint: {"center_x": 0.5}
+                password: True
+        Footer:
+            FooterButton:
+                text: "LOGIN"
+                pos_hint: {"x":0.4, "top": 0.6}
+                size_hint: (0.2, 0.4)
+                on_release: root.do_login(user_name.text, user_pass.text)
 # ---2---
 <ChooseDataset>:
     name: "choosedataset"
-    BoxLayout:
-        orientation: "vertical"
-        size: root.width, root.height
-        padding: [10,50,10,50]
-        spacing: 50
-        Image:
-            source: app.icon
-        MDLabel:
-            id: header
-            text: "CHOOSE DATASET"
-            font_size: 40
-            halign: 'center'
-            padding_y: 15
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                text: "Choose Dataset"
+        Main:
+            padding: 0,0,0,(0.5*self.height)-50
+            Spinner:
+                id: spinner_id
+                text: "Choose Dataset"
+                values: root.datasetsName
+                size_hint: 0.5, None
+                size_y: 100
+                pos_hint: {"center_x": 0.5}
+        Footer:
+            FooterButton:
+                text: "Apply"
+                pos_hint: {"x":0.4, "top": 0.6}
+                size_hint: (0.2, 0.4)
+                on_press: root.on_choose(spinner_id.text)
 # ---3---
 <Query>:
     name: "query"
-    BoxLayout:
-        orientation: "vertical"
-        size: root.width, root.height
-        padding: [10,50,10,50]
-        spacing: 50
-        Image:
-            source: app.icon
-        MDLabel:
-            id: header
-            text: "QUERY"
-            font_size: 40
-            halign: 'center'
-            padding_y: 15
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                text: "Insert Query"
+        Main:
+            GridLayout:
+                size: root.width - 10, root.height -10
+                cols: 2
+                id: attributes_box
+        Footer:
+            FooterButton:
+                text: 'Apply'
+                pos_hint: {"x":0.25, "top": 0.6}
+                size_hint: (0.2, 0.4)
+                on_press: root.on_apply()
+            FooterButton:
+                text: 'Back'
+                pos_hint: {"x":0.55, "top": 0.6}
+                size_hint: (0.2, 0.4)
+                on_press: root.on_back()
 # ---4---
 <Results>:
     name: "results"
-    BoxLayout:
+    MDBoxLayout:
         orientation: "vertical"
         size: root.width, root.height
-        padding: [10,50,10,50]
-        spacing: 50
-        Image:
-            source: app.icon
-        MDLabel:
-            id: header
-            text: "RESULTS"
-            font_size: 40
-            halign: 'center'
-            padding_y: 15
+        padding: [10,10,10,10]
+        spacing: 20
+        MDBoxLayout:
+            orientation: "vertical"
+            size: (root.width, 100)
+            size_hint: (None, None)
+            Image:
+                source: app.logo
+            MDLabel:
+                id: header
+                text: "RESULTS"
+                font_size: 40
+                halign: 'center'
+                padding_y: 15
+                size: 200,50
 # ---5---
 <DataAnalystMenu>:
     name: "dataanalysmenu"
-    BoxLayout:
+    MDBoxLayout:
         orientation: "vertical"
         size: root.width, root.height
-        padding: [10,50,10,50]
-        spacing: 50
-        Image:
-            source: app.icon
-        MDLabel:
-            id: header
-            text: "ANALYST MENU"
-            font_size: 40
-            halign: 'center'
-            padding_y: 15
+        padding: [10,10,10,10]
+        spacing: 20
+        MDBoxLayout:
+            orientation: "vertical"
+            size: (root.width, 100)
+            size_hint: (None, None)
+            Image:
+                source: app.logo
+            MDLabel:
+                id: header
+                text: "MENU"
+                font_size: 40
+                halign: 'center'
+                padding_y: 15
+                size: 200,50
         GridLayout:
-            size: root.width - 10, root.height -10
+            size: root.width*0.8, root.height*0.8
+            size_hint: (None, None)
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
             cols: 2
-            Button:
+            padding : 10
+            MDRoundFlatButton:
+                size: root.width*0.3, root.height*0.3
                 text: 'Try Query'
-                font_size: 24
-            Button:
+                font_size: 18
+                on_release: root.chooseScreen("choosedataset")
+            MDRoundFlatButton:
+                size: root.width*0.3, root.height*0.3
                 text: 'Manage Datasets'
-                font_size: 24
-            Button:
+                font_size: 18
+                on_release: root.chooseScreen("managedatasets")
+            MDRoundFlatButton:
+                size: root.width*0.3, root.height*0.3
                 text: 'Manage Distance Functions'
-                font_size: 24
-            Button:
+                font_size: 18
+                on_release: root.chooseScreen("managedistancefunctions")
+            MDRoundFlatButton:
+                size: root.width*0.3, root.height*0.3
                 text: 'Update Models'
-                font_size: 24
+                font_size: 18
+                on_release: root.chooseScreen("updatemodels")
 # ---6---
 <ManageDatasets>:
     name: "managedatasets"
-    BoxLayout:
+    MDBoxLayout:
         orientation: "vertical"
         size: root.width, root.height
-        padding: [10,50,10,50]
-        spacing: 50
-        Image:
-            source: app.icon
-        MDLabel:
-            id: header
-            text: "MANAGE DATASETS"
-            font_size: 40
-            halign: 'center'
-            padding_y: 15
+        padding: [10,10,10,10]
+        spacing: 20
+        MDBoxLayout:
+            orientation: "vertical"
+            size: (root.width, 100)
+            size_hint: (None, None)
+            Image:
+                source: app.logo
+            MDLabel:
+                id: header
+                text: "MANAGE DATASETS"
+                font_size: 40
+                halign: 'center'
+                padding_y: 15
+                size: 200,50
+        MDBoxLayout:
+            id: table_place
+            orientation: "vertical"
+            size: root.width, root.height
+        MDBoxLayout:
+            size: (root.width, 100)
+            size_hint: (None, None)
+            Button:
+                text: 'Back'
+                font_size: 24
+                on_press: root.on_back()
 # ---7---
 <CrudDatasets>:
     name: "cruddatasets"
-    BoxLayout:
+    MDBoxLayout:
         orientation: "vertical"
         size: root.width, root.height
-        padding: [10,50,10,50]
-        spacing: 50
-        Image:
-            source: app.icon
-        MDLabel:
-            id: header
-            text: "DATASET CRUD"
-            font_size: 40
-            halign: 'center'
-            padding_y: 15
+        padding: [10,10,10,10]
+        spacing: 20
+        MDBoxLayout:
+            orientation: "vertical"
+            size: (root.width, 100)
+            size_hint: (None, None)
+            Image:
+                source: app.logo
+            MDLabel:
+                id: header
+                text: "CRUD DATASET"
+                font_size: 40
+                halign: 'center'
+                padding_y: 15
+                size: 200,50
 # ---8---
 <ManageDistanceFunctions>:
     name: "managedistancefunctions"
-    BoxLayout:
+    MDBoxLayout:
         orientation: "vertical"
         size: root.width, root.height
-        padding: [10,50,10,50]
-        spacing: 50
-        Image:
-            source: app.icon
-        MDLabel:
-            id: header
-            text: "DATASET CRUD"
-            font_size: 40
-            halign: 'center'
-            padding_y: 15
+        padding: [10,10,10,10]
+        spacing: 20
+        MDBoxLayout:
+            orientation: "vertical"
+            size: (root.width, 100)
+            size_hint: (None, None)
+            Image:
+                source: app.logo
+            MDLabel:
+                id: header
+                text: "MANAGE DISTANCE FUNCTIONS"
+                font_size: 40
+                halign: 'center'
+                padding_y: 15
+                size: 200,50
+        MDBoxLayout:
+            id: table_place
+            orientation: "vertical"
+            size: root.width, root.height
+    
+        MDBoxLayout:
+            size: (root.width, 100)
+            size_hint: (None, None)
+            Button:
+                text: 'Back'
+                font_size: 24
+                on_press: root.on_back()
 # ---9---
 <CrudDistanceFunctions>:
     name: "cruddistancefunctions"
-    BoxLayout:
+    MDBoxLayout:
         orientation: "vertical"
         size: root.width, root.height
-        padding: [10,50,10,50]
-        spacing: 50
-        Image:
-            source: app.icon
-        MDLabel:
-            id: header
-            text: "DISTANCE FUNCTIONS CRUD"
-            font_size: 40
-            halign: 'center'
-            padding_y: 15
+        padding: [10,10,10,10]
+        spacing: 20
+        MDBoxLayout:
+            orientation: "vertical"
+            size: (root.width, 100)
+            size_hint: (None, None)
+            Image:
+                source: app.logo
+            MDLabel:
+                id: header
+                text: "CRUD DISTANCE FUNCTION"
+                font_size: 40
+                halign: 'center'
+                padding_y: 15
+                size: 200,50
 # ---10---
 <UpdateModels>:
     name: "updatemodels"
-    BoxLayout:
+    MDBoxLayout:
         orientation: "vertical"
         size: root.width, root.height
-        padding: [10,50,10,50]
-        spacing: 50
-        Image:
-            source: app.icon
-        MDLabel:
-            id: header
-            text: "Update Models"
-            font_size: 40
-            halign: 'center'
-            padding_y: 15
+        padding: [10,10,10,10]
+        spacing: 20
+        MDBoxLayout:
+            orientation: "vertical"
+            size: (root.width, 100)
+            size_hint: (None, None)
+            Image:
+                source: app.logo
+            MDLabel:
+                id: header
+                text: "UPDATE MODELS"
+                font_size: 40
+                halign: 'center'
+                padding_y: 15
+                size: 200,50
+        MDBoxLayout:
+            id: table_place
+        GridLayout:
+            size: (root.width, 100)
+            size_hint: (None, None)
+            cols: 2
+            MDRoundFlatButton:
+                text: 'Update Models'
+                font_size: 24
+            MDRoundFlatButton:
+                text: 'Back'
+                font_size: 24
+                on_press: root.on_back()
 # ---11---
 <ManageUsers>:
     name: "manageusers"
-    BoxLayout:
+    MDBoxLayout:
         orientation: "vertical"
         size: root.width, root.height
-        padding: [10,50,10,50]
-        spacing: 50
-        Image:
-            source: app.icon
-        MDLabel:
-            id: header
-            text: "MANAGE USERS"
-            font_size: 40
-            halign: 'center'
-            padding_y: 15
+        padding: [10,10,10,10]
+        spacing: 20
+        MDBoxLayout:
+            orientation: "vertical"
+            size: (root.width, 100)
+            size_hint: (None, None)
+            Image:
+                source: app.logo
+            MDLabel:
+                id: header
+                text: "MANAGE USERS"
+                font_size: 40
+                halign: 'center'
+                padding_y: 15
+                size: 200,50
 # ---12---
 <CrudUser>:
     name: "cruduser"
-    BoxLayout:
+    MDBoxLayout:
         orientation: "vertical"
         size: root.width, root.height
-        padding: [10,50,10,50]
-        spacing: 50
-        Image:
-            source: app.icon
-        MDLabel:
-            id: header
-            text: "USER CRUD"
-            font_size: 40
-            halign: 'center'
-            padding_y: 15
+        padding: [10,10,10,10]
+        spacing: 20
+        MDBoxLayout:
+            orientation: "vertical"
+            size: (root.width, 100)
+            size_hint: (None, None)
+            Image:
+                source: app.logo
+            MDLabel:
+                id: header
+                text: "CRUD USER"
+                font_size: 40
+                halign: 'center'
+                padding_y: 15
+                size: 200,50
 # ---13---
 <ChooseModels>:
     name: "choosemodels"
-    BoxLayout:
+    MDBoxLayout:
         orientation: "vertical"
         size: root.width, root.height
-        padding: [10,50,10,50]
-        spacing: 50
-        Image:
-            source: app.icon
-        MDLabel:
-            id: header
-            text: "CHOOSE MODELS"
-            font_size: 40
-            halign: 'center'
-            padding_y: 15
+        padding: [10,10,10,10]
+        spacing: 20
+        MDBoxLayout:
+            orientation: "vertical"
+            size: (root.width, 100)
+            size_hint: (None, None)
+            Image:
+                source: app.logo
+            MDLabel:
+                id: header
+                text: "CHOOSE MODELS"
+                font_size: 40
+                halign: 'center'
+                padding_y: 15
+                size: 200,50
 # ---14---
 <AnalystResults>:
     name: "analystresults"
-    BoxLayout:
+    MDBoxLayout:
         orientation: "vertical"
         size: root.width, root.height
-        padding: [10,50,10,50]
-        spacing: 50
-        Image:
-            source: app.icon
-        MDLabel:
-            id: header
-            text: "ANALYST RESULTS"
-            font_size: 40
-            halign: 'center'
-            padding_y: 15
+        padding: [10,10,10,10]
+        spacing: 20
+        MDBoxLayout:
+            orientation: "vertical"
+            size: (root.width, 100)
+            size_hint: (None, None)
+            Image:
+                source: app.logo
+            MDLabel:
+                id: header
+                text: "ANALYST REPORT"
+                font_size: 40
+                halign: 'center'
+                padding_y: 15
+                size: 200,50
