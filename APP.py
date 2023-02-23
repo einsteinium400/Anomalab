@@ -10,7 +10,7 @@ from kivymd.uix.datatables import MDDataTable
 from kivy.metrics import dp
 #forms imports
 from kivymd.uix.label import MDLabel
-from kivymd.uix.textfield import MDTextField
+from kivymd.uix.textfield import MDTextFieldRect
 from kivy.uix.spinner import Spinner
 
 from gui.popup import show_popup
@@ -77,9 +77,9 @@ class Query(Screen):
         attributeCategories=["cat1","cat2","cat3","cat4","cat5"]
         for i in range(attributesNumber):
             print (attributesNames[i] + attributeCategories[i])
-            self.ids.attributes_box.add_widget(MDLabel(text=attributesNames[i]))
+            self.ids.attributes_box.add_widget(MDLabel(text=f'{attributesNames[i]}:', halign="center"))
             if (attributeTypes[i]==0):
-                self.attributesRefs.append(MDTextField(text='', multiline=False))
+                self.attributesRefs.append(MDTextFieldRect(multiline=False, hint_text=f"insert here"))
             else:
                 self.attributesRefs.append(Spinner(text=attributesNames[i], values=attributeCategories))
             self.ids.attributes_box.add_widget(self.attributesRefs[i])
@@ -97,7 +97,9 @@ class Query(Screen):
         self.manager.current = 'choosedataset'
 #---4---
 class Results(Screen):
-    pass
+    def on_back(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'query'
 #---5---
 class DataAnalystMenu(Screen):
     def chooseScreen(self, screenName):
