@@ -206,7 +206,7 @@ class UpdateModels(Screen):
 
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
-        self.manager.current = 'choosedataset'
+        self.manager.current = 'dataanalystmenu'
 #---11---
 class ManageUsers(Screen):
     pass
