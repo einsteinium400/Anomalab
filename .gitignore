@@ -1,5 +1,7 @@
 env
 env/*
+venv
+kivy_venv
 .idea
 pyvenv.cfg
 .vscode
@@ -13,5 +15,4 @@ __pycache__
 .idea/misc.xml
 __pycache__/DistanceFunctions.cpython-39.pyc
 __pycache__/KMeanClusterer.cpython-39.pyc
-venv
-__pycache__
+gui/example

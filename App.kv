@@ -1,0 +1,321 @@
+#:kivy 2.1
+#:import Factory kivy.factory.Factory
+
+# ---HEADER WIDGETS---
+<LogoImage@Image>:
+    source: app.logo
+    pos_hint: {"x":0.2, "top": 0.9}
+    size_hint: (0.6, 0.4)
+<HeaderText@MDLabel>:
+    id: header
+    font_size: 40
+    pos_hint: {"x":0.3, "top": 0.4}
+    size_hint: (0.4, 0.3)
+    halign: "center"
+# ---GENERAL INPUT
+<TextInput@MDTextField>:
+    max_text_length: 30
+    multiline: False
+    padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
+    font_size: 24
+<MainSpinnerOption@SpinnerOption>:
+    font_size: 24
+<MainSpinner@Spinner>:
+    id: spinner_id
+    pos_hint: {"x":0.25, "top": 0.6}
+    size_hint: (0.5, 0.2)
+    font_size: 24
+    option_cls: "MainSpinnerOption"
+# ---QUERY INPUT
+<QueryLabel@MDLabel>:
+    halign: "center"
+    text_size: root.width, None
+    size: self.texture_size
+# ---FOOTER BUTTONS
+<FooterButton@MDFillRoundFlatButton>:
+    font_size: 24
+    size_hint: (0.2, 0.4)
+# ---FORMS WIDGETS---
+
+# ---SECTIONS---
+<Window@MDFloatLayout>:
+    size: root.width, root.height
+<Header@MDFloatLayout>:
+    pos_hint: {"x":0, "top": 1}
+    size_hint: (1, 0.2)
+    spacing: 10
+    canvas.before:
+        Color:
+            rgba: (1,0,0,1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+<Main@MDFloatLayout>:
+    id: main
+    orientation: "vertical"
+    pos_hint: {"x":0, "top": 0.8}
+    size_hint: (1, 0.65)
+    spacing: 20
+    canvas.before:
+        Color:
+            rgba: (0,1,0,1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+<Footer@MDFloatLayout>:
+    id: footer
+    pos_hint: {"x":0, "top": 0.15}
+    size_hint: (1, 0.15)
+    canvas.before:
+        Color:
+            rgba: (0,0,1,1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+# ---1---
+<Login>:
+    name: "login"
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                text: "Login"
+        Main:
+            TextInput:
+                id: user_name
+                hint_text: "username"
+                logo_right: "account"
+                pos_hint: {"x":0.25, "top": 0.7}
+                size_hint: (0.5, 0.15)
+            TextInput:
+                id: user_pass
+                hint_text: "password"
+                logo_right: "eye-off"
+                pos_hint: {"x":0.25, "top": 0.45}
+                size_hint: (0.5, 0.15)
+                password: True
+        Footer:
+            FooterButton:
+                text: "LOGIN"
+                pos_hint: {"x":0.4, "top": 0.6}
+                on_release: root.do_login(user_name.text, user_pass.text)
+# ---2---
+<ChooseDataset>:
+    name: "choosedataset"
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                text: "Choose Dataset"
+        Main:
+            MainSpinner:
+                text: "Choose Dataset"
+                values: root.datasetsNames
+                id: spinner_id
+                pos_hint: {"x":0.25, "top": 0.6}
+                size_hint: (0.5, 0.2)
+                font_size: 24
+        Footer:
+            FooterButton:
+                text: "Apply"
+                pos_hint: {"x":0.4, "top": 0.6}
+                on_press: root.on_choose(spinner_id.text)
+# ---3---
+<Query>:
+    name: "query"
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                text: "Insert Query"
+        Main:
+            GridLayout:
+                pos_hint: {"x":0.05, "top": 0.95}
+                size_hint: (0.9, 0.9)
+                cols: 4
+                row_force_default: True
+                row_default_height: 40
+                id: attributes_box
+        Footer:
+            FooterButton:
+                text: 'Apply'
+                pos_hint: {"x":0.25, "top": 0.6}
+                size_hint: (0.2, 0.4)
+                on_press: root.on_apply()
+            FooterButton:
+                text: 'Back'
+                pos_hint: {"x":0.55, "top": 0.6}
+                on_press: root.on_back()
+# ---4---
+<Results>:
+    name: "results"
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                text: "Results"
+        Main: 
+            Label:
+                text: "results will come here"
+                font_size: 40
+                pos_hint: {"x":0.3, "top": 0.65}
+                size_hint: (0.4, 0.3)
+                halign: "center"
+        Footer:
+            FooterButton:
+                text: 'Another query'
+                pos_hint: {"x":0.4, "top": 0.6}
+                on_press: root.on_back()
+# ---5---
+<DataAnalystMenu>:
+    name: "dataanalysmenu"
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                text: "Menu"
+        Main:
+            MDFillRoundFlatButton:
+                pos_hint: {"x":0.1, "top": 0.9}
+                size_hint: (None, 0.35)
+                width: dp(300) if root.width*0.35 <= dp (300) else root.width*0.35
+                text: 'Try Query'
+                font_size: 24
+                on_release: root.chooseScreen("choosedataset")
+            MDFillRoundFlatButton:
+                pos_hint: {"right":0.9, "top": 0.9}
+                size_hint: (None, 0.35)
+                width: dp(300) if root.width*0.35 <= dp (300) else root.width*0.35
+                text: 'Manage Datasets'
+                font_size: 24
+                on_release: root.chooseScreen("managedatasets")
+            MDFillRoundFlatButton:
+                pos_hint: {"x":0.1, "y": 0.1}
+                size_hint: (None, 0.35)
+                width: dp(300) if root.width*0.35 <= dp (300) else root.width*0.35
+                text: 'Manage Distance Functions'
+                font_size: 24
+                on_release: root.chooseScreen("managedistancefunctions")
+            MDFillRoundFlatButton:
+                pos_hint: {"right":0.9, "y": 0.1}
+                size_hint: (None, 0.35)
+                width: dp(300) if root.width*0.35 <= dp (300) else root.width*0.35
+                text: 'Update Models'
+                font_size: 24
+                on_release: root.chooseScreen("updatemodels")
+        Footer:
+# ---6---
+<ManageDatasets>:
+    name: "managedatasets"
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                text: "Manage Datasets"
+        Main:
+            id: table_place
+        Footer:
+            FooterButton:
+                text: 'Back'
+                pos_hint: {"x":0.4, "top": 0.6}
+                on_press: root.on_back()
+# ---7---
+<CrudDatasets>:
+    name: "cruddatasets"
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                text: "Crud Dataset"
+        Main:
+        Footer:
+# ---8---
+<ManageDistanceFunctions>:
+    name: "managedistancefunctions"
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                text: "Manage Distance Functions"
+        Main:
+            id: table_place
+        Footer:
+            FooterButton:
+                text: 'Back'
+                pos_hint: {"x":0.4, "top": 0.6}
+                on_press: root.on_back()
+# ---9---
+<CrudDistanceFunctions>:
+    name: "cruddistancefunctions"
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                text: "Crud Distance Functions"
+        Main:
+        Footer:
+# ---10---
+<UpdateModels>:
+    name: "updatemodels"
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                text: "Update Models"
+        Main:
+            id: table_place
+        Footer:
+            FooterButton:
+                text: 'Update'
+                pos_hint: {"x":0.25, "top": 0.6}
+            FooterButton:
+                text: 'Back'
+                pos_hint: {"x":0.55, "top": 0.6}
+                on_press: root.on_back()
+# ---11---
+<ManageUsers>:
+    name: "manageusers"
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                text: "Manage Users"
+        Main:
+        Footer:
+# ---12---
+<CrudUser>:
+    name: "cruduser"
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                text: "Crud User"
+        Main:
+        Footer:
+# ---13---
+<ChooseModels>:
+    name: "choosemodels"
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                text: "Choose Models"
+        Main:
+        Footer:
+# ---14---
+<AnalystResults>:
+    name: "analystresults"
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                text: "Analyst Results"
+        Main:
+            Label:
+                text: "results will come here"
+                font_size: 40
+                pos_hint: {"x":0.3, "top": 0.65}
+                size_hint: (0.4, 0.3)
+                halign: "center"
+        Footer:

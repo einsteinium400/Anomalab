@@ -1,0 +1,32 @@
+<MyGridLayout>
+
+    name:name # global variable
+    password:password # global variable
+
+    GridLayout:
+        cols: 1
+        size: root.width - 10, root.height -10
+        pos: 10, 10
+
+        GridLayout:
+            cols: 2
+
+            Label:
+                text: "Name"
+            TextInput:
+                id: name
+                multiline: False
+            
+            Label:
+                text: "Password"
+            TextInput:
+                id: password
+                multiline: False
+
+        Button:
+            text: "Submit"
+            font_size: 32
+            on_press: root.press()
+            #color (R,G,B,Opacity): CODE PICKER between 0 to 1
+            background_normal: ''
+            background_color: (0,1,0,1)

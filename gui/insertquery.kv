@@ -1,0 +1,38 @@
+#:kivy 2.1
+
+<InsertQuery>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: [10,50,10,50]
+        spacing: 50
+        id: layout
+
+        Image:
+            source: 'gui/images/logo.jpg'
+
+        Button:
+            id: load_button
+            text: "load form"
+            font_size: 32
+            on_press: root.create_attributes_form()
+
+        GridLayout:
+            size: root.width - 10, root.height -10
+            cols: 2
+            id: attributes_box
+        
+        GridLayout:
+            size: root.width - 10, root.height -10
+            cols: 2
+            Button:
+                text: 'Apply'
+                font_size: 24
+                on_press: root.on_apply()
+            Button:
+                text: 'Back'
+                font_size: 24
+                on_press: root.on_back()
+    
+    
+
+        
