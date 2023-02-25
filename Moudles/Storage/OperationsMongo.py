@@ -26,7 +26,12 @@ class OperationsMongo(Operations.Operations):
 
     def Save(self,name, jsonData, type):
         collection = self.PROJECTDB[COLLECTION_DICT[type]]
-        collection.insert_one(jsonData)
+        query = {"id": jsonData.id}
+        if(collection.find_one(query) == None):
+            collection.insert_one(jsonData)
+        else:
+            collection.update_one(query,jsonData)
+
 
     def Load(self, name, type):
         collection = self.PROJECTDB[COLLECTION_DICT[type]]
@@ -45,4 +50,13 @@ class OperationsMongo(Operations.Operations):
         finalNamesList = []
         for item in mongoList:
             finalNamesList.append(item['name'])
+        return finalNamesList
+
+    def GetFullItemsList(self, type):
+        collection = self.PROJECTDB[COLLECTION_DICT[type]]
+        mongoList = collection.find()
+
+        finalNamesList = []
+        for item in mongoList:
+            finalNamesList.append(item)
         return finalNamesList

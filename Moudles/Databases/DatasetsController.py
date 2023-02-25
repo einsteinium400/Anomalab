@@ -21,6 +21,15 @@ class DatasetsController:
         self.storage = operationFactory.CreateOperationItem()
         return self.storage.GetList("DATASET")
 
+    def GetAllDatasetsInfoList(self):
+        operationFactory = StorageFactory()
+        self.storage = operationFactory.CreateOperationItem()
+        fullList = self.storage.GetFullItemsList("DATASET")
+        finalList = []
+        for item in fullList:
+            finalList.append(list((item['id'],item['name'],len(item['featureNames']),len(item['data']),item['timestamp'])))
+        return finalList
+
     def SetBestModel(self,databaseName,modelName):
         modelsController = ModelsController()
         self.GetDataset(databaseName).BestModel = modelsController.GetModel(modelName)

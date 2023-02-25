@@ -51,3 +51,6 @@ class OperationsLocal(Operations.Operations):
         itemsList = os.listdir(filePath)
         new_set = {x.removesuffix('.json') for x in itemsList}
         return new_set
+
+    def GetFullItemsList(self, type):
+        pass
