@@ -46,7 +46,7 @@
     spacing: 10
     canvas.before:
         Color:
-            rgba: (0,1,0,1)
+            rgba: (1,0,0,1)
         Rectangle:
             pos: self.pos
             size: self.size
@@ -54,18 +54,18 @@
     id: main
     orientation: "vertical"
     pos_hint: {"x":0, "top": 0.8}
-    size_hint: (1, 0.6)
+    size_hint: (1, 0.65)
     spacing: 20
     canvas.before:
         Color:
-            rgba: (1,0,0,1)
+            rgba: (0,1,0,1)
         Rectangle:
             pos: self.pos
             size: self.size
 <Footer@MDFloatLayout>:
     id: footer
-    pos_hint: {"x":0, "top": 0.2}
-    size_hint: (1, 0.2)
+    pos_hint: {"x":0, "top": 0.15}
+    size_hint: (1, 0.15)
     canvas.before:
         Color:
             rgba: (0,0,1,1)
@@ -111,7 +111,7 @@
         Main:
             MainSpinner:
                 text: "Choose Dataset"
-                values: root.datasetsName
+                values: root.datasetsNames
                 id: spinner_id
                 pos_hint: {"x":0.25, "top": 0.6}
                 size_hint: (0.5, 0.2)
@@ -131,8 +131,8 @@
                 text: "Insert Query"
         Main:
             GridLayout:
-                pos_hint: {"x":0, "top": 1}
-                size_hint: (1, 1)
+                pos_hint: {"x":0.05, "top": 0.95}
+                size_hint: (0.9, 0.9)
                 cols: 4
                 row_force_default: True
                 row_default_height: 40
@@ -179,28 +179,28 @@
             MDFillRoundFlatButton:
                 pos_hint: {"x":0.1, "top": 0.9}
                 size_hint: (None, 0.35)
-                width: root.width * 0.8 if root.width * 0.8 <= dp(300) else dp(300)
+                width: dp(300) if root.width*0.35 <= dp (300) else root.width*0.35
                 text: 'Try Query'
                 font_size: 24
                 on_release: root.chooseScreen("choosedataset")
             MDFillRoundFlatButton:
                 pos_hint: {"right":0.9, "top": 0.9}
                 size_hint: (None, 0.35)
-                width: root.width * 0.8 if root.width * 0.8 <= dp(300) else dp(300)
+                width: dp(300) if root.width*0.35 <= dp (300) else root.width*0.35
                 text: 'Manage Datasets'
                 font_size: 24
                 on_release: root.chooseScreen("managedatasets")
             MDFillRoundFlatButton:
                 pos_hint: {"x":0.1, "y": 0.1}
                 size_hint: (None, 0.35)
-                width: root.width * 0.35 if root.width * 0.8 <= dp(300) else dp(300)
+                width: dp(300) if root.width*0.35 <= dp (300) else root.width*0.35
                 text: 'Manage Distance Functions'
                 font_size: 24
                 on_release: root.chooseScreen("managedistancefunctions")
             MDFillRoundFlatButton:
                 pos_hint: {"right":0.9, "y": 0.1}
                 size_hint: (None, 0.35)
-                width: root.width * 0.35 if root.width * 0.8 <= dp(300) else dp(300)
+                width: dp(300) if root.width*0.35 <= dp (300) else root.width*0.35
                 text: 'Update Models'
                 font_size: 24
                 on_release: root.chooseScreen("updatemodels")
