@@ -347,9 +347,6 @@ class ManageUsers(Screen):
 class CrudUser(Screen):
     def __init__(self, **kwargs):
         super(CrudUser, self).__init__(**kwargs)
-        app = MDApp.get_running_app()
-        app.manager.remove_widget(CrudUser(name='cruduser'))
-        app.manager.add_widget(CrudUser(name='cruduser'))
         if (app.jsonItem=={}):
             self.ids['header'].text= "New User"
             self.ids['name'].hint_text= "Name"
