@@ -7,13 +7,12 @@
     pos_hint: {"x":0.2, "top": 0.9}
     size_hint: (0.6, 0.4)
 <HeaderText@MDLabel>:
-    id: header
     font_size: 40
     pos_hint: {"x":0.3, "top": 0.4}
     size_hint: (0.4, 0.3)
     halign: "center"
 # ---GENERAL INPUT
-<TextInput@MDTextField>:
+<FreeTextInput@MDTextField>:
     max_text_length: 30
     multiline: False
     padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
@@ -82,13 +81,13 @@
             HeaderText:
                 text: "Login"
         Main:
-            TextInput:
+            FreeTextInput:
                 id: user_name
                 hint_text: "username"
                 logo_right: "account"
                 pos_hint: {"x":0.25, "top": 0.7}
                 size_hint: (0.5, 0.15)
-            TextInput:
+            FreeTextInput:
                 id: user_pass
                 hint_text: "password"
                 logo_right: "eye-off"
@@ -282,7 +281,16 @@
             HeaderText:
                 text: "Manage Users"
         Main:
+            id: table_place
         Footer:
+            FooterButton:
+                text: 'Add User'
+                pos_hint: {"x":0.25, "top": 0.6}
+                on_press: root.on_add()
+            FooterButton:
+                text: 'Back'
+                pos_hint: {"x":0.55, "top": 0.6}
+                on_press: root.on_back()
 # ---12---
 <CrudUser>:
     name: "cruduser"
@@ -290,9 +298,36 @@
         Header:
             LogoImage:
             HeaderText:
+                id: header
                 text: "Crud User"
         Main:
+            FreeTextInput:
+                id: name
+                pos_hint: {"x":0.3, "top": 0.9}
+                size_hint: (0.4, 0.2)
+            FreeTextInput:
+                id: password
+                pos_hint: {"x":0.3, "top": 0.6}
+                size_hint: (0.4, 0.2)
+            MainSpinner:
+                id: type
+                values: ["regular","data analyst","admin"]
+                pos_hint: {"x":0.3, "top": 0.3}
+                size_hint: (0.4, 0.2)
         Footer:
+            FooterButton:
+                text: 'Update'
+                pos_hint: {"x":0.1, "top": 0.6}
+                on_press: root.on_update()
+            FooterButton:
+                text: 'Delete'
+                pos_hint: {"x":0.4, "top": 0.6}
+                on_press: root.on_delete()
+            FooterButton:
+                text: 'Back'
+                pos_hint: {"x":0.4, "top": 0.6}
+                on_press: root.on_back()
+            
 # ---13---
 <ChooseModels>:
     name: "choosemodels"
@@ -312,7 +347,7 @@
             HeaderText:
                 text: "Analyst Results"
         Main:
-            Label:
+            MDLabel:
                 text: "results will come here"
                 font_size: 40
                 pos_hint: {"x":0.3, "top": 0.65}

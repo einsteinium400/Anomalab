@@ -5,6 +5,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
 from kivy.properties import StringProperty, NumericProperty
 from kivy.lang import Builder
 from kivy.core.window import Window
+import json
 #table imports
 from kivymd.uix.datatables import MDDataTable
 from kivy.metrics import dp
@@ -26,7 +27,11 @@ Builder.load_file('App.kv')
 #---1---
 class Login(Screen):
     def do_login(self, name, password):
-
+        #DELETE THIS SECTION
+        self.manager.transition = SlideTransition(direction="left")
+        self.manager.current = 'manageusers'
+        return
+        #
         if (name == '' or password == ''):
             self.resetForm()
             show_popup("Must enter user name and password")
@@ -286,14 +291,89 @@ class UpdateModels(Screen):
 class ManageUsers(Screen):
     def __init__(self, **kwargs):
         super(ManageUsers, self).__init__(**kwargs)
-        ##MICHAEL - GET ALL DATASETS data = [(id, name, attribute number, dataline, timestamp),(another one),(another one)]
+        ##MICHAEL - GET ALL USERS data = [(id, name, attribute number, dataline, timestamp),(another one),(another one)]
+        table_width = dp(Window.size[0]*9/50)
+        self.table = MDDataTable(
+            pos_hint = {'x': 0.05, 'top': 0.95},
+            size_hint= (0.9, 0.9),
+            use_pagination = True,
+            rows_num = 5,
+            pagination_menu_height = '240dp',
+            column_data = [
+                ("User-ID", dp (table_width*0.2)),
+                ("User-Name", dp (table_width*0.3)),
+                ("User-Password", dp (table_width*0.3)),
+                ("User-Type", dp (table_width*0.2)),
+            ],
+            row_data = [
+                ("1", "reg", "reg", "regular"),
+                ("2", "data", "data", "analyst"),
+                ("3", "admin", "admin", "admin"),
+            ]
+        )
+        self.table.bind(on_row_press=self.row_press)
+        self.ids['table_place'].add_widget(self.table)
+    # Function for row presses
+    def row_press(self, instance_table, instance_row):
+        #Called when a table row is clicked
+        print(instance_table, instance_row)
+        index = instance_row.index
+        cols_num = len(instance_table.column_data)
+        row_num = int(index/cols_num)
+        print (f'press on row_num is: {row_num}')
+        print (f'ID of pressed line is: {self.table.row_data[row_num][0]}')
+        app = MDApp.get_running_app()
+        app.user_id = int(self.table.row_data[row_num][0])
+        app.jsonItem = {'id':int(self.table.row_data[row_num][0]),
+                        'name':self.table.row_data[row_num][1],
+                        'password':self.table.row_data[row_num][2],
+                        'type':self.table.row_data[row_num][3],
+                        }
+        print (app.jsonItem)
+        self.manager.transition = SlideTransition(direction="left")
+        self.manager.current = 'cruduser'
+    # Function for add user
+    def on_add(self):
+        app = MDApp.get_running_app()
+        app.jsonItem = {}
+        
+        self.manager.transition = SlideTransition(direction="left")
+        self.manager.current = 'cruduser'
+    # Function for go back to login page
+    def on_back(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'login'
 #---12---
 class CrudUser(Screen):
-    ##MICHAEL - GET ONE USER(user ID)
-    ##MICHAEL - SAMPLE OF UPDATE USER METHOD
-    ##MICHAEL - SAMPLE OF DELETE USER METHOd
+    def __init__(self, **kwargs):
+        super(CrudUser, self).__init__(**kwargs)
+        app = MDApp.get_running_app()
+        app.manager.remove_widget(CrudUser(name='cruduser'))
+        app.manager.add_widget(CrudUser(name='cruduser'))
+        if (app.jsonItem=={}):
+            self.ids['header'].text= "New User"
+            self.ids['name'].hint_text= "Name"
+            self.ids['password'].hint_text= "Password"
+            self.ids['type'].hint_text= "type"
+        else:
+            self.ids['header'].text= app.jsonItem.id
+            self.ids['name'].hint_text= app.jsonItem.name
+            self.ids['password'].hint_text= app.jsonItem.password
+            self.ids['type'].hint_text= app.jsonItem.type
     ##MICHAEL - SAMPLE OF CREATE USER METHOd
-    pass
+    def on_delete(self):
+        ## MICHAEL - DELETE USER
+        print (f"id: {self.ids['header']}, name: {self.ids['name']}, password: {self.ids['password']}, type: {self.ids['type']}")
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'manageusers'
+    def on_update(self):
+        ## MICHAEL - UPDATE USER
+        print (f"id: {self.ids['header']}, name: {self.ids['name']}, password: {self.ids['password']}, type: {self.ids['type']}")
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'manageusers'
+    def on_back(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'manageusers'
 #---13---
 class ChooseModels(Screen):
     pass
@@ -310,7 +390,9 @@ class AnomalabApp(MDApp):
     datasetname = StringProperty(None)
     datasetID = NumericProperty(None)
     modelID = NumericProperty(None)
-    results = {}
+    userID = NumericProperty(None)
+    distancefunctionID = NumericProperty(None)
+    jsonItem = {}
     def build(self):
         self.theme_cls.theme_style = "Light"
         self.theme_cls.primary_palette = "BlueGray"
