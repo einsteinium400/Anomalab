@@ -25,48 +25,34 @@ from gui.popup import show_popup
 #---1---
 class Login(Screen):
     def do_login(self, name, password):
-        #DELETE THIS SECTION
-        self.manager.transition = SlideTransition(direction="left")
-        self.manager.current = 'manageusers'
-        return
-        #
-        if (name == '' or password == ''):
-            self.resetForm()
-            show_popup("Must enter user name and password")
-            return
-    
         app = MDApp.get_running_app()
-        app.username = name
-        print (f'login: name-{name} pass-{password}')
-        userController = UsersController()
-        attemptedLoginUser = None
+        ##MICHAEL PART
+        """attemptedLoginUser = None
         try:
-            attemptedLoginUser = userController.GetUser(name)
+            if (name == '' or password == ''):
+                raise Exception(f"Must enter user name and password")
+            attemptedLoginUser = app.userController.GetUser(name)
+            if attemptedLoginUser.VerifyPassword(password) == False:
+                raise Exception(f"Incorrect Password")
+            app.usertype = attemptedLoginUser.TypeNum()
         except Exception as e:
             self.resetForm()
             show_popup(str(e))
             return
-        if attemptedLoginUser.VerifyPassword(password) == False:
-            self.resetForm()
-            show_popup("Incorrect Password")
-            return
         app.usertype = attemptedLoginUser.TypeNum()
-        ##MICHAEL-PUT LOGIN FUNCTION send her name and password and return user type (app.usertype = LOGIN(name, password))
-        ## NOAM - Check I did it a bit diffrent by type is set
-        # app.usertype = password
-        if (app.usertype > 0):
-            self.manager.transition = SlideTransition(direction="left")
-            if (app.usertype == 1):
-                self.manager.current = 'choosedataset'
-            elif (app.usertype == 2):
-                self.manager.current = 'dataanalystmenu'
-            elif (app.usertype == 3):
-                pass
-                self.manager.current = 'manageusers'
-        else:
-            self.resetForm()
-            show_popup("Login failed")
-
+        """
+        ##
+        app.username = name
+        app.usertype = password
+        print (f'login: name-{name} pass-{password}')
+        self.manager.transition = SlideTransition(direction="left")
+        if (app.usertype == 1):
+            self.manager.current = 'choosedataset'
+        elif (app.usertype == 2):
+            self.manager.current = 'dataanalystmenu'
+        elif (app.usertype == 3):
+            self.manager.current = 'manageusers'
+        
     def resetForm(self):
         self.ids['user_name'].text = ""
         self.ids['user_pass'].text = ""
@@ -387,6 +373,10 @@ class AnomalabApp(MDApp):
     logo = StringProperty('gui/images/logo.jpg')
     icon = StringProperty('gui/images/icon.jpg')
     title = StringProperty('Anomalab')
+    userController=UsersController()
+    datasetController=DatasetsController()
+    modelController=ModelsController()
+    #PUT DISTANCE FUNCTION CONTROLLER
     username = StringProperty(None)
     usertype = NumericProperty(None)
     datasetname = StringProperty(None)
