@@ -1,6 +1,28 @@
 #:kivy 2.1
 #:import Factory kivy.factory.Factory
 
+ScreenManager:
+    Login:
+    ChooseDataset:
+    Query:
+    Results:
+    DataAnalystMenu:
+    ManageDatasets:
+    CrudDatasets:
+    ManageDistanceFunctions:
+    CrudDistanceFunctions:
+    UpdateModels:
+    ManageUsers:
+    CrudUser:
+    ChooseModels:
+    AnalystResults:
+
+<HomeScreen>:
+    BoxLayout:
+    Button:
+        size:self.size
+        on_press:
+            root.manager.current = "login"
 # ---HEADER WIDGETS---
 <LogoImage@Image>:
     source: app.logo

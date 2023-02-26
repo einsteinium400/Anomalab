@@ -1,7 +1,7 @@
 #CREATE VIRTUAL ENVITONMENT IN NOAM COMPUTER: kivy_venv\Scripts\activate
 
 from kivymd.app import MDApp
-from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
+from kivy.uix.screenmanager import Screen, SlideTransition
 from kivy.properties import StringProperty, NumericProperty
 from kivy.lang import Builder
 from kivy.core.window import Window
@@ -20,8 +20,6 @@ from Moudles.Models.ModelController import ModelsController
 from Moudles.Users.UsersController import UsersController
 
 from gui.popup import show_popup
-
-Builder.load_file('App.kv')
 
 #SCREENS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #---1---
@@ -106,6 +104,7 @@ class Query(Screen):
     attributesRefs=[]
     def __init__(self, **kwargs):
         super(Query, self).__init__(**kwargs)
+    def on_enter(self):
         self.datasetsController = DatasetsController()
         self.datasetsNames = self.datasetsController.GetAllDatasetsNamesList()
         ## TODO: Need to find Name
@@ -126,6 +125,7 @@ class Query(Screen):
 
         for i in range(attributesNumber):
             #print (attributesNames[i] + attributeCategories[i])
+            print(self.ids)
             self.ids.attributes_box.add_widget(MDLabel(text=f'{attributesNames[i]}:', halign="center"))
             if (attributeTypes[i]==0):
                 self.attributesRefs.append(MDTextFieldRect(multiline=False, hint_text=f"insert here"))
@@ -168,6 +168,7 @@ class DataAnalystMenu(Screen):
 class ManageDatasets(Screen):
     def __init__(self, **kwargs):
         super(ManageDatasets, self).__init__(**kwargs)
+    def on_enter(self):
         self.datasetsController = DatasetsController()
         ##MICHAEL - GET ALL DATASETS data = [(id, name, attribute number, dataline, timestamp),(another one),(another one)]
         ## NOAM - DONE
@@ -207,6 +208,7 @@ class CrudDatasets(Screen):
 class ManageDistanceFunctions(Screen):
     def __init__(self, **kwargs):
         super(ManageDistanceFunctions, self).__init__(**kwargs)
+    def on_enter(self):
         table_width = dp(Window.size[0]*9/50)
         table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
@@ -244,6 +246,7 @@ class UpdateModels(Screen):
         ##MICHAEL - datasetIDlist=ID's of ALL DATASETS FUNCTION()
         ##MICHAEL - distancefunctionsIDlist=ID's of ALL Distance functions FUNCTION()
         super(UpdateModels, self).__init__(**kwargs)
+    def on_enter(self):
         table_width = dp(Window.size[0]*9/50)
         table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
@@ -291,6 +294,7 @@ class UpdateModels(Screen):
 class ManageUsers(Screen):
     def __init__(self, **kwargs):
         super(ManageUsers, self).__init__(**kwargs)
+    def on_enter(self):
         ##MICHAEL - GET ALL USERS data = [(id, name, attribute number, dataline, timestamp),(another one),(another one)]
         table_width = dp(Window.size[0]*9/50)
         self.table = MDDataTable(
@@ -347,6 +351,7 @@ class ManageUsers(Screen):
 class CrudUser(Screen):
     def __init__(self, **kwargs):
         super(CrudUser, self).__init__(**kwargs)
+    def on_enter(self):
         if (app.jsonItem=={}):
             self.ids['header'].text= "New User"
             self.ids['name'].hint_text= "Name"
@@ -393,37 +398,7 @@ class AnomalabApp(MDApp):
     def build(self):
         self.theme_cls.theme_style = "Light"
         self.theme_cls.primary_palette = "BlueGray"
-        WindowManager = ScreenManager()
-        #---1---
-        WindowManager.add_widget(Login(name='login'))
-        #---2---
-        WindowManager.add_widget(ChooseDataset(name='choosedataset'))
-        #---3---
-        WindowManager.add_widget(Query(name='query'))
-        #---4---
-        WindowManager.add_widget(Results(name='results'))
-        #---5---
-        WindowManager.add_widget(DataAnalystMenu(name='dataanalystmenu'))
-        #---6---
-        WindowManager.add_widget(ManageDatasets(name='managedatasets'))
-        #---7---
-        WindowManager.add_widget(CrudDatasets(name='cruddatasets'))
-        #---8---
-        WindowManager.add_widget(ManageDistanceFunctions(name='managedistancefunctions'))
-        #---9---
-        WindowManager.add_widget(CrudDistanceFunctions(name='cruddistancefunctions'))
-        #---10---
-        WindowManager.add_widget(UpdateModels(name='updatemodels'))
-        #---11---
-        WindowManager.add_widget(ManageUsers(name='manageusers'))
-        #---12---
-        WindowManager.add_widget(CrudUser(name='cruduser'))
-        #---13---
-        WindowManager.add_widget(ChooseModels(name='choosemodels'))
-        #---14---
-        WindowManager.add_widget(AnalystResults(name='analystresults'))
-        
-        return WindowManager
+        return Builder.load_file('App.kv')
 # MAIN ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if __name__ == '__main__':
     app = AnomalabApp()
