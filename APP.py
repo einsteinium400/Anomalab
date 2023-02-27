@@ -2,7 +2,7 @@
 
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import Screen, SlideTransition
-from kivy.properties import StringProperty, NumericProperty
+from kivy.properties import StringProperty, NumericProperty, ObjectProperty
 from kivy.lang import Builder
 from kivy.core.window import Window
 import json
@@ -52,59 +52,51 @@ class Login(Screen):
             self.manager.current = 'dataanalystmenu'
         elif (app.usertype == 3):
             self.manager.current = 'manageusers'
-        
     def resetForm(self):
         self.ids['user_name'].text = ""
         self.ids['user_pass'].text = ""
 #---2---
 class ChooseDataset(Screen):
-
-    ## MICHAEL - PUT get datasets
-    ## MICHAEL - datasetsNames = only array of names)
-    ## NOAM - DONE
-    # datasetsNames = ["lymphography","adult"]
-    datasetsController = DatasetsController()
-    datasetsNames = datasetsController.GetAllDatasetsNamesList()
-    def __init__(self, **kwargs):
-        super(ChooseDataset, self).__init__(**kwargs)
-        
+    def on_enter(self):
+        app = MDApp.get_running_app()
+        self.datasetsNames = app.datasetController.GetAllDatasetsNamesList()
+        if (self.datasetsNames == []):
+            show_popup("THERE ARE NO DATASETS IN THE SYSTEM")
+            self.manager.transition = SlideTransition(direction="right")
+            self.manager.current = 'login'
+        self.ids['spinner_id'].values = self.datasetsNames
+           
     def on_choose(self, dataset):
-        if (dataset == 'Choose Dataset'):
+        if (dataset == 'Choose Dataset'or dataset == "THERE ARE NO DATASETS IN THE SYSTEM" or dataset == ""):
+            print (f'choose dataset: {dataset}')
             show_popup("you must choose dataset")
             return
         app = MDApp.get_running_app()
-        
-        ## MICHAEL - app.datasetname = dataset name
-        # app.datasetname = dataset
-        dataSetObject = self.datasetsController.GetDataset(dataset)
-        app.datasetname = dataSetObject.Name
-        ## MICHAEL - app.datasetID = dataset ID
-        app.datasetID = dataSetObject.Id
-
-        ## NOAM - Done
-
+        app.dataSetObject = app.datasetController.GetDataset(dataset)
+        print (f'choose dataset name: {app.dataSetObject.Name}')
+        #IF USER IS REG GO TO QUERY ELSE GO TO CHOOSE MODELS
         self.manager.transition = SlideTransition(direction="left")
-        self.manager.current = 'query'
+        if (app.usertype==1):
+            self.manager.current = 'query'
+        else:
+            self.manager.current = 'choosemodels'    
+    
+    def logout(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'login'
 #---3---
 class Query(Screen):
     attributesRefs=[]
-    def __init__(self, **kwargs):
-        super(Query, self).__init__(**kwargs)
     def on_enter(self):
-        self.datasetsController = DatasetsController()
-        self.datasetsNames = self.datasetsController.GetAllDatasetsNamesList()
+        app = MDApp.get_running_app()
         ## TODO: Need to find Name
-        # self.dataSetObject = self.datasetsController.GetDataset()
-
-        ## NOAM - Need clarification what is the name of the dataset???
-        ## It will be for all this class
-
+        ## MICHEAL SEE THAT app.dataSetObject contain the choosen dataset object
         ## MICHAEL GET DATASET FEATURE DETAILS
-        ## MICHAEL ATTRIBUTES NUMBER
+        ## ATTRIBUTES NUMBER
         attributesNumber=3
-        ## MICHAEL ATTRIBUTES NAMES
+        ## ATTRIBUTES NAMES
         attributesNames=["attribute1","attribute2","attribute3"]
-        ## MICHAEL ATTRIBUTES TYPES (0 - NUMERIC, 1 - CATEGORIAL)
+        ## ATTRIBUTES TYPES (0 - NUMERIC, 1 - CATEGORIAL)
         attributeTypes=[0,0,1]
         ## MICHAEL CATEGORIES FOR EACH CATEGORICAL ATTRIBUTE -- TODO:Add caterogries availble for each item and types
         attributeCategories=["cat1","cat2","cat3","cat4","cat5"]
@@ -140,26 +132,34 @@ class Query(Screen):
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'choosedataset'
+
+    def logout(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'login'
 #---4---
 class Results(Screen):
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'query'
+    
+    def logout(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'login'
 #---5---
 class DataAnalystMenu(Screen):
     def chooseScreen(self, screenName):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = screenName
+    
+    def logout(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'login'
 #---6---
 class ManageDatasets(Screen):
-    def __init__(self, **kwargs):
-        super(ManageDatasets, self).__init__(**kwargs)
     def on_enter(self):
         self.datasetsController = DatasetsController()
-        ##MICHAEL - GET ALL DATASETS data = [(id, name, attribute number, dataline, timestamp),(another one),(another one)]
-        ## NOAM - DONE
         table_width = dp(Window.size[0]*9/50)
-        table = MDDataTable(
+        self.table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
             size_hint= (0.9, 0.9),
             use_pagination = True,
@@ -178,22 +178,28 @@ class ManageDatasets(Screen):
             #     ("2", "adult", "14", "32561", "22-02-2023, 10:50:32"),
             # ]
         )
-        self.ids['table_place'].add_widget(table)
+        self.table.bind(on_row_press=self.row_press)
+        self.ids['table_place'].add_widget(self.table)
 
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
-        self.manager.current = 'dataanalystmenu'        
+        self.manager.current = 'dataanalystmenu'
+
+    def logout(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'login'
 #---7---
 class CrudDatasets(Screen):
     ##MICHAEL - GET ONE DATASET(dataset ID)
     ##MICHAEL - SAMPLE OF UPDATE DATASET METHOD
     ##MICHAEL - SAMPLE OF DELETE DATASET METHOd
     ##MICHAEL - SAMPLE OF CREATE DATASET METHOd
-    pass
+
+    def logout(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'login'
 #---8---
 class ManageDistanceFunctions(Screen):
-    def __init__(self, **kwargs):
-        super(ManageDistanceFunctions, self).__init__(**kwargs)
     def on_enter(self):
         table_width = dp(Window.size[0]*9/50)
         table = MDDataTable(
@@ -218,20 +224,25 @@ class ManageDistanceFunctions(Screen):
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'dataanalystmenu'
+
+    def logout(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'login'
 #---9---
 class CrudDistanceFunctions(Screen):
     ##MICHAEL - GET ONE DISTANCE FUNCTION(dataset ID)
     ##MICHAEL - SAMPLE OF UPDATE DISTANCE FUNCTION METHOD
     ##MICHAEL - SAMPLE OF DELETE DISTANCE FUNCTION METHOd
     ##MICHAEL - SAMPLE OF CREATE DISTANCE FUNCTION METHOd
-    pass
+
+    def logout(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'login'
 #---10---
 class UpdateModels(Screen):
-    def __init__(self, **kwargs):
-        ##MICHAEL - data=GET ALL MODELS FUNCTION()
-        ##MICHAEL - datasetIDlist=ID's of ALL DATASETS FUNCTION()
-        ##MICHAEL - distancefunctionsIDlist=ID's of ALL Distance functions FUNCTION()
-        super(UpdateModels, self).__init__(**kwargs)
+    ##MICHAEL - data=GET ALL MODELS FUNCTION()
+    ##MICHAEL - datasetIDlist=ID's of ALL DATASETS FUNCTION()
+    ##MICHAEL - distancefunctionsIDlist=ID's of ALL Distance functions FUNCTION()
     def on_enter(self):
         table_width = dp(Window.size[0]*9/50)
         table = MDDataTable(
@@ -273,13 +284,15 @@ class UpdateModels(Screen):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'dataanalystmenu'
 
+    def logout(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'login'
+
     ##MICHAEL - SAMPLE OF UPDATE MODEL FUNCTION METHOD
     ##MICHAEL - SAMPLE OF DELETE DISTANCE FUNCTION METHOd
     ##MICHAEL - SAMPLE OF CREATE DISTANCE FUNCTION METHOd
 #---11---
 class ManageUsers(Screen):
-    def __init__(self, **kwargs):
-        super(ManageUsers, self).__init__(**kwargs)
     def on_enter(self):
         ##MICHAEL - GET ALL USERS data = [(id, name, attribute number, dataline, timestamp),(another one),(another one)]
         table_width = dp(Window.size[0]*9/50)
@@ -314,40 +327,36 @@ class ManageUsers(Screen):
         print (f'ID of pressed line is: {self.table.row_data[row_num][0]}')
         app = MDApp.get_running_app()
         app.user_id = int(self.table.row_data[row_num][0])
-        app.jsonItem = {'id':int(self.table.row_data[row_num][0]),
-                        'name':self.table.row_data[row_num][1],
-                        'password':self.table.row_data[row_num][2],
-                        'type':self.table.row_data[row_num][3],
-                        }
-        print (app.jsonItem)
+        app.dictionary =  {
+            "id": int(self.table.row_data[row_num][0]),
+            "name": self.table.row_data[row_num][1],
+            "password": self.table.row_data[row_num][2],
+            "type": self.table.row_data[row_num][3],
+        }
         self.manager.transition = SlideTransition(direction="left")
         self.manager.current = 'cruduser'
     # Function for add user
     def on_add(self):
         app = MDApp.get_running_app()
-        app.jsonItem = {}
+        app.dictionary = {}
         
         self.manager.transition = SlideTransition(direction="left")
         self.manager.current = 'cruduser'
-    # Function for go back to login page
-    def on_back(self):
+
+    def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
 #---12---
 class CrudUser(Screen):
-    def __init__(self, **kwargs):
-        super(CrudUser, self).__init__(**kwargs)
     def on_enter(self):
-        if (app.jsonItem=={}):
+        app = MDApp.get_running_app()
+        if (app.dictionary=={}):
             self.ids['header'].text= "New User"
-            self.ids['name'].hint_text= "Name"
-            self.ids['password'].hint_text= "Password"
-            self.ids['type'].hint_text= "type"
         else:
-            self.ids['header'].text= app.jsonItem.id
-            self.ids['name'].hint_text= app.jsonItem.name
-            self.ids['password'].hint_text= app.jsonItem.password
-            self.ids['type'].hint_text= app.jsonItem.type
+            self.ids['header'].text= "user id: "+str(app.dictionary['id'])
+            self.ids['name'].text= str(app.dictionary['name'])
+            self.ids['password'].text= str(app.dictionary['password'])
+            self.ids['type'].text= str(app.dictionary['type'])
     ##MICHAEL - SAMPLE OF CREATE USER METHOd
     def on_delete(self):
         ## MICHAEL - DELETE USER
@@ -362,29 +371,38 @@ class CrudUser(Screen):
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'manageusers'
+    def logout(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'login'
 #---13---
 class ChooseModels(Screen):
-    pass
+    def logout(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'login'
 #---14---
 class AnalystResults(Screen):
-    pass
+    def logout(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'login'
 # WINDOW MANAGER ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class AnomalabApp(MDApp):
+    #GENERAL
     logo = StringProperty('gui/images/logo.jpg')
     icon = StringProperty('gui/images/icon.jpg')
     title = StringProperty('Anomalab')
+    #CONTROLLERS
     userController=UsersController()
     datasetController=DatasetsController()
     modelController=ModelsController()
-    #PUT DISTANCE FUNCTION CONTROLLER
+    #INNER VALUES
+    dataSetObject = ObjectProperty(None)
     username = StringProperty(None)
     usertype = NumericProperty(None)
-    datasetname = StringProperty(None)
-    datasetID = NumericProperty(None)
     modelID = NumericProperty(None)
     userID = NumericProperty(None)
     distancefunctionID = NumericProperty(None)
-    jsonItem = {}
+    dictionary = {}
+    
     def build(self):
         self.theme_cls.theme_style = "Light"
         self.theme_cls.primary_palette = "BlueGray"

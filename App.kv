@@ -33,12 +33,18 @@ ScreenManager:
     pos_hint: {"x":0.3, "top": 0.4}
     size_hint: (0.4, 0.3)
     halign: "center"
+<HeaderButton@MDFillRoundFlatButton>:
+    text: 'Logout'
+    pos_hint: {"x":0.7, "top": 0.75}
+    font_size: 24
+    size_hint: (0.2, 0.5)
 # ---GENERAL INPUT
 <FreeTextInput@MDTextField>:
     max_text_length: 30
     multiline: False
     padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
     font_size: 24
+    mode: "rectangle"
 <MainSpinnerOption@SpinnerOption>:
     font_size: 24
 <MainSpinner@Spinner>:
@@ -129,10 +135,11 @@ ScreenManager:
             LogoImage:
             HeaderText:
                 text: "Choose Dataset"
+            HeaderButton:
+                on_release: root.logout()
         Main:
             MainSpinner:
                 text: "Choose Dataset"
-                values: root.datasetsNames
                 id: spinner_id
                 pos_hint: {"x":0.25, "top": 0.6}
                 size_hint: (0.5, 0.2)
@@ -150,6 +157,8 @@ ScreenManager:
             LogoImage:
             HeaderText:
                 text: "Insert Query"
+            HeaderButton:
+                on_release: root.logout()
         Main:
             GridLayout:
                 pos_hint: {"x":0.05, "top": 0.95}
@@ -176,6 +185,8 @@ ScreenManager:
             LogoImage:
             HeaderText:
                 text: "Results"
+            HeaderButton:
+                on_release: root.logout()
         Main: 
             Label:
                 text: "results will come here"
@@ -196,6 +207,8 @@ ScreenManager:
             LogoImage:
             HeaderText:
                 text: "Menu"
+            HeaderButton:
+                on_release: root.logout()
         Main:
             MDFillRoundFlatButton:
                 pos_hint: {"x":0.1, "top": 0.9}
@@ -234,6 +247,8 @@ ScreenManager:
             LogoImage:
             HeaderText:
                 text: "Manage Datasets"
+            HeaderButton:
+                on_release: root.logout()
         Main:
             id: table_place
         Footer:
@@ -249,6 +264,8 @@ ScreenManager:
             LogoImage:
             HeaderText:
                 text: "Crud Dataset"
+            HeaderButton:
+                on_release: root.logout()
         Main:
         Footer:
 # ---8---
@@ -259,6 +276,8 @@ ScreenManager:
             LogoImage:
             HeaderText:
                 text: "Manage Distance Functions"
+            HeaderButton:
+                on_release: root.logout()
         Main:
             id: table_place
         Footer:
@@ -274,6 +293,8 @@ ScreenManager:
             LogoImage:
             HeaderText:
                 text: "Crud Distance Functions"
+            HeaderButton:
+                on_release: root.logout()
         Main:
         Footer:
 # ---10---
@@ -284,6 +305,8 @@ ScreenManager:
             LogoImage:
             HeaderText:
                 text: "Update Models"
+            HeaderButton:
+                on_release: root.logout()
         Main:
             id: table_place
         Footer:
@@ -302,17 +325,15 @@ ScreenManager:
             LogoImage:
             HeaderText:
                 text: "Manage Users"
+            HeaderButton:
+                on_release: root.logout()
         Main:
             id: table_place
         Footer:
             FooterButton:
                 text: 'Add User'
-                pos_hint: {"x":0.25, "top": 0.6}
+                pos_hint: {"x":0.4, "top": 0.6}
                 on_press: root.on_add()
-            FooterButton:
-                text: 'Back'
-                pos_hint: {"x":0.55, "top": 0.6}
-                on_press: root.on_back()
 # ---12---
 <CrudUser>:
     name: "cruduser"
@@ -322,17 +343,22 @@ ScreenManager:
             HeaderText:
                 id: header
                 text: "Crud User"
+            HeaderButton:
+                on_release: root.logout()
         Main:
             FreeTextInput:
                 id: name
+                hint_text: "Name"
                 pos_hint: {"x":0.3, "top": 0.9}
                 size_hint: (0.4, 0.2)
             FreeTextInput:
                 id: password
+                hint_text: "Password"
                 pos_hint: {"x":0.3, "top": 0.6}
                 size_hint: (0.4, 0.2)
             MainSpinner:
                 id: type
+                text: "Type"
                 values: ["regular","data analyst","admin"]
                 pos_hint: {"x":0.3, "top": 0.3}
                 size_hint: (0.4, 0.2)
@@ -347,7 +373,7 @@ ScreenManager:
                 on_press: root.on_delete()
             FooterButton:
                 text: 'Back'
-                pos_hint: {"x":0.4, "top": 0.6}
+                pos_hint: {"x":0.7, "top": 0.6}
                 on_press: root.on_back()
             
 # ---13---
@@ -358,6 +384,8 @@ ScreenManager:
             LogoImage:
             HeaderText:
                 text: "Choose Models"
+            HeaderButton:
+                on_release: root.logout()
         Main:
         Footer:
 # ---14---
@@ -368,6 +396,8 @@ ScreenManager:
             LogoImage:
             HeaderText:
                 text: "Analyst Results"
+            HeaderButton:
+                on_release: root.logout()
         Main:
             MDLabel:
                 text: "results will come here"
