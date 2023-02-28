@@ -193,6 +193,11 @@ class ManageDatasets(Screen):
         }
         self.manager.transition = SlideTransition(direction="left")
         self.manager.current = 'cruddatasets'
+    def on_add(self):
+        app = MDApp.get_running_app()
+        app.dictionary = {}
+        self.manager.transition = SlideTransition(direction="left")
+        self.manager.current = 'cruddatasets'
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'dataanalystmenu'
@@ -206,16 +211,51 @@ class CrudDatasets(Screen):
     ##MICHAEL - SAMPLE OF DELETE DATASET METHOd
     ##MICHAEL - SAMPLE OF CREATE DATASET METHOd
     mode = ""
-    attributes_data=[{'text': str(x)} for x in range (20)]
+    data = []
     def on_enter(self):
         app = MDApp.get_running_app()
         if (app.dictionary=={}):
             self.ids['header'].text= "New Dataset"
             self.mode = "add"
+            self.data = []
         else:
             self.ids['header'].text= "dataset name: "+str(app.dictionary['name'])
             #self.idf[...].text= ...
             self.mode = "update"
+            self.data = [
+                ("name", "categorial", "Dana, Michael, Noam"),
+                ("height", "numeric", ""),
+                ("grade", "numeric", ""),
+            ]
+        
+        table_width = dp(Window.size[0]*6/50)
+        self.table = MDDataTable(
+            pos_hint = {'x': 0.05, 'top': 0.95},
+            size_hint= (0.9, 0.9),
+            use_pagination = True,
+            rows_num = 3,
+            pagination_menu_height = '240dp',
+            column_data = [
+                ("Name", dp (table_width*0.25)),
+                ("Type", dp (table_width*0.25)),
+                ("Values", dp (table_width*0.5)),
+            ],
+            #row_data = attributes table
+            ## MICHAEL - FIX GetDATASET INFO
+            
+    
+            row_data = self.data
+        )
+        self.table.bind(on_row_press=self.row_press)
+        self.ids['attributes_place'].add_widget(self.table)
+        
+    def row_press(self, instance_table, instance_row):
+        index = instance_row.index
+        cols_num = len(instance_table.column_data)
+        row_num = int(index/cols_num)
+        print (f'press on row_num is: {row_num}')
+        print (f'ID of pressed line is: {self.table.row_data[row_num][0]}')
+
     def on_delete(self):
         ## MICHAEL - DELETE Dataset
         print (f"delete dataset: {self.ids['header']}")

@@ -52,17 +52,10 @@ ScreenManager:
     halign: "center"
     text_size: root.width, None
     size: self.texture_size
-# ---ATTRIBUTES INPUT
-<scrollerWidget@RecycleBoxLayout>:
-    padding: 30
-    spacing: 10
-    orientation: "vertical"
-
 # ---FOOTER BUTTONS
 <FooterButton@MDFillRoundFlatButton>:
     font_size: 24
     size_hint: (0.2, 0.4)
-
 # ---SECTIONS---
 <Window@MDFloatLayout>:
     size: root.width, root.height
@@ -280,11 +273,10 @@ ScreenManager:
                 hint_text: "data path"
                 pos_hint: {"x":0.3, "top": 0.8}
                 size_hint: (0.4, 0.2)
-            scrollerWidget:
+            FloatLayout:
                 id: attributes_place
-                data: root.attributes_data
                 pos_hint: {"x":0.2, "top": 0.6}
-                size_hint: (0.6, 0.4)
+                size_hint: (0.6, 0.6)
         Footer:
             FooterButton:
                 text: 'Apply'
