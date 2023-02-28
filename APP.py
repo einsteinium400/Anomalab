@@ -5,7 +5,6 @@ from kivy.uix.screenmanager import Screen, SlideTransition
 from kivy.properties import StringProperty, NumericProperty, ObjectProperty
 from kivy.lang import Builder
 from kivy.core.window import Window
-import json
 #table imports
 from kivymd.uix.datatables import MDDataTable
 from kivy.metrics import dp
@@ -55,6 +54,8 @@ class Login(Screen):
     def resetForm(self):
         self.ids['user_name'].text = ""
         self.ids['user_pass'].text = ""
+    def close(self):
+        MDApp.get_running_app().stop()
 #---2---
 class ChooseDataset(Screen):
     def on_enter(self):
@@ -157,8 +158,8 @@ class DataAnalystMenu(Screen):
 #---6---
 class ManageDatasets(Screen):
     def on_enter(self):
-        self.datasetsController = DatasetsController()
         table_width = dp(Window.size[0]*9/50)
+        #print (app.datasetController.GetAllDatasetsInfoList())
         self.table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
             size_hint= (0.9, 0.9),
@@ -166,25 +167,35 @@ class ManageDatasets(Screen):
             rows_num = 5,
             pagination_menu_height = '240dp',
             column_data = [
-                ("ID", dp (table_width*0.1)),
                 ("Name", dp (table_width*0.25)),
-                ("Attributes", dp (table_width*0.20)),
-                ("Instances", dp (table_width*0.20)),
+                ("Attributes", dp (table_width*0.25)),
+                ("Instances", dp (table_width*0.25)),
                 ("Time stamp", dp (table_width*0.25)),
             ],
-            row_data = self.datasetsController.GetAllDatasetsInfoList()
-            # row_data = [
-            #     ("1", "lymphography", "19", "148", "22-02-2023, 10:51:12"),
-            #     ("2", "adult", "14", "32561", "22-02-2023, 10:50:32"),
-            # ]
+            #row_data = app.datasetController.GetAllDatasetsInfoList()
+            ## MICHAEL - FIX GetAllDatasetsInfoList GET LIST OR JSON OF EVERYTHING
+            row_data = [
+                ("lymphography", "19", "148", "22-02-2023, 10:51:12"),
+                ("adult", "14", "32561", "22-02-2023, 10:50:32"),
+            ]
         )
         self.table.bind(on_row_press=self.row_press)
         self.ids['table_place'].add_widget(self.table)
-
+    def row_press(self, instance_table, instance_row):
+        index = instance_row.index
+        cols_num = len(instance_table.column_data)
+        row_num = int(index/cols_num)
+        print (f'press on row_num is: {row_num}')
+        print (f'name of pressed line is: {self.table.row_data[row_num][0]}')
+        app = MDApp.get_running_app()
+        app.dictionary =  {
+            "name": self.table.row_data[row_num][1],
+        }
+        self.manager.transition = SlideTransition(direction="left")
+        self.manager.current = 'cruddatasets'
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'dataanalystmenu'
-
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
@@ -194,7 +205,34 @@ class CrudDatasets(Screen):
     ##MICHAEL - SAMPLE OF UPDATE DATASET METHOD
     ##MICHAEL - SAMPLE OF DELETE DATASET METHOd
     ##MICHAEL - SAMPLE OF CREATE DATASET METHOd
-
+    mode = ""
+    attributes_data=[{'text': str(x)} for x in range (20)]
+    def on_enter(self):
+        app = MDApp.get_running_app()
+        if (app.dictionary=={}):
+            self.ids['header'].text= "New Dataset"
+            self.mode = "add"
+        else:
+            self.ids['header'].text= "dataset name: "+str(app.dictionary['name'])
+            #self.idf[...].text= ...
+            self.mode = "update"
+    def on_delete(self):
+        ## MICHAEL - DELETE Dataset
+        print (f"delete dataset: {self.ids['header']}")
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'managedatasets'
+    def on_apply(self):
+        if (self.mode=="add"):
+            ## MICHAEL - CREATE Dataset
+            print (f"add dataset: {self.ids['header']}")
+        else:
+            ## MICHAEL - UPDATE Dataset
+            print (f"update dataset: {self.ids['header']}")
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'managedatasets'
+    def on_back(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'managedatasets'
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
@@ -294,8 +332,10 @@ class UpdateModels(Screen):
 #---11---
 class ManageUsers(Screen):
     def on_enter(self):
+        app = MDApp.get_running_app()
         ##MICHAEL - GET ALL USERS data = [(id, name, attribute number, dataline, timestamp),(another one),(another one)]
         table_width = dp(Window.size[0]*9/50)
+        print (app.userController.GetAllUsers())
         self.table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
             size_hint= (0.9, 0.9),
@@ -314,19 +354,17 @@ class ManageUsers(Screen):
                 ("3", "admin", "admin", "admin"),
             ]
         )
+        # bind function to row press
         self.table.bind(on_row_press=self.row_press)
         self.ids['table_place'].add_widget(self.table)
     # Function for row presses
     def row_press(self, instance_table, instance_row):
-        #Called when a table row is clicked
-        print(instance_table, instance_row)
         index = instance_row.index
         cols_num = len(instance_table.column_data)
         row_num = int(index/cols_num)
         print (f'press on row_num is: {row_num}')
         print (f'ID of pressed line is: {self.table.row_data[row_num][0]}')
         app = MDApp.get_running_app()
-        app.user_id = int(self.table.row_data[row_num][0])
         app.dictionary =  {
             "id": int(self.table.row_data[row_num][0]),
             "name": self.table.row_data[row_num][1],
@@ -335,37 +373,40 @@ class ManageUsers(Screen):
         }
         self.manager.transition = SlideTransition(direction="left")
         self.manager.current = 'cruduser'
-    # Function for add user
     def on_add(self):
         app = MDApp.get_running_app()
         app.dictionary = {}
-        
         self.manager.transition = SlideTransition(direction="left")
         self.manager.current = 'cruduser'
-
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
 #---12---
 class CrudUser(Screen):
+    mode = ""
     def on_enter(self):
         app = MDApp.get_running_app()
         if (app.dictionary=={}):
             self.ids['header'].text= "New User"
+            self.mode = "add"
         else:
             self.ids['header'].text= "user id: "+str(app.dictionary['id'])
             self.ids['name'].text= str(app.dictionary['name'])
             self.ids['password'].text= str(app.dictionary['password'])
             self.ids['type'].text= str(app.dictionary['type'])
-    ##MICHAEL - SAMPLE OF CREATE USER METHOd
+            self.mode = "update"
     def on_delete(self):
         ## MICHAEL - DELETE USER
         print (f"id: {self.ids['header']}, name: {self.ids['name']}, password: {self.ids['password']}, type: {self.ids['type']}")
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'manageusers'
-    def on_update(self):
-        ## MICHAEL - UPDATE USER
-        print (f"id: {self.ids['header']}, name: {self.ids['name']}, password: {self.ids['password']}, type: {self.ids['type']}")
+    def on_apply(self):
+        if (self.mode=="add"):
+            ## MICHAEL - CREATE USER
+            print (f"add id: {self.ids['header']}, name: {self.ids['name']}, password: {self.ids['password']}, type: {self.ids['type']}")
+        else:
+            ## MICHAEL - UPDATE USER
+            print (f"update id: {self.ids['header']}, name: {self.ids['name']}, password: {self.ids['password']}, type: {self.ids['type']}")
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'manageusers'
     def on_back(self):
@@ -398,9 +439,6 @@ class AnomalabApp(MDApp):
     dataSetObject = ObjectProperty(None)
     username = StringProperty(None)
     usertype = NumericProperty(None)
-    modelID = NumericProperty(None)
-    userID = NumericProperty(None)
-    distancefunctionID = NumericProperty(None)
     dictionary = {}
     
     def build(self):
