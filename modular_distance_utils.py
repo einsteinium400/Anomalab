@@ -3,7 +3,7 @@ import os
 import ast
 import astor
 import inspect
-
+import re
 import Moudles.Functions.DistanceFunctions
 
 function_list = []
@@ -11,34 +11,57 @@ function_list = []
 DISTANCE_FUNCTIONS_PATH = "Moudles/Functions/DistanceFunctions.py"
 
 
-def load_user_distance_functions(source_dir):
+def load_user_distance_functions(content):
     # Initialize a list to hold the AST nodes for the function definitions
-    function_nodes = []
+    with open(DISTANCE_FUNCTIONS_PATH, 'a') as target_file:
+        # Write the string to the target file
+       target_file.write(content)
 
-    # Iterate over all Python files in the directory
-    for root, dirs, files in os.walk(source_dir):
-        for file in files:
-            if file.endswith(".py"):
-                # Get the full path of the file
-                file_path = os.path.join(root, file)
+    # Define a regular expression pattern to match function definitions
+    pattern = re.compile(r'^\s*def\s+(\w+)\s*\(', re.MULTILINE)
 
-                # Open the file and extract the function definitions
-                with open(file_path, "r") as f:
-                    source = f.read()
-                    module = ast.parse(source)
-                    for node in module.body:
-                        #if isinstance(node, ast.FunctionDef):
-                        if isinstance(node, ast.FunctionDef):
-                            function_nodes.append(node)
+    # Search the source code for the function definition
+    match = pattern.search(content)
 
-    # Write the AST nodes to a new file
-    with open(DISTANCE_FUNCTIONS_PATH, "a") as outfile:
-        outfile.write(astor.to_source(ast.Module(body=function_nodes)))
-
-    # refresh distance function module
-    importlib.reload(Moudles.Functions.DistanceFunctions)
+    if match:
+        function_name = match.group(1)
+        print(function_name)  # Outputs function name
+    else:
+        print("Function not found in file.")
 
     refresh_functions_list()
+
+    return function_name
+#    refresh_functions_list()
+
+
+
+
+    # function_nodes = []
+
+    # # Iterate over all Python files in the directory
+    # for root, dirs, files in os.walk(source_dir):
+    #     for file in files:
+    #         if file.endswith(".py"):
+    #             # Get the full path of the file
+    #             file_path = os.path.join(root, file)
+
+    #             # Open the file and extract the function definitions
+    #             with open(file_path, "r") as f:
+    #                 source = f.read()
+    #                 module = ast.parse(source)
+    #                 for node in module.body:
+    #                     #if isinstance(node, ast.FunctionDef):
+    #                     if isinstance(node, ast.FunctionDef):
+    #                         function_nodes.append(node)
+
+    # # Write the AST nodes to a new file
+    # with open(DISTANCE_FUNCTIONS_PATH, "a") as outfile:
+    #     outfile.write(astor.to_source(ast.Module(body=function_nodes)))
+
+    # # refresh distance function module
+    # importlib.reload(Moudles.Functions.DistanceFunctions)
+    # print (function_list)
 
     # todo: update in mongoDB
 
@@ -77,8 +100,7 @@ def delete_user_function(function_name):
                 i += 1
 
     # refresh distance function module
-    importlib.reload(Moudles.Functions.DistanceFunctions)
-
+    importlib.reload(DISTANCE_FUNCTIONS_PATH)
     refresh_functions_list()
 
 

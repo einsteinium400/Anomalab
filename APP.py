@@ -296,7 +296,7 @@ class ManageDistanceFunctions(Screen):
         print (f'name of pressed line is: {self.table.row_data[row_num][0]}')
         app = MDApp.get_running_app()
         app.dictionary =  {
-            "name": self.table.row_data[row_num][1],
+            "name": self.table.row_data[row_num][0],
         }
         self.manager.transition = SlideTransition(direction="left")
         self.manager.current = 'uddistancefunction'
@@ -320,13 +320,13 @@ class AddDistanceFunction(Screen):
             print(filename[0])
         except:
             pass
-    def on_add(self, name, path):
+    def on_add(self, path):
         app = MDApp.get_running_app()
         try:
-            if (name == '' or path == ''):
+            if (path == ''):
                 raise Exception(f"Must enter name & choose file")
-            app.distanceController.add_function(path, name)
-            show_popup(f"ADD DISTANCE FUCNTION {name} SUCCESS")
+            app.distanceController.add_function(path)
+            show_popup(f"ADD DISTANCE FUCNTION SUCCESS")
         except Exception as e:
             self.resetForm()
             show_popup(str(e))
@@ -340,30 +340,22 @@ class AddDistanceFunction(Screen):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
     def resetForm(self):
-        self.ids['name'].text = ""
         self.ids['path'].text = ""
 class UDDistanceFunction(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
-        if app.dictionary == {}:
-            self.ids['apply'].text=f'Apply'
-        else:
-            self.ids['header'].text=f'Distance function: {app.dictionary.name}'
-            self.ids['apply'].text=f'Delete'
-    ##MICHAEL - GET ONE DISTANCE FUNCTION(dataset ID)
-    ##MICHAEL - SAMPLE OF DELETE DISTANCE FUNCTION METHOd
-    ##MICHAEL - SAMPLE OF CREATE DISTANCE FUNCTION METHOd
-    def selected(self, filename):
-        try:
-            self.ids.path.text = filename[0]
-            print(filename[0])
-        except:
-            pass
-    def on_apply(self):
+        self.ids['name'].text= str(app.dictionary['name'])
+    def on_delete(self, name):
+        print (f"delete distance function: {name}")
         app = MDApp.get_running_app()
-        if app.dictionary == {}:
-            print (f'add function for {self.ids.path.text}')
-        pass
+        try:
+            app.distanceController.delete_function(name)
+            show_popup(f"DELETE DISTANCE FUNCTION {name} SUCCESS")
+        except Exception as e:
+            show_popup(str(e))
+            return
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'managedistancefunctions'
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'managedistancefunctions'

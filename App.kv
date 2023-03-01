@@ -373,28 +373,23 @@ ScreenManager:
                 on_release: root.logout()
         Main:
             FreeTextInput:
-                id: name
-                hint_text: "Name"
-                pos_hint: {"x":0.3, "top": 1}
-                size_hint: (0.4, 0.2)
-            FreeTextInput:
                 id: path
                 max_text_length: 100
-                pos_hint: {"x":0.1, "top": 0.8}
+                pos_hint: {"x":0.1, "top": 0.95}
                 size_hint: (0.8, 0.2)
                 hint_text: "File Path"
                 text: ""
             FileChooserListView:
                 id: filechooser
-                pos_hint: {"x":0.1, "top": 0.6}
-                size_hint: (0.8, 0.6)
+                pos_hint: {"x":0.1, "top": 0.7}
+                size_hint: (0.8, 0.65)
                 on_selection: root.selected(filechooser.selection)
         Footer:
             FooterButton:
                 id: apply
                 text: "Add"
                 pos_hint: {"x":0.25, "top": 0.6}
-                on_press: root.on_add(name.text, path.text)
+                on_press: root.on_add(path.text)
             FooterButton:
                 text: 'Back'
                 pos_hint: {"x":0.55, "top": 0.6}
@@ -410,24 +405,17 @@ ScreenManager:
             HeaderButton:
                 on_release: root.logout()
         Main:
-            FreeTextInput:
-                id: path
-                max_text_length: 100
-                pos_hint: {"x":0.1, "top": 0.95}
-                size_hint: (0.8, 0.2)
-                hint_text: "File Path"
-                text: ""
-            FileChooserListView:
-                id: filechooser
-                pos_hint: {"x":0.1, "top": 0.7}
-                size_hint: (0.8, 0.65)
-                on_selection: root.selected(filechooser.selection)
+            MDLabel:
+                id: name
+                pos_hint: {"x":0.3, "top": 0.6}
+                size_hint: (0.4, 0.2)
+                font_size: 24
+
         Footer:
             FooterButton:
-                id: apply
-                text: ""
+                text: "DELETE"
                 pos_hint: {"x":0.25, "top": 0.6}
-                on_press: root.on_apply()
+                on_press: root.on_delete(name.text)
             FooterButton:
                 text: 'Back'
                 pos_hint: {"x":0.55, "top": 0.6}

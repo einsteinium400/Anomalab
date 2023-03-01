@@ -7,8 +7,9 @@ from Moudles.Storage.OperationsMongo import OperationsMongo
 from Moudles.Storage.OperationsMongo import Operations
 
 import base64
+import inspect
 
-path = modular_distance_utils.DISTANCE_FUNCTIONS_PATH
+# path = modular_distance_utils.DISTANCE_FUNCTIONS_PATH
 
 
 class Distance_Functions_Controller:
@@ -19,8 +20,8 @@ class Distance_Functions_Controller:
         self.mongo_operations = operationFactory.CreateOperationItem()
 
         # make sure the functions dir exists and create it if it doesnt
-        if not os.path.exists(path):
-            os.makedirs(path)
+        if not os.path.exists(modular_distance_utils.DISTANCE_FUNCTIONS_PATH):
+            os.makedirs(modular_distance_utils.DISTANCE_FUNCTIONS_PATH)
 
         # upload dynamically all functions from mongoDB
         functions = self.mongo_operations.GetFullItemsList("FUNCTION")
@@ -34,7 +35,7 @@ class Distance_Functions_Controller:
             file_content+="\n\n"
 
         # copy the string content to a file
-        with open(path, "w") as file:
+        with open(modular_distance_utils.DISTANCE_FUNCTIONS_PATH, "w") as file:
             file.write(file_content)
 
         modular_distance_utils.refresh_functions_list()
@@ -50,7 +51,7 @@ class Distance_Functions_Controller:
         # delete in functions list
         modular_distance_utils.delete_user_function(name)
 
-    def add_function(self, file_dir, name):
+    def add_function(self, file_dir):
         with open(file_dir, 'r') as source_file:
             contents = source_file.read()
 
@@ -58,17 +59,19 @@ class Distance_Functions_Controller:
         print(type(encoded_string))
         print(encoded_string)
 
+        new_func_name=modular_distance_utils.load_user_distance_functions(contents)
+
+
         data = {
             "id": "y5",
             "function": encoded_string,
-            "name": name
+            "name": new_func_name
         }
 
         jsonData = data  # json.dumps(data)
 
         # update database
-        self.mongo_operations.Save(name, jsonData, "FUNCTION")
+        self.mongo_operations.Save(new_func_name, jsonData, "FUNCTION")
 
         # update functions list
         print(dir)
-        modular_distance_utils.load_user_distance_functions(file_dir)
