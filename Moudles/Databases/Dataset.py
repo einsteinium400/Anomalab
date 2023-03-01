@@ -5,6 +5,7 @@ import uuid
 import pandas as pd
 import time
 
+from Moudles.Databases.DatasetPreProcessor import DatasetPreProcessor
 from Moudles.Databases.RawDatasetData import RawDatasetData
 from Moudles.Storage.StorageFactory import StorageFactory
 
@@ -24,12 +25,16 @@ class Dataset:
             dataFrame=None
     ):
         if (dataFrame is not None):
+            dfProccesor = DatasetPreProcessor()
+
             self._name = name
+            newData, attribuesInfo = dfProccesor.dataSetPreProcess(self._name,dataFrame)
             self._id = str(uuid.uuid1())
             self._timeStamp = time.time()
             self._featuresNumber = len(dataFrame.columns.values.tolist())
             self._featureNames = dataFrame.columns.values.tolist()
             self._instancesNumber = len(dataFrame.values.tolist())
+            self._attributesInfo = attribuesInfo
             self._data = self._name
             self._importantFeatures = []
             self._bestModel = "none"
@@ -42,9 +47,10 @@ class Dataset:
                 "featureNames": self._featureNames,
                 "importantfeatures":self._importantFeatures,
                 "instancesNumber":self._instancesNumber,
+                "attribuesInfo":self._attributesInfo,
                 "data": self._data
             }
-            RawDatasetData(self._name,dataFrame)
+            RawDatasetData(self._name,newData)
         else:
             self._name = name
             self._jsonData = self.LoadDataset()
@@ -56,6 +62,7 @@ class Dataset:
             self._data = self._jsonData['data']
             self._importantFeatures = self._jsonData['featureNames']
             self._bestModel = self._jsonData['bestmodel']
+            self._attributesInfo = self._jsonData['attribuesInfo']
 
     @property
     def Id(self):
@@ -96,6 +103,15 @@ class Dataset:
     @ImportFeatures.setter
     def ImportFeatures(self, value):
         self._importantFeatures = value
+        self.SaveDataset()
+
+    @property
+    def AttributesInfo(self):
+        return self._attributesInfo
+
+    @AttributesInfo.setter
+    def AttributesInfo(self, value):
+        self._attributesInfo = value
         self.SaveDataset()
 
     @property

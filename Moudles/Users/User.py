@@ -51,6 +51,7 @@ class User:
             self._jsonData = self.LoadUser()
             self._password = self._jsonData['pass']
             self._type = self._jsonData['type']
+            self._id = self._jsonData['id']
 
     def __str__(self):
         return f"The username name is {self._username}"
