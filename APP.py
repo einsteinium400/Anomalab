@@ -13,6 +13,11 @@ from kivymd.uix.label import MDLabel
 from kivymd.uix.textfield import MDTextFieldRect
 from kivy.uix.spinner import Spinner
 
+# Controllers import
+from Moudles.Databases.DatasetsController import DatasetsController
+from Moudles.Models.ModelController import ModelsController
+from Moudles.Users.UsersController import UsersController
+
 from gui.popup import show_popup
 
 Builder.load_file('App.kv')
@@ -21,6 +26,7 @@ Builder.load_file('App.kv')
 #---1---
 class Login(Screen):
     def do_login(self, name, password):
+
         if (name == '' or password == ''):
             self.resetForm()
             show_popup("Must enter user name and password")
@@ -29,9 +35,22 @@ class Login(Screen):
         app = MDApp.get_running_app()
         app.username = name
         print (f'login: name-{name} pass-{password}')
-
+        userController = UsersController()
+        attemptedLoginUser = None
+        try:
+            attemptedLoginUser = userController.GetUser(name)
+        except Exception as e:
+            self.resetForm()
+            show_popup(str(e))
+            return
+        if attemptedLoginUser.VerifyPassword(password) == False:
+            self.resetForm()
+            show_popup("Incorrect Password")
+            return
+        app.usertype = attemptedLoginUser.TypeNum()
         ##MICHAEL-PUT LOGIN FUNCTION send her name and password and return user type (app.usertype = LOGIN(name, password))
-        app.usertype = password
+        ## NOAM - Check I did it a bit diffrent by type is set
+        # app.usertype = password
         if (app.usertype > 0):
             self.manager.transition = SlideTransition(direction="left")
             if (app.usertype == 1):
@@ -50,11 +69,13 @@ class Login(Screen):
         self.ids['user_pass'].text = ""
 #---2---
 class ChooseDataset(Screen):
-    ## MICHAEL - PUT get datasets
 
+    ## MICHAEL - PUT get datasets
     ## MICHAEL - datasetsNames = only array of names)
-    datasetsNames = ["lymphography","adult"]
-       
+    ## NOAM - DONE
+    # datasetsNames = ["lymphography","adult"]
+    datasetsController = DatasetsController()
+    datasetsNames = datasetsController.GetAllDatasetsNamesList()
     def __init__(self, **kwargs):
         super(ChooseDataset, self).__init__(**kwargs)
         
@@ -65,9 +86,13 @@ class ChooseDataset(Screen):
         app = MDApp.get_running_app()
         
         ## MICHAEL - app.datasetname = dataset name
-        app.datasetname = dataset
+        # app.datasetname = dataset
+        dataSetObject = self.datasetsController.GetDataset(dataset)
+        app.datasetname = dataSetObject.Name
         ## MICHAEL - app.datasetID = dataset ID
-        app.datasetID = 0
+        app.datasetID = dataSetObject.Id
+
+        ## NOAM - Done
 
         self.manager.transition = SlideTransition(direction="left")
         self.manager.current = 'query'
@@ -76,6 +101,14 @@ class Query(Screen):
     attributesRefs=[]
     def __init__(self, **kwargs):
         super(Query, self).__init__(**kwargs)
+        self.datasetsController = DatasetsController()
+        self.datasetsNames = self.datasetsController.GetAllDatasetsNamesList()
+        ## TODO: Need to find Name
+        # self.dataSetObject = self.datasetsController.GetDataset()
+
+        ## NOAM - Need clarification what is the name of the dataset???
+        ## It will be for all this class
+
         ## MICHAEL GET DATASET FEATURE DETAILS
         ## MICHAEL ATTRIBUTES NUMBER
         attributesNumber=3
@@ -83,7 +116,7 @@ class Query(Screen):
         attributesNames=["attribute1","attribute2","attribute3"]
         ## MICHAEL ATTRIBUTES TYPES (0 - NUMERIC, 1 - CATEGORIAL)
         attributeTypes=[0,0,1]
-        ## MICHAEL CATEGORIES FOR EACH CATEGORICAL ATTRIBUTE
+        ## MICHAEL CATEGORIES FOR EACH CATEGORICAL ATTRIBUTE -- TODO:Add caterogries availble for each item and types
         attributeCategories=["cat1","cat2","cat3","cat4","cat5"]
 
         for i in range(attributesNumber):
@@ -102,7 +135,7 @@ class Query(Screen):
         print (f'query is {query}')
         
         app = MDApp.get_running_app()
-        
+        ## MICHAEL - TODO: Work on model controller yet to be done sorry
         ## MICHAEL- get BEST MODEL ID for model ID in app.DatasetID ,if no model return 0
         app.model = 1
 
@@ -130,7 +163,9 @@ class DataAnalystMenu(Screen):
 class ManageDatasets(Screen):
     def __init__(self, **kwargs):
         super(ManageDatasets, self).__init__(**kwargs)
+        self.datasetsController = DatasetsController()
         ##MICHAEL - GET ALL DATASETS data = [(id, name, attribute number, dataline, timestamp),(another one),(another one)]
+        ## NOAM - DONE
         table_width = dp(Window.size[0]*9/50)
         table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
@@ -145,10 +180,11 @@ class ManageDatasets(Screen):
                 ("Instances", dp (table_width*0.20)),
                 ("Time stamp", dp (table_width*0.25)),
             ],
-            row_data = [
-                ("1", "lymphography", "19", "148", "22-02-2023, 10:51:12"),
-                ("2", "adult", "14", "32561", "22-02-2023, 10:50:32"),
-            ]
+            row_data = self.datasetsController.GetAllDatasetsInfoList()
+            # row_data = [
+            #     ("1", "lymphography", "19", "148", "22-02-2023, 10:51:12"),
+            #     ("2", "adult", "14", "32561", "22-02-2023, 10:50:32"),
+            # ]
         )
         self.ids['table_place'].add_widget(table)
 

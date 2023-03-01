@@ -15,6 +15,11 @@ USERS_TYPE_DICT = {
     1: "analyst",
     2: "admin"
 }
+REVERSE_USERS_TYPE_DICT = {
+    "regular": 1,
+    "analyst":2,
+    "admin":3
+}
 
 
 class User:
@@ -34,7 +39,7 @@ class User:
             self._username = name
             self._id = str(uuid.uuid1())
             self._password = hashlib.md5(password.encode()).hexdigest()
-            self._type = type
+            self._type = USERS_TYPE_DICT[type]
             self._jsonData = {
                 "name": self._username,
                 "id": self._id,
@@ -47,6 +52,8 @@ class User:
             self._password = self._jsonData['pass']
             self._type = self._jsonData['type']
 
+    def __str__(self):
+        return f"The username name is {self._username}"
 
     @property
     def Id(self):
@@ -74,6 +81,9 @@ class User:
         self._type = value
         self.SaveUser()
 
+    def TypeNum(self):
+        return REVERSE_USERS_TYPE_DICT[self._type]
+
     def VerifyPassword(self,value):
         valueHash = hashlib.md5(value.encode()).hexdigest()
         if valueHash == self.Password:
@@ -90,3 +100,4 @@ class User:
         loader = operationFactory.CreateOperationItem()
         jsonData = loader.Load(self._username, "USER")
         return jsonData
+

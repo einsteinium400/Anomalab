@@ -46,6 +46,9 @@ class Model:
             self._numberOfClusters = len(self._jsonData['clusters_info'])
             self._clusters = self._jsonData['clusters_info']
 
+    def __str__(self):
+        return f"The model name is {self._name}"
+
     @property
     def Id(self):
         return self._id
@@ -57,8 +60,6 @@ class Model:
     @property
     def Timestamp(self):
         return self._timeStamp
-
-
 
     @property
     def Wcss(self):

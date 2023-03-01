@@ -4,10 +4,9 @@ import os
 import uuid
 import pandas as pd
 import time
-from dotenv import load_dotenv
 
 from Moudles.Storage.StorageFactory import StorageFactory
-
+from Moudles.Databases.RawDatasetData import RawDatasetData
 
 
 class Dataset:
@@ -30,7 +29,7 @@ class Dataset:
             self._id = str(uuid.uuid1())
             self._timeStamp = time.time()
             self._featureNames = dataFrame.columns.values.tolist()
-            self._data = dataFrame.values.tolist()
+            self._data = self._name
             self._importantFeatures = []
             self._bestModel = "none"
             self._jsonData = {
@@ -42,18 +41,16 @@ class Dataset:
                 "importantfeatures":self._importantFeatures,
                 "data": self._data
             }
+            RawDatasetData(self._name,dataFrame)
         else:
             self._name = name
             self._jsonData = self.LoadDataset()
-            print(self._jsonData)
-            print(type(self._jsonData))
             self._id = self._jsonData['id']
             self._timeStamp = self._jsonData['timestamp']
             self._featureNames = self._jsonData['featureNames']
-            self._data = self._jsonData.featureNames['data']
+            self._data = self._jsonData['data']
             self._importantFeatures = self._jsonData['featureNames']
             self._bestModel = self._jsonData['bestmodel']
-        # left to put other things
 
     @property
     def Id(self):
@@ -73,7 +70,7 @@ class Dataset:
 
     @property
     def Data(self):
-        return self._data
+        return self.getRawData()
 
     @property
     def JsonData(self):
@@ -123,3 +120,9 @@ class Dataset:
     @property
     def jsonData(self):
         return self._jsonData
+
+    def __str__(self):
+        return f"The dataset name is {self._name}"
+
+    def getRawData(self):
+        return RawDatasetData(self._name).Data

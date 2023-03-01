@@ -9,7 +9,8 @@ FILEPATH_DICT = {
     "FUNCTION": "functions",
     "DATASET": "datasets",
     "MODEL": "models",
-    "USER":"users"
+    "USER":"users",
+    "RAW_DATASET":"raw-datasets"
 }
 from Moudles.Storage import Operations
 
@@ -48,6 +49,11 @@ class OperationsLocal(Operations.Operations):
         return 0
     def GetList(self, type):
         filePath = f"{DATAPATH}\{FILEPATH_DICT[type]}"
-        itemsList = os.listdir(filePath)
-        new_set = {x.removesuffix('.json') for x in itemsList}
-        return new_set
+        if (os.path.exists(filePath)):
+            itemsList = os.listdir(filePath)
+            new_set = {x.removesuffix('.json') for x in itemsList}
+            return new_set
+        return []
+
+    def GetFullItemsList(self, type):
+        pass

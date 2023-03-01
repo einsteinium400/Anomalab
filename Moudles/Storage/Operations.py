@@ -21,3 +21,7 @@ class Operations:
     @abstractmethod
     def GetList(self, type):
         pass
+
+    @abstractmethod
+    def GetFullItemsList(self, type):
+        pass

@@ -40,5 +40,14 @@ class UsersController:
             raise Exception("User Does not exist")
         attemptedLoggedUser = User(username)
         if attemptedLoggedUser.VerifyPassword(suggestedPass):
-            return True
-        return False
+            return attemptedLoggedUser
+        else:
+            raise Exception("Incorrect Password")
+        raise Exception("Login Error")
+
+    def GetAllInstances(self):
+        availableDatasets = self.GetAllModelsNamesList()
+        finalList = []
+        for item in availableDatasets:
+            finalList.append(self.GetModel(item))
+        return finalList
