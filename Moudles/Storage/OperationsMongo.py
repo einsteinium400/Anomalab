@@ -5,7 +5,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import pymongo
 
-from Anomalab.Moudles.Storage.Operations import Operations
+from Moudles.Storage.Operations import Operations
 
 COLLECTION_DICT = {
     "FUNCTION": "functions",
@@ -17,7 +17,7 @@ COLLECTION_DICT = {
 from Moudles.Storage import Operations
 
 
-class OperationsMongo(Operations):
+class OperationsMongo(Operations.Operations):
     def __init__(self):
         self._name = "Mongo"
         load_dotenv()
@@ -27,11 +27,11 @@ class OperationsMongo(Operations):
 
     def Save(self, name, jsonData, type):
         collection = self.PROJECTDB[COLLECTION_DICT[type]]
-        query = {"id": jsonData["id"]}
+        query = {"name": name}
         if(collection.find_one(query) == None):
             collection.insert_one(jsonData)
         else:
-            collection.update_one(query,jsonData)
+            collection.update_one(query,{"$set":jsonData})
 
 
     def Load(self, name, type):

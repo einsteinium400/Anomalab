@@ -1,6 +1,5 @@
 import numpy as np
 
-from Moudles.Functions.MixedDistance import MixedDistance
 from Moudles.Storage.StorageFactory import StorageFactory
 from Moudles.Models.Model import Model
 from Moudles.Clustring.KMeanClusterer import KMeansClusterer
@@ -12,7 +11,7 @@ class ModelsController:
     storage = operationFactory.CreateOperationItem()
 
     def CreateModel(self, name, dataset, distanceName):
-        dataSet = dataset
+        '''dataSet = dataset
         distanceFunction = MixedDistance()
         mean  =dataSet.MeanValues
         types = dataSet.getAttributesTypesList()
@@ -31,7 +30,8 @@ class ModelsController:
             except:
                 trained = 0
         modelJson = clusterer.getModelData()
-        self.storage.Save(name, modelJson, "MODEL")
+        self.storage.Save(name, modelJson, "MODEL")'''
+        pass
 
     def GetAllModelsNamesList(self):
         operationFactory = StorageFactory()

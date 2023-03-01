@@ -2,7 +2,7 @@ from matplotlib import pyplot as plt
 
 from Moudles.Clustring.KMeanClusterer import KMeansClusterer
 from Moudles.Functions.DistanceFunctions import *
-from Moudles.Functions.Hamming import Hamming
+from user_functions_stage_area.Hamming import Hamming
 from Moudles.Functions.MixedDistance import MixedDistance
 from Moudles.Functions.Euclidian import EuclideanDistance
 from Moudles.Utils.utils import *

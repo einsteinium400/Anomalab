@@ -14,6 +14,7 @@ from kivymd.uix.textfield import MDTextFieldRect
 from kivy.uix.spinner import Spinner
 
 # Controllers import
+from distance_functions_controller import Distance_Functions_Controller
 from Moudles.Databases.DatasetsController import DatasetsController
 from Moudles.Models.ModelController import ModelsController
 from Moudles.Users.UsersController import UsersController
@@ -81,6 +82,7 @@ class Query(Screen):
     attributesRefs=[]
     def on_enter(self):
         app = MDApp.get_running_app()
+        print (app.dataSetObject.AttributesInfo())
         ## TODO: Need to find Name
         ## MICHEAL SEE THAT app.dataSetObject contain the choosen dataset object
         ## MICHAEL GET DATASET FEATURE DETAILS
@@ -210,12 +212,11 @@ class AddDataset(Screen):
         except:
             pass
     def on_add(self, name, path):
-        pathString = path[0]
         app = MDApp.get_running_app()
         try:
-            if (name == '' or pathString == ''):
+            if (name == '' or path == ''):
                 raise Exception(f"Must enter name & choose file")
-            app.datasetController.CreateDataset(name, pathString)
+            app.datasetController.CreateDataset(name, path)
             show_popup(f"LOAD DATASET {name} SUCCESS")
         except Exception as e:
             self.resetForm()
@@ -263,26 +264,29 @@ class UDDataset(Screen):
 #---8---
 class ManageDistanceFunctions(Screen):
     def on_enter(self):
+        app = MDApp.get_running_app()
+        distancesData = app.distanceController.view_all_functions()
+        print (distancesData)
+        self.data=[]
+        for distanceFunction in distancesData:
+            row = []
+            row.append(distanceFunction)
+            self.data.append(row)
+        
         table_width = dp(Window.size[0]*9/50)
-        table = MDDataTable(
+        self.table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
             size_hint= (0.9, 0.9),
             use_pagination = True,
             rows_num = 5,
             pagination_menu_height = '240dp',
             column_data = [
-                ("ID", dp (table_width*0.2)),
-                ("Name", dp (table_width*0.35)),
-                ("Time stamp", dp (table_width*0.45)),
+                ("Name", dp (table_width)),
             ],
-            row_data = [
-                ("1", "Hamming", "22-02-2023, 10:51:12"),
-                ("2", "Euclidian", "22-02-2023, 10:50:32"),
-                ("3", "Mixed", "22-02-2023, 10:50:32"),
-            ]
+            row_data = self.data
         )
         self.table.bind(on_row_press=self.row_press)
-        self.ids['table_place'].add_widget(table)
+        self.ids['table_place'].add_widget(self.table)
 
     def row_press(self, instance_table, instance_row):
         index = instance_row.index
@@ -298,8 +302,6 @@ class ManageDistanceFunctions(Screen):
         self.manager.current = 'uddistancefunction'
         
     def on_add(self):
-        app = MDApp.get_running_app()
-        app.dictionary = {}
         self.manager.transition = SlideTransition(direction="left")
         self.manager.current = 'adddistancefunction'
 
@@ -312,33 +314,34 @@ class ManageDistanceFunctions(Screen):
         self.manager.current = 'login'
 #---9---
 class AddDistanceFunction(Screen):
-    def on_enter(self):
-        app = MDApp.get_running_app()
-        if app.dictionary == {}:
-            self.ids['apply'].text=f'Apply'
-        else:
-            self.ids['header'].text=f'Distance function: {app.dictionary.name}'
-            self.ids['apply'].text=f'Delete'
-    ##MICHAEL - GET ONE DISTANCE FUNCTION(dataset ID)
-    ##MICHAEL - SAMPLE OF DELETE DISTANCE FUNCTION METHOd
-    ##MICHAEL - SAMPLE OF CREATE DISTANCE FUNCTION METHOd
     def selected(self, filename):
         try:
             self.ids.path.text = filename[0]
             print(filename[0])
         except:
             pass
-    def on_apply(self):
+    def on_add(self, name, path):
         app = MDApp.get_running_app()
-        if app.dictionary == {}:
-            print (f'add function for {self.ids.path.text}')
-        pass
+        try:
+            if (name == '' or path == ''):
+                raise Exception(f"Must enter name & choose file")
+            app.distanceController.add_function(path, name)
+            show_popup(f"ADD DISTANCE FUCNTION {name} SUCCESS")
+        except Exception as e:
+            self.resetForm()
+            show_popup(str(e))
+            return
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'managedistancefunctions'
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'managedistancefunctions'
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
+    def resetForm(self):
+        self.ids['name'].text = ""
+        self.ids['path'].text = ""
 class UDDistanceFunction(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
@@ -554,6 +557,7 @@ class AnomalabApp(MDApp):
     userController=UsersController()
     datasetController=DatasetsController()
     modelController=ModelsController()
+    distanceController=Distance_Functions_Controller()
     #INNER VALUES
     dataSetObject = ObjectProperty(None)
     distanceFunctionObject = ObjectProperty(None)

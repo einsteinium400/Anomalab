@@ -1,4 +1,4 @@
-from Moudles.Functions.DistanceFunctions import DistanceFunction
+'''from Moudles.Functions.DistanceFunctions import DistanceFunction
 
 
 class MixedDistance(DistanceFunction):
@@ -18,4 +18,4 @@ class MixedDistance(DistanceFunction):
             else:
                 distance += abs(u[i] - v[i])
 
-        return distance
+        return distance'''

@@ -2,7 +2,7 @@
 import json
 import os
 import modular_distance_utils
-from Anomalab.Moudles.Storage.StorageFactory import StorageFactory
+from Moudles.Storage.StorageFactory import StorageFactory
 from Moudles.Storage.OperationsMongo import OperationsMongo
 from Moudles.Storage.OperationsMongo import Operations
 
@@ -36,6 +36,8 @@ class Distance_Functions_Controller:
         # copy the string content to a file
         with open(path, "w") as file:
             file.write(file_content)
+
+        modular_distance_utils.refresh_functions_list()
 
     @staticmethod
     def view_all_functions():
