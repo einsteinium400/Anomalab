@@ -28,7 +28,9 @@ class Dataset:
             self._name = name
             self._id = str(uuid.uuid1())
             self._timeStamp = time.time()
+            self._featuresNumber = len(dataFrame.columns.values.tolist())
             self._featureNames = dataFrame.columns.values.tolist()
+            self._instancesNumber = len(dataFrame.values.tolist())
             self._data = self._name
             self._importantFeatures = []
             self._bestModel = "none"
@@ -37,8 +39,10 @@ class Dataset:
                 "id": self._id,
                 "timestamp": self._timeStamp,
                 "bestmodel": self._bestModel,
+                "featuresNumber": self._featuresNumber,
                 "featureNames": self._featureNames,
                 "importantfeatures":self._importantFeatures,
+                "instancesNumber":self._instancesNumber,
                 "data": self._data
             }
             RawDatasetData(self._name,dataFrame)
@@ -47,7 +51,9 @@ class Dataset:
             self._jsonData = self.LoadDataset()
             self._id = self._jsonData['id']
             self._timeStamp = self._jsonData['timestamp']
+            self._featuresNumber = self._jsonData['featuresNumber']
             self._featureNames = self._jsonData['featureNames']
+            self._instancesNumber = self._jsonData['instancesNumber']
             self._data = self._jsonData['data']
             self._importantFeatures = self._jsonData['featureNames']
             self._bestModel = self._jsonData['bestmodel']
@@ -67,6 +73,14 @@ class Dataset:
     @property
     def FeatureNames(self):
         return self._featureNames
+    
+    @property
+    def featuresNumber(self):
+        return self._featuresNumber
+    
+    @property
+    def instancesNumber(self):
+        return self._instancesNumber
 
     @property
     def Data(self):

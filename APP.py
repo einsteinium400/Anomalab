@@ -151,6 +151,8 @@ class ManageDatasets(Screen):
     def on_enter(self):
         table_width = dp(Window.size[0]*9/50)
         #print (app.datasetController.GetAllDatasetsInfoList())
+        app = MDApp.get_running_app()
+        datasetsData = app.datasetController.GetAllDatasetsInfoList()
         self.table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
             size_hint= (0.9, 0.9),
@@ -163,8 +165,6 @@ class ManageDatasets(Screen):
                 ("Instances", dp (table_width*0.25)),
                 ("Time stamp", dp (table_width*0.25)),
             ],
-            #row_data = app.datasetController.GetAllDatasetsInfoList()
-            ## MICHAEL - FIX GetAllDatasetsInfoList GET LIST OR JSON OF EVERYTHING
             row_data = [
                 ("lymphography", "19", "148", "22-02-2023, 10:51:12"),
                 ("adult", "14", "32561", "22-02-2023, 10:50:32"),
