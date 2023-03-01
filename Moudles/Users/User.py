@@ -39,7 +39,7 @@ class User:
             self._username = name
             self._id = str(uuid.uuid1())
             self._password = hashlib.md5(password.encode()).hexdigest()
-            self._type = USERS_TYPE_DICT[type]
+            self._type = type
             self._jsonData = {
                 "name": self._username,
                 "id": self._id,

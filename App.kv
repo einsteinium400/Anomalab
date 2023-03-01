@@ -15,7 +15,8 @@ ScreenManager:
     UDDistanceFunction:
     UpdateModels:
     ManageUsers:
-    CrudUser:
+    AddUser:
+    UDUser:
     ChooseModels:
     AnalystResults:
 
@@ -185,7 +186,7 @@ ScreenManager:
             HeaderButton:
                 on_release: root.logout()
         Main: 
-            Label:
+            MDLabel:
                 text: "results will come here"
                 font_size: 40
                 pos_hint: {"x":0.3, "top": 0.65}
@@ -275,19 +276,21 @@ ScreenManager:
                 pos_hint: {"x":0.3, "top": 1}
                 size_hint: (0.4, 0.2)
             FreeTextInput:
-                id: directory
-                hint_text: "data path"
-                pos_hint: {"x":0.3, "top": 0.8}
-                size_hint: (0.4, 0.2)
-            FloatLayout:
-                id: attributes_place
-                pos_hint: {"x":0.2, "top": 0.6}
-                size_hint: (0.6, 0.6)
+                id: path
+                max_text_length: 100
+                pos_hint: {"x":0.1, "top": 0.8}
+                size_hint: (0.8, 0.2)
+                hint_text: "File Path"
+            FileChooserListView:
+                id: filechooser
+                pos_hint: {"x":0.1, "top": 0.6}
+                size_hint: (0.8, 0.6)
+                on_selection: root.selected(filechooser.selection)
         Footer:
             FooterButton:
                 text: 'Apply'
                 pos_hint: {"x":0.25, "top": 0.7}
-                on_press: root.on_add()
+                on_press: root.on_add(name.text, filechooser.selection)
             FooterButton:
                 text: 'Back'
                 pos_hint: {"x":0.55, "top": 0.7}
@@ -303,29 +306,35 @@ ScreenManager:
             HeaderButton:
                 on_release: root.logout()
         Main:
-            FreeTextInput:
+            MDLabel:
                 id: name
-                hint_text: "Name"
                 pos_hint: {"x":0.3, "top": 1}
                 size_hint: (0.4, 0.2)
-            FreeTextInput:
-                id: directory
-                hint_text: "data path"
-                pos_hint: {"x":0.3, "top": 0.8}
+                font_size: 24
+            MDLabel:
+                id: features
+                pos_hint: {"x":0.3, "top": 0.75}
                 size_hint: (0.4, 0.2)
-            FloatLayout:
-                id: attributes_place
-                pos_hint: {"x":0.2, "top": 0.6}
-                size_hint: (0.6, 0.6)
+                font_size: 24
+            MDLabel:
+                id: instances
+                pos_hint: {"x":0.3, "top": 0.5}
+                size_hint: (0.4, 0.2)
+                font_size: 24
+            MDLabel:
+                id: timestamp
+                pos_hint: {"x":0.3, "top": 0.25}
+                size_hint: (0.4, 0.2)
+                font_size: 24
         Footer:
             FooterButton:
-                text: 'Apply'
+                text: 'UPDATE-notworking'
                 pos_hint: {"x":0.1, "top": 0.7}
-                on_press: root.on_apply()
+                on_press: root.on_update(name.text)
             FooterButton:
                 text: 'Delete'
                 pos_hint: {"x":0.4, "top": 0.7}
-                on_press: root.on_delete()
+                on_press: root.on_delete(name.text)
             FooterButton:
                 text: 'Back'
                 pos_hint: {"x":0.7, "top": 0.7}
@@ -455,9 +464,9 @@ ScreenManager:
                 text: 'Add User'
                 pos_hint: {"x":0.4, "top": 0.6}
                 on_press: root.on_add()
-# ---12---
-<CrudUser>:
-    name: "cruduser"
+# ---12--- 
+<AddUser>:
+    name: "adduser"
     Window:
         Header:
             LogoImage:
@@ -480,23 +489,54 @@ ScreenManager:
             MainSpinner:
                 id: type
                 text: "Type"
-                values: ["regular","data analyst","admin"]
+                values: ["regular","analyst","admin"]
                 pos_hint: {"x":0.3, "top": 0.3}
                 size_hint: (0.4, 0.2)
         Footer:
             FooterButton:
                 text: 'Apply'
-                pos_hint: {"x":0.1, "top": 0.7}
-                on_press: root.on_apply()
+                pos_hint: {"x":0.2, "top": 0.7}
+                on_press: root.on_apply(name.text, password.text, type.text)
+            FooterButton:
+                text: 'Back'
+                pos_hint: {"x":0.6, "top": 0.7}
+                on_press: root.on_back()
+<UDUser>:
+    name: "uduser"
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                id: header
+                text: "Update User"
+            HeaderButton:
+                on_release: root.logout()
+        Main:
+            MDLabel:
+                id: name
+                hint_text: "Name"
+                pos_hint: {"x":0.3, "top": 0.8}
+                size_hint: (0.4, 0.2)
+                font_size: 24
+            MainSpinner:
+                id: type
+                text: "Type"
+                values: ["regular","analyst","admin"]
+                pos_hint: {"x":0.3, "top": 0.4}
+                size_hint: (0.4, 0.2)
+        Footer:
+            FooterButton:
+                text: 'Update Type'
+                pos_hint: {"x":0.15, "top": 0.7}
+                on_press: root.on_apply(name.text, type.text)
             FooterButton:
                 text: 'Delete'
                 pos_hint: {"x":0.4, "top": 0.7}
-                on_press: root.on_delete()
+                on_press: root.on_delete(name.text)
             FooterButton:
                 text: 'Back'
-                pos_hint: {"x":0.7, "top": 0.7}
-                on_press: root.on_back()
-            
+                pos_hint: {"x":0.65, "top": 0.7}
+                on_press: root.on_back()            
 # ---13---
 <ChooseModels>:
     name: "choosemodels"
