@@ -49,5 +49,5 @@ class UsersController:
         availableDatasets = self.GetAllUsers()
         finalList = []
         for item in availableDatasets:
-            finalList.append(self.GetModel(item))
+            finalList.append(self.GetUser(item))
         return finalList
