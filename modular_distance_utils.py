@@ -27,6 +27,7 @@ def load_user_distance_functions(source_dir):
                     source = f.read()
                     module = ast.parse(source)
                     for node in module.body:
+                        #if isinstance(node, ast.FunctionDef):
                         if isinstance(node, ast.FunctionDef):
                             function_nodes.append(node)
 
@@ -49,8 +50,9 @@ def load_user_distance_functions(source_dir):
 # filename = 'dest.py'
 # function_name = 'subtraction'
 
-def delete_user_function(function_index):
-    function_name=get_function_name(function_index)
+def delete_user_function(function_name):
+    #function_name=get_function_name(function_index)
+
 
     # Load the module dynamically and get the source code for the function
     module = __import__(os.path.splitext(DISTANCE_FUNCTIONS_PATH)[0])
@@ -75,7 +77,7 @@ def delete_user_function(function_index):
                 i += 1
 
     # refresh distance function module
-    importlib.reload(DistanceFunctions)
+    importlib.reload(Moudles.Functions.DistanceFunctions)
 
     refresh_functions_list()
 

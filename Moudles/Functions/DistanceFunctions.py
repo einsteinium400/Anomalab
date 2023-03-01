@@ -1,46 +1,23 @@
-from math import sqrt
-import numpy
-from abc import ABC, abstractmethod
+class mixed_distance():
 
-class DistanceFunction:
-    def __init__(
-            self,
-            name  # Function name
-            ):
-            self._name = name
-    @abstractmethod
-    def calculate(self,u, v, type_values):
-        pass
+    def __init__(self, u, v, type_values):
+        self.distance = 0
+        self.u=u
+        self.v=v
+        self.type_values=type_values
 
-    def getName(self):
-        return self._name
+    def calc(self):
+        self.distance = 0
+        for i in range(len(self.u)):
+            # if type is categorical
+            if self.type_values[i]:
+                if self.v[i] != self.u[i]:
+                    self.distance += 1
+            # if type is numeric
+            else:
+                self.distance += abs(self.u[i] - self.v[i])
 
-    def __str__(self):
-        return f"The Function name is {self._name}"
-
-def hamming(u, v, type_values):
-    distance = 0
-    for i in range(len(u)):
-        if v[i] != u[i]:
-            distance += 1
-    return distance
+        return self.distance
 
 
-def euclidean_distance(u, v, type_values):
-    diff = u - v
-    return sqrt(numpy.dot(diff, diff))
 
-
-def mixed_distance(u, v, type_values):
-    distance = 0
-
-    for i in range(len(u)):
-        # if type is categorical
-        if type_values[i]:
-            if v[i] != u[i]:
-                distance += 1
-        # if type is numeric
-        else:
-            distance += abs(u[i] - v[i])
-
-    return distance
