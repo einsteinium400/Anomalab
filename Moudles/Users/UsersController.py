@@ -40,5 +40,7 @@ class UsersController:
             raise Exception("User Does not exist")
         attemptedLoggedUser = User(username)
         if attemptedLoggedUser.VerifyPassword(suggestedPass):
-            return True
-        return False
+            return attemptedLoggedUser
+        else:
+            raise Exception("Incorrect Password")
+        raise Exception("Login Error")

@@ -5,7 +5,7 @@ def checkAnomaly(clusterJson):
     print("Distance form centroid: ", clusterJson['distance_from_centroid'])
     print("variance: ", 3*clusterJson['variance'])
     print("average_cluster_distance: ",clusterJson['average_cluster_distance'] )
-    return abs(clusterJson['distance_from_centroid']  >= (3*clusterJson['variance'] + clusterJson['average_cluster_distance']))
+    return abs(clusterJson['distance_from_centroid'] >= (3*clusterJson['variance'] + clusterJson['average_cluster_distance']))
 
 def mergeClassifcationData(model,classifedClusterIndex,classifedClusterDistancesInfo):
         classicationData = {
