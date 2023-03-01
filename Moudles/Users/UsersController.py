@@ -46,7 +46,7 @@ class UsersController:
         raise Exception("Login Error")
 
     def GetAllInstances(self):
-        availableDatasets = self.GetAllModelsNamesList()
+        availableDatasets = self.GetAllUsers()
         finalList = []
         for item in availableDatasets:
             finalList.append(self.GetModel(item))

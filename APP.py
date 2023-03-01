@@ -153,6 +153,7 @@ class ManageDatasets(Screen):
         #print (app.datasetController.GetAllDatasetsInfoList())
         app = MDApp.get_running_app()
         datasetsData = app.datasetController.GetAllDatasetsInfoList()
+        print (str(datasetsData))
         self.table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
             size_hint= (0.9, 0.9),
@@ -502,9 +503,10 @@ class UpdateModels(Screen):
 class ManageUsers(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
-        ##MICHAEL - GET ALL USERS data = [(id, name, attribute number, dataline, timestamp),(another one),(another one)]
         table_width = dp(Window.size[0]*9/50)
-        print (app.userController.GetAllUsers())
+        self.data=app.userController.GetAllInstances()
+        print (f'name: {self.data.name} id: {self.data.id} pass: {self.data["pass"]} type: {self.data.type}')
+
         self.table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
             size_hint= (0.9, 0.9),
