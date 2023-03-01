@@ -1,3 +1,4 @@
+import numpy
 from matplotlib import pyplot as plt
 
 from Moudles.Clustring.KMeanClusterer import KMeansClusterer
