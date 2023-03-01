@@ -24,32 +24,23 @@ from gui.popup import show_popup
 #---1---
 class Login(Screen):
     def do_login(self, name, password):
+        print (f'login: name-{name} pass-{password}')
         app = MDApp.get_running_app()
-        ##MICHAEL PART
-        """attemptedLoginUser = None
         try:
             if (name == '' or password == ''):
                 raise Exception(f"Must enter user name and password")
-            attemptedLoginUser = app.userController.GetUser(name)
-            if attemptedLoginUser.VerifyPassword(password) == False:
-                raise Exception(f"Incorrect Password")
-            app.usertype = attemptedLoginUser.TypeNum()
+            app.userObject = app.userController.LoginUser(name, password)
         except Exception as e:
             self.resetForm()
             show_popup(str(e))
             return
-        app.usertype = attemptedLoginUser.TypeNum()
-        """
-        ##
-        app.username = name
-        app.usertype = password
-        print (f'login: name-{name} pass-{password}')
+        print (f'login successful: {str(app.userObject)} type is: {app.userObject.Type}')
         self.manager.transition = SlideTransition(direction="left")
-        if (app.usertype == 1):
+        if (app.userObject.Type == 'regular'):
             self.manager.current = 'choosedataset'
-        elif (app.usertype == 2):
+        elif (app.userObject.Type == 'analyst'):
             self.manager.current = 'dataanalystmenu'
-        elif (app.usertype == 3):
+        elif (app.userObject.Type == 'admin'):
             self.manager.current = 'manageusers'
     def resetForm(self):
         self.ids['user_name'].text = ""
@@ -77,7 +68,7 @@ class ChooseDataset(Screen):
         print (f'choose dataset name: {app.dataSetObject.Name}')
         #IF USER IS REG GO TO QUERY ELSE GO TO CHOOSE MODELS
         self.manager.transition = SlideTransition(direction="left")
-        if (app.usertype==1):
+        if (app.userObject.Type==1):
             self.manager.current = 'query'
         else:
             self.manager.current = 'choosemodels'    
@@ -192,12 +183,12 @@ class ManageDatasets(Screen):
             "name": self.table.row_data[row_num][1],
         }
         self.manager.transition = SlideTransition(direction="left")
-        self.manager.current = 'cruddatasets'
+        self.manager.current = 'uddataset'
     def on_add(self):
         app = MDApp.get_running_app()
         app.dictionary = {}
         self.manager.transition = SlideTransition(direction="left")
-        self.manager.current = 'cruddatasets'
+        self.manager.current = 'adddataset'
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'dataanalystmenu'
@@ -205,7 +196,78 @@ class ManageDatasets(Screen):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
 #---7---
-class CrudDatasets(Screen):
+class AddDataset(Screen):
+    ##MICHAEL - GET ONE DATASET(dataset ID)
+    ##MICHAEL - SAMPLE OF UPDATE DATASET METHOD
+    ##MICHAEL - SAMPLE OF DELETE DATASET METHOd
+    ##MICHAEL - SAMPLE OF CREATE DATASET METHOd
+    mode = ""
+    data = []
+    def on_enter(self):
+        app = MDApp.get_running_app()
+        if (app.dictionary=={}):
+            self.ids['header'].text= "New Dataset"
+            self.mode = "add"
+            self.data = []
+        else:
+            self.ids['header'].text= "dataset name: "+str(app.dictionary['name'])
+            #self.idf[...].text= ...
+            self.mode = "update"
+            self.data = [
+                ("name", "categorial", "Dana, Michael, Noam"),
+                ("height", "numeric", ""),
+                ("grade", "numeric", ""),
+            ]
+        
+        table_width = dp(Window.size[0]*6/50)
+        self.table = MDDataTable(
+            pos_hint = {'x': 0.05, 'top': 0.95},
+            size_hint= (0.9, 0.9),
+            use_pagination = True,
+            rows_num = 3,
+            pagination_menu_height = '240dp',
+            column_data = [
+                ("Name", dp (table_width*0.25)),
+                ("Type", dp (table_width*0.25)),
+                ("Values", dp (table_width*0.5)),
+            ],
+            #row_data = attributes table
+            ## MICHAEL - FIX GetDATASET INFO
+            
+    
+            row_data = self.data
+        )
+        self.table.bind(on_row_press=self.row_press)
+        self.ids['attributes_place'].add_widget(self.table)
+        
+    def row_press(self, instance_table, instance_row):
+        index = instance_row.index
+        cols_num = len(instance_table.column_data)
+        row_num = int(index/cols_num)
+        print (f'press on row_num is: {row_num}')
+        print (f'ID of pressed line is: {self.table.row_data[row_num][0]}')
+
+    def on_delete(self):
+        ## MICHAEL - DELETE Dataset
+        print (f"delete dataset: {self.ids['header']}")
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'managedatasets'
+    def on_apply(self):
+        if (self.mode=="add"):
+            ## MICHAEL - CREATE Dataset
+            print (f"add dataset: {self.ids['header']}")
+        else:
+            ## MICHAEL - UPDATE Dataset
+            print (f"update dataset: {self.ids['header']}")
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'managedatasets'
+    def on_back(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'managedatasets'
+    def logout(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'login'
+class UDDataset(Screen):
     ##MICHAEL - GET ONE DATASET(dataset ID)
     ##MICHAEL - SAMPLE OF UPDATE DATASET METHOD
     ##MICHAEL - SAMPLE OF DELETE DATASET METHOd
@@ -297,7 +359,27 @@ class ManageDistanceFunctions(Screen):
                 ("3", "Mixed", "22-02-2023, 10:50:32"),
             ]
         )
+        self.table.bind(on_row_press=self.row_press)
         self.ids['table_place'].add_widget(table)
+
+    def row_press(self, instance_table, instance_row):
+        index = instance_row.index
+        cols_num = len(instance_table.column_data)
+        row_num = int(index/cols_num)
+        print (f'press on row_num is: {row_num}')
+        print (f'name of pressed line is: {self.table.row_data[row_num][0]}')
+        app = MDApp.get_running_app()
+        app.dictionary =  {
+            "name": self.table.row_data[row_num][1],
+        }
+        self.manager.transition = SlideTransition(direction="left")
+        self.manager.current = 'uddistancefunction'
+        
+    def on_add(self):
+        app = MDApp.get_running_app()
+        app.dictionary = {}
+        self.manager.transition = SlideTransition(direction="left")
+        self.manager.current = 'adddistancefunction'
 
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
@@ -307,12 +389,59 @@ class ManageDistanceFunctions(Screen):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
 #---9---
-class CrudDistanceFunctions(Screen):
+class AddDistanceFunction(Screen):
+    def on_enter(self):
+        app = MDApp.get_running_app()
+        if app.dictionary == {}:
+            self.ids['apply'].text=f'Apply'
+        else:
+            self.ids['header'].text=f'Distance function: {app.dictionary.name}'
+            self.ids['apply'].text=f'Delete'
     ##MICHAEL - GET ONE DISTANCE FUNCTION(dataset ID)
-    ##MICHAEL - SAMPLE OF UPDATE DISTANCE FUNCTION METHOD
     ##MICHAEL - SAMPLE OF DELETE DISTANCE FUNCTION METHOd
     ##MICHAEL - SAMPLE OF CREATE DISTANCE FUNCTION METHOd
-
+    def selected(self, filename):
+        try:
+            self.ids.path.text = filename[0]
+            print(filename[0])
+        except:
+            pass
+    def on_apply(self):
+        app = MDApp.get_running_app()
+        if app.dictionary == {}:
+            print (f'add function for {self.ids.path.text}')
+        pass
+    def on_back(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'managedistancefunctions'
+    def logout(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'login'
+class UDDistanceFunction(Screen):
+    def on_enter(self):
+        app = MDApp.get_running_app()
+        if app.dictionary == {}:
+            self.ids['apply'].text=f'Apply'
+        else:
+            self.ids['header'].text=f'Distance function: {app.dictionary.name}'
+            self.ids['apply'].text=f'Delete'
+    ##MICHAEL - GET ONE DISTANCE FUNCTION(dataset ID)
+    ##MICHAEL - SAMPLE OF DELETE DISTANCE FUNCTION METHOd
+    ##MICHAEL - SAMPLE OF CREATE DISTANCE FUNCTION METHOd
+    def selected(self, filename):
+        try:
+            self.ids.path.text = filename[0]
+            print(filename[0])
+        except:
+            pass
+    def on_apply(self):
+        app = MDApp.get_running_app()
+        if app.dictionary == {}:
+            print (f'add function for {self.ids.path.text}')
+        pass
+    def on_back(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'managedistancefunctions'
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
@@ -477,8 +606,9 @@ class AnomalabApp(MDApp):
     modelController=ModelsController()
     #INNER VALUES
     dataSetObject = ObjectProperty(None)
-    username = StringProperty(None)
-    usertype = NumericProperty(None)
+    distanceFunctionObject = ObjectProperty(None)
+    modelObject = ObjectProperty(None)
+    userObject = ObjectProperty(None)
     dictionary = {}
     
     def build(self):

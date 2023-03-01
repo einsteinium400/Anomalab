@@ -8,9 +8,11 @@ ScreenManager:
     Results:
     DataAnalystMenu:
     ManageDatasets:
-    CrudDatasets:
+    AddDataset:
+    UDDataset:
     ManageDistanceFunctions:
-    CrudDistanceFunctions:
+    AddDistanceFunction:
+    UDDistanceFunction:
     UpdateModels:
     ManageUsers:
     CrudUser:
@@ -248,12 +250,50 @@ ScreenManager:
             id: table_place
         Footer:
             FooterButton:
+                text: 'Add'
+                pos_hint: {"x":0.25, "top": 0.6}
+                on_press: root.on_add()
+            FooterButton:
                 text: 'Back'
-                pos_hint: {"x":0.4, "top": 0.6}
+                pos_hint: {"x":0.55, "top": 0.6}
                 on_press: root.on_back()
 # ---7---
-<CrudDatasets>:
-    name: "cruddatasets"
+<AddDataset>:
+    name: "adddataset"
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                text: "Crud Dataset"
+                id: header
+            HeaderButton:
+                on_release: root.logout()
+        Main:
+            FreeTextInput:
+                id: name
+                hint_text: "Name"
+                pos_hint: {"x":0.3, "top": 1}
+                size_hint: (0.4, 0.2)
+            FreeTextInput:
+                id: directory
+                hint_text: "data path"
+                pos_hint: {"x":0.3, "top": 0.8}
+                size_hint: (0.4, 0.2)
+            FloatLayout:
+                id: attributes_place
+                pos_hint: {"x":0.2, "top": 0.6}
+                size_hint: (0.6, 0.6)
+        Footer:
+            FooterButton:
+                text: 'Apply'
+                pos_hint: {"x":0.25, "top": 0.7}
+                on_press: root.on_add()
+            FooterButton:
+                text: 'Back'
+                pos_hint: {"x":0.55, "top": 0.7}
+                on_press: root.on_back()
+<UDDataset>:
+    name: "uddataset"
     Window:
         Header:
             LogoImage:
@@ -304,21 +344,80 @@ ScreenManager:
             id: table_place
         Footer:
             FooterButton:
+                text: 'Add'
+                pos_hint: {"x":0.25, "top": 0.6}
+                on_press: root.on_add()
+            FooterButton:
                 text: 'Back'
-                pos_hint: {"x":0.4, "top": 0.6}
+                pos_hint: {"x":0.55, "top": 0.6}
                 on_press: root.on_back()
 # ---9---
-<CrudDistanceFunctions>:
-    name: "cruddistancefunctions"
+<AddDistanceFunction>:
+    name: "adddistancefunction"
     Window:
         Header:
             LogoImage:
             HeaderText:
-                text: "Crud Distance Functions"
+                id : header
+                text: "Add distance function"
             HeaderButton:
                 on_release: root.logout()
         Main:
+            FreeTextInput:
+                id: path
+                max_text_length: 100
+                pos_hint: {"x":0.1, "top": 0.95}
+                size_hint: (0.8, 0.2)
+                hint_text: "File Path"
+                text: ""
+            FileChooserListView:
+                id: filechooser
+                pos_hint: {"x":0.1, "top": 0.7}
+                size_hint: (0.8, 0.65)
+                on_selection: root.selected(filechooser.selection)
         Footer:
+            FooterButton:
+                id: apply
+                text: ""
+                pos_hint: {"x":0.25, "top": 0.6}
+                on_press: root.on_apply()
+            FooterButton:
+                text: 'Back'
+                pos_hint: {"x":0.55, "top": 0.6}
+                on_press: root.on_back()
+<UDDistanceFunction>:
+    name: "uddistancefunction"
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                id : header
+                text: "Add distance function"
+            HeaderButton:
+                on_release: root.logout()
+        Main:
+            FreeTextInput:
+                id: path
+                max_text_length: 100
+                pos_hint: {"x":0.1, "top": 0.95}
+                size_hint: (0.8, 0.2)
+                hint_text: "File Path"
+                text: ""
+            FileChooserListView:
+                id: filechooser
+                pos_hint: {"x":0.1, "top": 0.7}
+                size_hint: (0.8, 0.65)
+                on_selection: root.selected(filechooser.selection)
+        Footer:
+            FooterButton:
+                id: apply
+                text: ""
+                pos_hint: {"x":0.25, "top": 0.6}
+                on_press: root.on_apply()
+            FooterButton:
+                text: 'Back'
+                pos_hint: {"x":0.55, "top": 0.6}
+                on_press: root.on_back()
 # ---10---
 <UpdateModels>:
     name: "updatemodels"
