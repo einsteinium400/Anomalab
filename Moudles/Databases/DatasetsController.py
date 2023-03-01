@@ -1,6 +1,6 @@
-from ..Models.ModelController import ModelsController
-from ..Storage.StorageFactory import StorageFactory
-from Dataset import Dataset
+from Moudles.Databases.Dataset import Dataset
+from Moudles.Models.ModelController import ModelsController
+from Moudles.Storage.StorageFactory import StorageFactory
 import pandas as pd
 
 
