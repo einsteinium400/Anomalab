@@ -1,23 +1,46 @@
 #:kivy 2.1
 #:import Factory kivy.factory.Factory
 
+ScreenManager:
+    Login:
+    ChooseDataset:
+    Query:
+    Results:
+    DataAnalystMenu:
+    ManageDatasets:
+    AddDataset:
+    UDDataset:
+    ManageDistanceFunctions:
+    AddDistanceFunction:
+    UDDistanceFunction:
+    UpdateModels:
+    ManageUsers:
+    CrudUser:
+    ChooseModels:
+    AnalystResults:
+
 # ---HEADER WIDGETS---
 <LogoImage@Image>:
     source: app.logo
     pos_hint: {"x":0.2, "top": 0.9}
     size_hint: (0.6, 0.4)
 <HeaderText@MDLabel>:
-    id: header
     font_size: 40
     pos_hint: {"x":0.3, "top": 0.4}
     size_hint: (0.4, 0.3)
     halign: "center"
+<HeaderButton@MDFillRoundFlatButton>:
+    text: 'Logout'
+    pos_hint: {"x":0.7, "top": 0.75}
+    font_size: 24
+    size_hint: (0.2, 0.5)
 # ---GENERAL INPUT
-<TextInput@MDTextField>:
+<FreeTextInput@MDTextField>:
     max_text_length: 30
     multiline: False
     padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
     font_size: 24
+    mode: "rectangle"
 <MainSpinnerOption@SpinnerOption>:
     font_size: 24
 <MainSpinner@Spinner>:
@@ -35,8 +58,6 @@
 <FooterButton@MDFillRoundFlatButton>:
     font_size: 24
     size_hint: (0.2, 0.4)
-# ---FORMS WIDGETS---
-
 # ---SECTIONS---
 <Window@MDFloatLayout>:
     size: root.width, root.height
@@ -81,14 +102,17 @@
             LogoImage:
             HeaderText:
                 text: "Login"
+            HeaderButton:
+                text: "exit"
+                on_release: root.close()
         Main:
-            TextInput:
+            FreeTextInput:
                 id: user_name
                 hint_text: "username"
                 logo_right: "account"
                 pos_hint: {"x":0.25, "top": 0.7}
                 size_hint: (0.5, 0.15)
-            TextInput:
+            FreeTextInput:
                 id: user_pass
                 hint_text: "password"
                 logo_right: "eye-off"
@@ -108,10 +132,11 @@
             LogoImage:
             HeaderText:
                 text: "Choose Dataset"
+            HeaderButton:
+                on_release: root.logout()
         Main:
             MainSpinner:
                 text: "Choose Dataset"
-                values: root.datasetsNames
                 id: spinner_id
                 pos_hint: {"x":0.25, "top": 0.6}
                 size_hint: (0.5, 0.2)
@@ -129,6 +154,8 @@
             LogoImage:
             HeaderText:
                 text: "Insert Query"
+            HeaderButton:
+                on_release: root.logout()
         Main:
             GridLayout:
                 pos_hint: {"x":0.05, "top": 0.95}
@@ -155,6 +182,8 @@
             LogoImage:
             HeaderText:
                 text: "Results"
+            HeaderButton:
+                on_release: root.logout()
         Main: 
             Label:
                 text: "results will come here"
@@ -169,12 +198,14 @@
                 on_press: root.on_back()
 # ---5---
 <DataAnalystMenu>:
-    name: "dataanalysmenu"
+    name: "dataanalystmenu"
     Window:
         Header:
             LogoImage:
             HeaderText:
                 text: "Menu"
+            HeaderButton:
+                on_release: root.logout()
         Main:
             MDFillRoundFlatButton:
                 pos_hint: {"x":0.1, "top": 0.9}
@@ -213,23 +244,92 @@
             LogoImage:
             HeaderText:
                 text: "Manage Datasets"
+            HeaderButton:
+                on_release: root.logout()
         Main:
             id: table_place
         Footer:
             FooterButton:
+                text: 'Add'
+                pos_hint: {"x":0.25, "top": 0.6}
+                on_press: root.on_add()
+            FooterButton:
                 text: 'Back'
-                pos_hint: {"x":0.4, "top": 0.6}
+                pos_hint: {"x":0.55, "top": 0.6}
                 on_press: root.on_back()
 # ---7---
-<CrudDatasets>:
-    name: "cruddatasets"
+<AddDataset>:
+    name: "adddataset"
     Window:
         Header:
             LogoImage:
             HeaderText:
                 text: "Crud Dataset"
+                id: header
+            HeaderButton:
+                on_release: root.logout()
         Main:
+            FreeTextInput:
+                id: name
+                hint_text: "Name"
+                pos_hint: {"x":0.3, "top": 1}
+                size_hint: (0.4, 0.2)
+            FreeTextInput:
+                id: directory
+                hint_text: "data path"
+                pos_hint: {"x":0.3, "top": 0.8}
+                size_hint: (0.4, 0.2)
+            FloatLayout:
+                id: attributes_place
+                pos_hint: {"x":0.2, "top": 0.6}
+                size_hint: (0.6, 0.6)
         Footer:
+            FooterButton:
+                text: 'Apply'
+                pos_hint: {"x":0.25, "top": 0.7}
+                on_press: root.on_add()
+            FooterButton:
+                text: 'Back'
+                pos_hint: {"x":0.55, "top": 0.7}
+                on_press: root.on_back()
+<UDDataset>:
+    name: "uddataset"
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                text: "Crud Dataset"
+                id: header
+            HeaderButton:
+                on_release: root.logout()
+        Main:
+            FreeTextInput:
+                id: name
+                hint_text: "Name"
+                pos_hint: {"x":0.3, "top": 1}
+                size_hint: (0.4, 0.2)
+            FreeTextInput:
+                id: directory
+                hint_text: "data path"
+                pos_hint: {"x":0.3, "top": 0.8}
+                size_hint: (0.4, 0.2)
+            FloatLayout:
+                id: attributes_place
+                pos_hint: {"x":0.2, "top": 0.6}
+                size_hint: (0.6, 0.6)
+        Footer:
+            FooterButton:
+                text: 'Apply'
+                pos_hint: {"x":0.1, "top": 0.7}
+                on_press: root.on_apply()
+            FooterButton:
+                text: 'Delete'
+                pos_hint: {"x":0.4, "top": 0.7}
+                on_press: root.on_delete()
+            FooterButton:
+                text: 'Back'
+                pos_hint: {"x":0.7, "top": 0.7}
+                on_press: root.on_back()
 # ---8---
 <ManageDistanceFunctions>:
     name: "managedistancefunctions"
@@ -238,23 +338,86 @@
             LogoImage:
             HeaderText:
                 text: "Manage Distance Functions"
+            HeaderButton:
+                on_release: root.logout()
         Main:
             id: table_place
         Footer:
             FooterButton:
+                text: 'Add'
+                pos_hint: {"x":0.25, "top": 0.6}
+                on_press: root.on_add()
+            FooterButton:
                 text: 'Back'
-                pos_hint: {"x":0.4, "top": 0.6}
+                pos_hint: {"x":0.55, "top": 0.6}
                 on_press: root.on_back()
 # ---9---
-<CrudDistanceFunctions>:
-    name: "cruddistancefunctions"
+<AddDistanceFunction>:
+    name: "adddistancefunction"
     Window:
         Header:
             LogoImage:
             HeaderText:
-                text: "Crud Distance Functions"
+                id : header
+                text: "Add distance function"
+            HeaderButton:
+                on_release: root.logout()
         Main:
+            FreeTextInput:
+                id: path
+                max_text_length: 100
+                pos_hint: {"x":0.1, "top": 0.95}
+                size_hint: (0.8, 0.2)
+                hint_text: "File Path"
+                text: ""
+            FileChooserListView:
+                id: filechooser
+                pos_hint: {"x":0.1, "top": 0.7}
+                size_hint: (0.8, 0.65)
+                on_selection: root.selected(filechooser.selection)
         Footer:
+            FooterButton:
+                id: apply
+                text: ""
+                pos_hint: {"x":0.25, "top": 0.6}
+                on_press: root.on_apply()
+            FooterButton:
+                text: 'Back'
+                pos_hint: {"x":0.55, "top": 0.6}
+                on_press: root.on_back()
+<UDDistanceFunction>:
+    name: "uddistancefunction"
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                id : header
+                text: "Add distance function"
+            HeaderButton:
+                on_release: root.logout()
+        Main:
+            FreeTextInput:
+                id: path
+                max_text_length: 100
+                pos_hint: {"x":0.1, "top": 0.95}
+                size_hint: (0.8, 0.2)
+                hint_text: "File Path"
+                text: ""
+            FileChooserListView:
+                id: filechooser
+                pos_hint: {"x":0.1, "top": 0.7}
+                size_hint: (0.8, 0.65)
+                on_selection: root.selected(filechooser.selection)
+        Footer:
+            FooterButton:
+                id: apply
+                text: ""
+                pos_hint: {"x":0.25, "top": 0.6}
+                on_press: root.on_apply()
+            FooterButton:
+                text: 'Back'
+                pos_hint: {"x":0.55, "top": 0.6}
+                on_press: root.on_back()
 # ---10---
 <UpdateModels>:
     name: "updatemodels"
@@ -263,6 +426,8 @@
             LogoImage:
             HeaderText:
                 text: "Update Models"
+            HeaderButton:
+                on_release: root.logout()
         Main:
             id: table_place
         Footer:
@@ -281,8 +446,15 @@
             LogoImage:
             HeaderText:
                 text: "Manage Users"
+            HeaderButton:
+                on_release: root.logout()
         Main:
+            id: table_place
         Footer:
+            FooterButton:
+                text: 'Add User'
+                pos_hint: {"x":0.4, "top": 0.6}
+                on_press: root.on_add()
 # ---12---
 <CrudUser>:
     name: "cruduser"
@@ -290,9 +462,41 @@
         Header:
             LogoImage:
             HeaderText:
+                id: header
                 text: "Crud User"
+            HeaderButton:
+                on_release: root.logout()
         Main:
+            FreeTextInput:
+                id: name
+                hint_text: "Name"
+                pos_hint: {"x":0.3, "top": 0.9}
+                size_hint: (0.4, 0.2)
+            FreeTextInput:
+                id: password
+                hint_text: "Password"
+                pos_hint: {"x":0.3, "top": 0.6}
+                size_hint: (0.4, 0.2)
+            MainSpinner:
+                id: type
+                text: "Type"
+                values: ["regular","data analyst","admin"]
+                pos_hint: {"x":0.3, "top": 0.3}
+                size_hint: (0.4, 0.2)
         Footer:
+            FooterButton:
+                text: 'Apply'
+                pos_hint: {"x":0.1, "top": 0.7}
+                on_press: root.on_apply()
+            FooterButton:
+                text: 'Delete'
+                pos_hint: {"x":0.4, "top": 0.7}
+                on_press: root.on_delete()
+            FooterButton:
+                text: 'Back'
+                pos_hint: {"x":0.7, "top": 0.7}
+                on_press: root.on_back()
+            
 # ---13---
 <ChooseModels>:
     name: "choosemodels"
@@ -301,6 +505,8 @@
             LogoImage:
             HeaderText:
                 text: "Choose Models"
+            HeaderButton:
+                on_release: root.logout()
         Main:
         Footer:
 # ---14---
@@ -311,8 +517,10 @@
             LogoImage:
             HeaderText:
                 text: "Analyst Results"
+            HeaderButton:
+                on_release: root.logout()
         Main:
-            Label:
+            MDLabel:
                 text: "results will come here"
                 font_size: 40
                 pos_hint: {"x":0.3, "top": 0.65}
