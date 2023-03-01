@@ -1,12 +1,38 @@
+import numpy as np
+
+from Moudles.Functions.MixedDistance import MixedDistance
 from Moudles.Storage.StorageFactory import StorageFactory
 from Moudles.Models.Model import Model
+from Moudles.Clustring.KMeanClusterer import KMeansClusterer
+
 
 
 class ModelsController:
     operationFactory = StorageFactory()
     storage = operationFactory.CreateOperationItem()
-    def CreateModel(self,modelJson):
-        pass
+
+    def CreateModel(self, name, dataset, distanceName):
+        dataSet = dataset
+        distanceFunction = MixedDistance()
+        mean  =dataSet.MeanValues
+        types = dataSet.getAttributesTypesList()
+        print(dataSet.Data)
+        clusterer = KMeansClusterer(num_means=2,
+                                    distance=distanceFunction,
+                                    repeats=9,
+                                    mean_values=mean,
+                                    type_of_fields=types)
+        data = np.array(dataSet.Data)
+        trained = 0
+        while trained == 0:
+            try:
+                clusterer.cluster(data)
+                trained =1
+            except:
+                trained = 0
+        modelJson = clusterer.getModelData()
+        self.storage.Save(name, modelJson, "MODEL")
+
     def GetAllModelsNamesList(self):
         operationFactory = StorageFactory()
         self.storage = operationFactory.CreateOperationItem()

@@ -2,8 +2,8 @@ import json
 
 import numpy as np
 
-from ..Utils import utils as utils
-from ..Functions import DistanceFunctions
+from Moudles.Utils import utils as utils
+
 
 class KMeansClusterer:
 
@@ -35,16 +35,16 @@ class KMeansClusterer:
         }
         listObj = []
         for i in range(len(self._means)):
-            cluster_info_list = []
-            for item in self._clusters_info[i]:
-                cluster_info_list.append(item.tolist())
+            # cluster_info_list = []
+            # for item in self._clusters_info[i]:
+            #     cluster_info_list.append(item.tolist())
             listObj.append(
                 {
                     "cluster": i,
                     "average_cluster_distance": self._average_distance_list[i],
                     "variance": self._variance_list[i],
                     "mean": self._means[i].tolist(),
-                    "dataPoints":cluster_info_list
+                    # "dataPoints":cluster_info_list
                 }
             )
         jsonData['clusters_info'] = listObj
@@ -96,8 +96,8 @@ class KMeansClusterer:
             return centroid
 
         else:
-            print("bad seed")  # todo: handle this with re-run
-            exit()
+            print("bad seed")
+            raise Exception("bad seed")  # todo: handle this with re-run
 
     def get_wcss(self):
         return self._wcss
