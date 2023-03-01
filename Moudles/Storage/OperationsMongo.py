@@ -13,7 +13,7 @@ COLLECTION_DICT = {
     "USER":"users",
     "RAW_DATASET":"raw-dataset"
 }
-from ..Storage import Operations
+from Moudles.Storage import Operations
 
 
 class OperationsMongo(Operations.Operations):
@@ -27,11 +27,11 @@ class OperationsMongo(Operations.Operations):
 
     def Save(self,name, jsonData, type):
         collection = self.PROJECTDB[COLLECTION_DICT[type]]
-        query = {"id": jsonData["id"]}
+        query = {"name":name}
         if(collection.find_one(query) == None):
             collection.insert_one(jsonData)
         else:
-            collection.update_one(query,jsonData)
+            collection.update_one(query,{"$set":jsonData})
 
 
     def Load(self, name, type):

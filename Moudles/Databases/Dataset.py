@@ -34,10 +34,15 @@ class Dataset:
             self._featuresNumber = len(dataFrame.columns.values.tolist())
             self._featureNames = dataFrame.columns.values.tolist()
             self._instancesNumber = len(dataFrame.values.tolist())
-            self._attributesInfo = attribuesInfo
+            self._featuresInfo = attribuesInfo
             self._data = self._name
             self._importantFeatures = []
             self._bestModel = "none"
+            self._meanValues = []
+            ## Get mean values
+            for item in self._featureNames:
+                self._meanValues.append(int(newData[item].max()))
+            print(self._meanValues)
             self._jsonData = {
                 "name": self._name,
                 "id": self._id,
@@ -47,7 +52,8 @@ class Dataset:
                 "featureNames": self._featureNames,
                 "importantfeatures":self._importantFeatures,
                 "instancesNumber":self._instancesNumber,
-                "attribuesInfo":self._attributesInfo,
+                "featuresInfo":self._featuresInfo,
+                "meanValues":self._meanValues,
                 "data": self._data
             }
             RawDatasetData(self._name,newData)
@@ -61,8 +67,9 @@ class Dataset:
             self._instancesNumber = self._jsonData['instancesNumber']
             self._data = self._jsonData['data']
             self._importantFeatures = self._jsonData['featureNames']
+            self._meanValues = self._jsonData['meanValues']
             self._bestModel = self._jsonData['bestmodel']
-            self._attributesInfo = self._jsonData['attribuesInfo']
+            self._featuresInfo = self._jsonData['featuresInfo']
 
     @property
     def Id(self):
@@ -107,11 +114,11 @@ class Dataset:
 
     @property
     def AttributesInfo(self):
-        return self._attributesInfo
+        return self._featuresInfo
 
     @AttributesInfo.setter
     def AttributesInfo(self, value):
-        self._attributesInfo = value
+        self._featuresInfo = value
         self.SaveDataset()
 
     @property
@@ -122,6 +129,21 @@ class Dataset:
     def BestModel(self, value):
         self._bestModel = value
         self.SaveDataset()
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def jsonData(self):
+        return self._jsonData
+
+    @property
+    def MeanValues(self):
+        return self._meanValues
+
+    def __str__(self):
+        return f"The dataset name is {self._name}"
 
     def AddImportantFeature(self, value):
         if value not in self._featureNames:
@@ -142,16 +164,19 @@ class Dataset:
         jsonData = loader.Load(self._name, "DATASET")
         return jsonData
 
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def jsonData(self):
-        return self._jsonData
-
-    def __str__(self):
-        return f"The dataset name is {self._name}"
-
     def getRawData(self):
         return RawDatasetData(self._name).Data
+
+    def getAttributesTypesList(self):
+        featuresList = self._featureNames
+        featuresInfo = self._featuresInfo
+        finalList = []
+        for item in featuresList:
+            for feature in featuresInfo:
+                if(item == feature['name']):
+                    if feature['type'] == 'categorical':
+                        finalList.append(True)
+                    else:
+                        finalList.append(False)
+        return finalList
+
