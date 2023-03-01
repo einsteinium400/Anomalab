@@ -100,3 +100,4 @@ class User:
         loader = operationFactory.CreateOperationItem()
         jsonData = loader.Load(self._username, "USER")
         return jsonData
+

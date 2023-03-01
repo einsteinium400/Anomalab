@@ -23,3 +23,10 @@ class ModelsController:
         if modelName not in modelsList:
             raise Exception(f"Model named {modelName} Does not exist")
         self.storage.Delete(modelsList, "Model")
+
+    def GetAllInstances(self):
+        availableDatasets = self.GetAllModelsNamesList()
+        finalList = []
+        for item in availableDatasets:
+            finalList.append(self.GetModel(item))
+        return finalList

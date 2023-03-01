@@ -44,3 +44,10 @@ class UsersController:
         else:
             raise Exception("Incorrect Password")
         raise Exception("Login Error")
+
+    def GetAllInstances(self):
+        availableDatasets = self.GetAllModelsNamesList()
+        finalList = []
+        for item in availableDatasets:
+            finalList.append(self.GetModel(item))
+        return finalList
