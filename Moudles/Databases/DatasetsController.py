@@ -8,7 +8,7 @@ class DatasetsController:
     operationFactory = StorageFactory()
     storage = operationFactory.CreateOperationItem()
 
-    def CreateDataset(self,name, csvFilePath):
+    def CreateDataset(self, name, csvFilePath):
         dataSetsList = self.GetAllDatasetsNamesList()
         if name in dataSetsList:
             raise Exception(f'Dataset name {name} already taken')
