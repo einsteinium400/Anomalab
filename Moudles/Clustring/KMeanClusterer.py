@@ -2,9 +2,8 @@ import json
 
 import numpy as np
 
-import Moudles.Utils.utils as utils
-import Moudles.Functions.DistanceFunctions
-
+from ..Utils import utils as utils
+from ..Functions import DistanceFunctions
 
 class KMeansClusterer:
 

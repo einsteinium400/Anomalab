@@ -1,6 +1,6 @@
-from Moudles.Models.ModelController import ModelsController
-from Moudles.Storage.StorageFactory import StorageFactory
-from Moudles.Databases.Dataset import Dataset
+from ..Models.ModelController import ModelsController
+from ..Storage.StorageFactory import StorageFactory
+from Dataset import Dataset
 import pandas as pd
 
 
@@ -52,3 +52,5 @@ class DatasetsController:
         for item in availableDatasets:
             finalList.append(self.GetDataset(item))
         return finalList
+
+

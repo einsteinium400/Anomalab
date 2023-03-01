@@ -1,10 +1,10 @@
 from matplotlib import pyplot as plt
 
-from KMeanClusterer import KMeansClusterer
-from DistanceFunctions import *
-from utils import *
+from Moudles.Clustring.KMeanClusterer import KMeansClusterer
+from Moudles.Functions.DistanceFunctions import *
+from Moudles.Utils.utils import *
 from modular_distance_utils import *
-from Elbow import elbow_method
+from Moudles.Clustring.Elbow import elbow_method
 
 # name of labeled file name. label is last coloumn
 LABLED_FILE_NAME = "dataset1/labeled_data.csv"
