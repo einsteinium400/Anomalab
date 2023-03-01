@@ -71,7 +71,7 @@ class ChooseDataset(Screen):
         if (app.userObject.Type==1):
             self.manager.current = 'query'
         else:
-            self.manager.current = 'choosemodels'    
+            self.manager.current = 'choosemodels'
     
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
