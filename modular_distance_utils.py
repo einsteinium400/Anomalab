@@ -4,11 +4,11 @@ import ast
 import astor
 import inspect
 
-import DistanceFunctions
+import Moudles.Functions.DistanceFunctions
 
 function_list = []
 
-DISTANCE_FUNCTIONS_PATH = "DistanceFunctions.py"
+DISTANCE_FUNCTIONS_PATH = "Moudles/Functions/DistanceFunctions.py"
 
 
 def load_user_distance_functions(source_dir):
@@ -35,10 +35,11 @@ def load_user_distance_functions(source_dir):
         outfile.write(astor.to_source(ast.Module(body=function_nodes)))
 
     # refresh distance function module
-    importlib.reload(DistanceFunctions)
+    importlib.reload(Moudles.Functions.DistanceFunctions)
 
     refresh_functions_list()
 
+    # todo: update in mongoDB
 
 # # Define the source and destination file paths
 # source_file = 'subtraction.py'

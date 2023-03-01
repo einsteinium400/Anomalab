@@ -1,7 +1,5 @@
 import csv
 import random
-from Moudles.Functions.DistanceFunctions import *
-
 
 def mean_generator(K, values):
     means = []
