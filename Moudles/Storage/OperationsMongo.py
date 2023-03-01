@@ -10,7 +10,8 @@ COLLECTION_DICT = {
     "FUNCTION": "functions",
     "DATASET": "datasets",
     "MODEL": "models",
-    "USER":"users"
+    "USER":"users",
+    "RAW_DATASET":"raw-dataset"
 }
 from Moudles.Storage import Operations
 
@@ -26,7 +27,6 @@ class OperationsMongo(Operations.Operations):
 
     def Save(self,name, jsonData, type):
         collection = self.PROJECTDB[COLLECTION_DICT[type]]
-        print(jsonData)
         query = {"id": jsonData["id"]}
         if(collection.find_one(query) == None):
             collection.insert_one(jsonData)
