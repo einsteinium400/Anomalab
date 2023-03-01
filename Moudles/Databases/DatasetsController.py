@@ -45,3 +45,10 @@ class DatasetsController:
         if DatasetName not in dataSetsList:
             raise Exception(f"Dataset named {DatasetName} Does not exist")
         self.storage.Delete(DatasetName, "DATASET")
+
+    def GetAllInstances(self):
+        availableDatasets = self.GetAllDatasetsNamesList()
+        finalList = []
+        for item in availableDatasets:
+            finalList.append(self.GetDataset(item))
+        return finalList
