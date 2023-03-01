@@ -52,6 +52,8 @@ class User:
             self._password = self._jsonData['pass']
             self._type = self._jsonData['type']
 
+    def __str__(self):
+        return f"The username name is {self._username}"
 
     @property
     def Id(self):
