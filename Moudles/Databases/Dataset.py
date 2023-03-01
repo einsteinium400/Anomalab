@@ -120,3 +120,6 @@ class Dataset:
     @property
     def jsonData(self):
         return self._jsonData
+
+    def __str__(self):
+        return f"The dataset name is {self._name}"

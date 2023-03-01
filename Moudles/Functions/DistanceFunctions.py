@@ -15,6 +15,9 @@ class DistanceFunction:
     def getName(self):
         return self._name
 
+    def __str__(self):
+        return f"The Function name is {self._name}"
+
 def hamming(u, v, type_values):
     distance = 0
     for i in range(len(u)):

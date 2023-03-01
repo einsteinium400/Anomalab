@@ -26,7 +26,8 @@ class OperationsMongo(Operations.Operations):
 
     def Save(self,name, jsonData, type):
         collection = self.PROJECTDB[COLLECTION_DICT[type]]
-        query = {"id": jsonData.id}
+        print(jsonData)
+        query = {"id": jsonData["id"]}
         if(collection.find_one(query) == None):
             collection.insert_one(jsonData)
         else:
