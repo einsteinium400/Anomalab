@@ -80,43 +80,47 @@ class ChooseDataset(Screen):
 #---3---
 class Query(Screen):
     attributesRefs=[]
+    attributesTypes=[]
     def on_enter(self):
+        self.ids.attributes_box.clear_widgets()
         app = MDApp.get_running_app()
-        print (app.dataSetObject.AttributesInfo())
-        ## TODO: Need to find Name
-        ## MICHEAL SEE THAT app.dataSetObject contain the choosen dataset object
-        ## MICHAEL GET DATASET FEATURE DETAILS
-        ## ATTRIBUTES NUMBER
-        attributesNumber=3
-        ## ATTRIBUTES NAMES
-        attributesNames=["attribute1","attribute2","attribute3"]
-        ## ATTRIBUTES TYPES (0 - NUMERIC, 1 - CATEGORIAL)
-        attributeTypes=[0,0,1]
-        ## MICHAEL CATEGORIES FOR EACH CATEGORICAL ATTRIBUTE -- TODO:Add caterogries availble for each item and types
-        attributeCategories=["cat1","cat2","cat3","cat4","cat5"]
-
-        for i in range(attributesNumber):
-            #print (attributesNames[i] + attributeCategories[i])
-            print(self.ids)
-            self.ids.attributes_box.add_widget(MDLabel(text=f'{attributesNames[i]}:', halign="center"))
-            if (attributeTypes[i]==0):
-                self.attributesRefs.append(MDTextFieldRect(multiline=False, hint_text=f"insert here"))
+        for i in range(len(app.dataSetObject.AttributesInfo)):
+            print (app.dataSetObject.AttributesInfo[i])
+            self.ids.attributes_box.add_widget(MDLabel(text=f'{app.dataSetObject.AttributesInfo[i]["name"]}:', halign="center"))
+            if (app.dataSetObject.AttributesInfo[i]["type"] == 'numeric'):
+                self.attributesTypes.append(False)
+                self.attributesRefs.append(MDTextFieldRect(multiline=False, hint_text=f"insert here", input_filter = 'float'))
+                self.attributesRefs[i].bind(text=self.on_text)
             else:
-                self.attributesRefs.append(Spinner(text=attributesNames[i], values=attributeCategories))
+                self.attributesTypes.append(True)
+                self.attributesRefs.append(Spinner(text="", values=app.dataSetObject.AttributesInfo[i]["values"].values()))
+                self.attributesRefs[i].bind(text=self.on_text)
             self.ids.attributes_box.add_widget(self.attributesRefs[i])
+
+    def on_text(self, instance, value):
+        if (value == ""):
+            instance.background_color = (1,0,0,1)
+        else:
+            instance.background_color = (0,1,0,1)
+
 
     def on_apply(self):
         query = []
-        for i in range(len(self.attributesRefs)):
-            query.append(self.attributesRefs[i].text)
-        print (f'query is {query}')
-        
         app = MDApp.get_running_app()
+        for i in range(len(self.attributesRefs)):
+            if (self.attributesRefs[i].text==""):
+                show_popup(f'MUST FILL ALL FIELDS check field number {i}')
+                return
+            if (self.attributesTypes.pop(0)):
+                ## get the numeric value for categorical attribute
+                dict = app.dataSetObject.AttributesInfo[i]["values"]
+                value = [k for k, v in dict.items() if v == self.attributesRefs[i].text][0]
+                query.append(value)
+            else:
+                query.append(self.attributesRefs[i].text)
+        print (f'query is {query}')
         ## MICHAEL - TODO: Work on model controller yet to be done sorry
         ## MICHAEL- get BEST MODEL ID for model ID in app.DatasetID ,if no model return 0
-        app.model = 1
-
-        
         ## DANA- SEND QUERY (query - arr of values, ModelID) get answer to app.results=PREDICT(query)
         app.results= {}
         
@@ -162,13 +166,17 @@ class ManageDatasets(Screen):
             row.append(dataset.instancesNumber)
             row.append(dataset.Timestamp)
             self.data.append(row)
-        
+        dataRows = len(self.data)
+        pagination = False
+        print (f'row of data = {dataRows}')
+        if (dataRows > 5):
+            pagination = True
+            dataRows = 5
         self.table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
             size_hint= (0.9, 0.9),
-            use_pagination = True,
-            rows_num = 5,
-            pagination_menu_height = '240dp',
+            use_pagination = pagination,
+            rows_num = dataRows,
             column_data = [
                 ("Name", dp (table_width*0.25)),
                 ("Attributes", dp (table_width*0.25)),
@@ -178,8 +186,11 @@ class ManageDatasets(Screen):
             row_data = self.data
         )
         self.table.bind(on_row_press=self.row_press)
+        self.ids['table_place'].clear_widgets()
         self.ids['table_place'].add_widget(self.table)
     def row_press(self, instance_table, instance_row):
+        print(instance_row.children)
+        print ("BLAH BLAH2")
         index = instance_row.index
         cols_num = len(instance_table.column_data)
         row_num = int(index/cols_num)
@@ -266,26 +277,31 @@ class ManageDistanceFunctions(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
         distancesData = app.distanceController.view_all_functions()
-        print (distancesData)
         self.data=[]
         for distanceFunction in distancesData:
             row = []
             row.append(distanceFunction)
             self.data.append(row)
         
+        dataRows = len(self.data)
+        pagination = False
+        print (f'row of data = {dataRows}')
+        if (dataRows > 5):
+            pagination = True
+            dataRows = 5
         table_width = dp(Window.size[0]*9/50)
         self.table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
             size_hint= (0.9, 0.9),
-            use_pagination = True,
-            rows_num = 5,
-            pagination_menu_height = '240dp',
+            use_pagination = pagination,
+            rows_num = dataRows,
             column_data = [
                 ("Name", dp (table_width)),
             ],
             row_data = self.data
         )
         self.table.bind(on_row_press=self.row_press)
+        self.ids['table_place'].clear_widgets()
         self.ids['table_place'].add_widget(self.table)
 
     def row_press(self, instance_table, instance_row):
@@ -366,16 +382,29 @@ class UDDistanceFunction(Screen):
 class UpdateModels(Screen):
     ##MICHAEL - data=GET ALL MODELS FUNCTION()
     ##MICHAEL - datasetIDlist=ID's of ALL DATASETS FUNCTION()
-    ##MICHAEL - distancefunctionsIDlist=ID's of ALL Distance functions FUNCTION()
+    ##MICHAEL - distancefunctionsIDlist=ID's of ALL Distance functions FUNCTION()    
     def on_enter(self):
+        modelsData = [
+            ("1-1", "ly-Ha", "lymphography", "Hamming", "5.2", "22-02-2023, 10:51:12"),
+            ("1-2", "ly-Eu", "lymphography", "Euclidian", "4.7", "22-02-2023, 10:50:32"),
+            ("1-3", "ly-Mi", "lymphography", "Mixed", "3.7", "22-02-2023, 10:50:32"),
+            ("2-1", "ad-Ha", "adult", "Hamming", "14.2", "22-02-2023, 10:51:12"),
+            ("2-2", "ad-Eu", "adult", "Euclidian", "5.5", "22-02-2023, 10:50:32"),
+            ("2-3", "ad-Mi", "adult", "Mixed", "2.5", "22-02-2023, 10:50:32"),
+        ]
+        dataRows = len(modelsData)
+        pagination = False
+        print (f'row of data = {dataRows}')
+        if (dataRows > 5):
+            pagination = True
+            dataRows = 5
         table_width = dp(Window.size[0]*9/50)
         table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
             size_hint= (0.9, 0.9),
             check = True,
-            use_pagination = True,
-            rows_num = 5,
-            pagination_menu_height = '240dp',
+            use_pagination = pagination,
+            rows_num = dataRows,
             column_data = [
                 #HERE COME CHECK MARK width
                 ("ID", dp (table_width*0.1)),
@@ -385,17 +414,11 @@ class UpdateModels(Screen):
                 ("SSE", dp (table_width*0.1)),
                 ("Time stamp", dp (table_width*0.23)),
             ],
-            row_data = [
-                ("1-1", "ly-Ha", "lymphography", "Hamming", "5.2", "22-02-2023, 10:51:12"),
-                ("1-2", "ly-Eu", "lymphography", "Euclidian", "4.7", "22-02-2023, 10:50:32"),
-                ("1-3", "ly-Mi", "lymphography", "Mixed", "3.7", "22-02-2023, 10:50:32"),
-                ("2-1", "ad-Ha", "adult", "Hamming", "14.2", "22-02-2023, 10:51:12"),
-                ("2-2", "ad-Eu", "adult", "Euclidian", "5.5", "22-02-2023, 10:50:32"),
-                ("2-3", "ad-Mi", "adult", "Mixed", "2.5", "22-02-2023, 10:50:32"),
-            ]
+            row_data = modelsData
         )
         table.bind(on_check_press=self.checked)
         table.bind(on_row_press=self.row_checked)
+        self.ids['table_place'].clear_widgets()
         self.ids['table_place'].add_widget(table)
     # Function for check presses
     def checked (self, instance_table, current_row):
@@ -428,20 +451,26 @@ class ManageUsers(Screen):
             row.append(user.Name)
             row.append(user.Type)
             self.data.append(row)
+        dataRows = len(self.data)
+        pagination = False
+        print (f'row of data = {dataRows}')
+        if (dataRows > 5):
+            pagination = True
+            dataRows = 5
         self.table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
             size_hint= (0.9, 0.9),
-            use_pagination = True,
-            rows_num = 5,
-            pagination_menu_height = '240dp',
+            use_pagination = pagination,
+            rows_num = dataRows,
             column_data = [
-                ("User-Name", dp (table_width*0.9)),
-                ("User-Type", dp (table_width*0.9)),
+                ("User-Name", dp (table_width*0.5)),
+                ("User-Type", dp (table_width*0.5)),
             ],
             row_data = self.data
         )
         # bind function to row press
         self.table.bind(on_row_press=self.row_press)
+        self.ids['table_place'].clear_widgets()
         self.ids['table_place'].add_widget(self.table)
     # Function for row presses
     def row_press(self, instance_table, instance_row):
