@@ -38,11 +38,11 @@ class Dataset:
             self._data = self._name
             self._importantFeatures = []
             self._bestModel = "none"
-            #self._meanValues = []
-            ## Get mean values
-            #for item in self._featureNames:
-            #    self._meanValues.append(int(newData[item].max()))
-            #print(self._meanValues)
+            self._meanValues = []
+            # Get mean values
+            for item in self._featureNames:
+               self._meanValues.append(int(newData[item].max()))
+            print(self._meanValues)
             self._jsonData = {
                 "name": self._name,
                 "id": self._id,
@@ -53,7 +53,7 @@ class Dataset:
                 "importantfeatures":self._importantFeatures,
                 "instancesNumber":self._instancesNumber,
                 "featuresInfo":self._featuresInfo,
-                #"meanValues":self._meanValues,
+                "meanValues":self._meanValues,
                 "data": self._data
             }
             RawDatasetData(self._name,newData)
@@ -67,7 +67,7 @@ class Dataset:
             self._instancesNumber = self._jsonData['instancesNumber']
             self._data = self._jsonData['data']
             self._importantFeatures = self._jsonData['featureNames']
-            #self._meanValues = self._jsonData['meanValues']
+            self._meanValues = self._jsonData['meanValues']
             self._bestModel = self._jsonData['bestmodel']
             self._featuresInfo = self._jsonData['featuresInfo']
 
@@ -154,6 +154,19 @@ class Dataset:
         self.SaveDataset()
 
     def SaveDataset(self):
+        self._jsonData = {
+            "name": self._name,
+            "id": self._id,
+            "timestamp": self._timeStamp,
+            "bestmodel": self._bestModel,
+            "featuresNumber": self._featuresNumber,
+            "featureNames": self._featureNames,
+            "importantfeatures": self._importantFeatures,
+            "instancesNumber": self._instancesNumber,
+            "featuresInfo": self._featuresInfo,
+            # "meanValues":self._meanValues,
+            "data": self._data
+        }
         operationFactory = StorageFactory()
         saver = operationFactory.CreateOperationItem()
         saver.Save(self._name, self._jsonData, "DATASET")

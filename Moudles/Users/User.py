@@ -9,7 +9,9 @@ import hashlib
 
 
 from Moudles.Storage.StorageFactory import StorageFactory
-
+USERS_TYPE_LIST = ["regular"
+    ,"analyst"
+    ,"admin"]
 USERS_TYPE_DICT = {
     0: "regular",
     1: "analyst",
@@ -79,6 +81,8 @@ class User:
 
     @Type.setter
     def Type(self, value):
+        if(value not in USERS_TYPE_LIST):
+            raise Exception("Not a valid user type")
         self._type = value
         self.SaveUser()
 
@@ -92,6 +96,12 @@ class User:
         return False
 
     def SaveUser(self):
+        self._jsonData = {
+            "name": self._username,
+            "id": self._id,
+            "pass": self._password,
+            "type": self._type,
+        }
         operationFactory = StorageFactory()
         saver = operationFactory.CreateOperationItem()
         saver.Save(self._username, self._jsonData, "USER")
