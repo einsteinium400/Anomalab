@@ -2,8 +2,14 @@ import distance_functions_controller
 
 controller = distance_functions_controller.Distance_Functions_Controller()
 
-path = "user_functions_stage_area/mixed_distance.py"
-controller.add_function(file_dir=path, name="mixed distance")
+path = "user_functions_stage_area/Hamming.py"
+controller.delete_function("Hamming")
+controller.add_function(file_dir=path)
+print(controller.view_all_functions())
+
+
+
+
 
 # import base64
 # with open("main.py", 'r') as source_file:

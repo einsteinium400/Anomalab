@@ -23,6 +23,26 @@ class Distance_Functions_Controller:
         if not os.path.exists(modular_distance_utils.DISTANCE_FUNCTIONS_PATH):
             os.makedirs(modular_distance_utils.DISTANCE_FUNCTIONS_PATH)
 
+        self.reload_functions_from_mongo()
+
+        # # upload dynamically all functions from mongoDB
+        # functions = self.mongo_operations.GetFullItemsList("FUNCTION")
+        #
+        # file_content = ""
+        #
+        # # iterate all functions and input them to string
+        # for json_obj in functions:
+        #     function_value = json_obj["function"]
+        #     file_content += base64.b64decode(function_value).decode('utf-8')
+        #     file_content+="\n\n"
+        #
+        # # copy the string content to a file
+        # with open(modular_distance_utils.DISTANCE_FUNCTIONS_PATH, "w") as file:
+        #     file.write(file_content)
+        #
+        # modular_distance_utils.refresh_functions_list()
+
+    def reload_functions_from_mongo(self):
         # upload dynamically all functions from mongoDB
         functions = self.mongo_operations.GetFullItemsList("FUNCTION")
 
@@ -32,7 +52,7 @@ class Distance_Functions_Controller:
         for json_obj in functions:
             function_value = json_obj["function"]
             file_content += base64.b64decode(function_value).decode('utf-8')
-            file_content+="\n\n"
+            file_content += "\n\n"
 
         # copy the string content to a file
         with open(modular_distance_utils.DISTANCE_FUNCTIONS_PATH, "w") as file:
@@ -48,8 +68,9 @@ class Distance_Functions_Controller:
     def delete_function(self, name):
         # delete in mongoDB
         self.mongo_operations.Delete(name, "FUNCTION")
+        self.reload_functions_from_mongo()
         # delete in functions list
-        modular_distance_utils.delete_user_function(name)
+        #modular_distance_utils.delete_user_function(name)
 
     def add_function(self, file_dir):
         with open(file_dir, 'r') as source_file:
