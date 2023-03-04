@@ -249,6 +249,7 @@ class AddDataset(Screen):
     def resetForm(self):
         self.ids['name'].text = ""
         #self.ids['path'].text = ""
+#---8---
 class UDDataset(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
@@ -277,7 +278,7 @@ class UDDataset(Screen):
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
-#---8---
+#---9---
 class ManageDistanceFunctions(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
@@ -333,7 +334,7 @@ class ManageDistanceFunctions(Screen):
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
-#---9---
+#---10---
 class AddDistanceFunction(Screen):
     def selected(self, filename):
         try:
@@ -362,6 +363,7 @@ class AddDistanceFunction(Screen):
         self.manager.current = 'login'
     def resetForm(self):
         self.ids['path'].text = ""
+#---11---
 class UDDistanceFunction(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
@@ -383,7 +385,7 @@ class UDDistanceFunction(Screen):
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
-#---10---
+#---12---
 class UpdateModels(Screen):
     def on_enter(self):
         '''modelsData = [
@@ -450,7 +452,7 @@ class UpdateModels(Screen):
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
-#---11---
+#---13---
 class ManageUsers(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
@@ -506,7 +508,7 @@ class ManageUsers(Screen):
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
-#---12---
+#---14---
 class AddUser(Screen):
     def on_apply(self, name, password, type):
         app = MDApp.get_running_app()
@@ -531,7 +533,7 @@ class AddUser(Screen):
         self.ids['name'].text = ""
         self.ids['password'].text = ""
         self.ids['type'].text = "Type"
-#~~~~~~~~~~~~~~~~~~~~~~~~~
+#---15---
 class UDUser(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
@@ -569,12 +571,12 @@ class UDUser(Screen):
         app = MDApp.get_running_app()
         self.ids['name'].text= str(app.dictionary['name'])
         self.ids['type'].text= str(app.dictionary['type'])
-#---13---
+#---16---
 class ChooseModels(Screen):
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
-#---14---
+#---17---
 class AnalystResults(Screen):
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
