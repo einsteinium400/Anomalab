@@ -388,26 +388,18 @@ class UDDistanceFunction(Screen):
 #---12---
 class UpdateModels(Screen):
     def on_enter(self):
-        '''modelsData = [
-            ("ly-Ha", "lymphography", "Hamming", "5.2", "22-02-2023, 10:51:12"),
-            ("ly-Eu", "lymphography", "Euclidian", "4.7", "22-02-2023, 10:50:32"),
-            ("ly-Mi", "lymphography", "Mixed", "3.7", "22-02-2023, 10:50:32"),
-            ("ad-Ha", "adult", "Hamming", "14.2", "22-02-2023, 10:51:12"),
-            ("ad-Eu", "adult", "Euclidian", "5.5", "22-02-2023, 10:50:32"),
-            ("ad-Mi", "adult", "Mixed", "2.5", "22-02-2023, 10:50:32"),
-        ]'''
         app = MDApp.get_running_app()
         modelsData = app.modelController.GetAllInstances()
         self.data=[]
         for model in modelsData:
             row = []
             row.append(model.Name)
-            row.append("datasetName") #TO CHANGE LATER
+            row.append(model.DatasetName)
             row.append(model.DistanceFunction)
             row.append(model.Wcss)
             row.append(model.Timestamp)
             self.data.append(row)
-        dataRows = len(modelsData)
+        dataRows = len(self.data)
         pagination = False
         print (f'row of data = {dataRows}')
         if (dataRows > 5):
@@ -428,7 +420,7 @@ class UpdateModels(Screen):
                 ("SSE", dp (table_width*0.1)),
                 ("Time stamp", dp (table_width*0.25)),
             ],
-            row_data = modelsData
+            row_data = self.data
         )
         self.ids['table_place'].clear_widgets()
         self.ids['table_place'].add_widget(self.table)
@@ -442,8 +434,9 @@ class UpdateModels(Screen):
         print(instance_table, instance_row)
 
     def on_update(self):
-        self.manager.transition = SlideTransition(direction="right")
-        self.manager.current = 'dataanalystmenu'
+        pass
+        #self.manager.transition = SlideTransition(direction="right")
+        #self.manager.current = 'dataanalystmenu'
     
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
