@@ -1,34 +1,22 @@
+import numpy
+
 from Moudles.Databases.DatasetPreProcessor import DatasetPreProcessor
 from Moudles.Databases.DatasetsController import DatasetsController
 from Moudles.Models.ModelController import ModelsController
 from Moudles.Users.UsersController import UsersController
+from distance_functions_controller import Distance_Functions_Controller
+import traceback
 
 import pymongo
+
+
 
 userController = UsersController()
 databaseController = DatasetsController()
 modelsController = ModelsController()
+functionController = Distance_Functions_Controller()
 
-
-
-# import base64
-# funcData = 0
-# with open("Moudles/Functions/Euclidian.py", "rb") as f:
-#     encodedZip = base64.b64encode(f.read())
-#     funcData = encodedZip
-# print(funcData)
-# CLIENT = pymongo.MongoClient("mongodb+srv://anomalab:8EVoc8M9fK387636@anomalab.verl4tn.mongodb.net/?retryWrites=true&w=majority")
-# PROJECTDB=CLIENT["AnomaLab"]
-# collection = PROJECTDB["functions"]
-# data = {"name":"function1","data":funcData}
-# collection.insert_one(data)
-# print("extract and write to file")
-# decodedFile = collection.find_one({"name":"function1"})
-# decoded = base64.b64decode(decodedFile['data'])
-# filename = f"testFile.py"
-# with open(filename, "w") as file:
-#     file.write(decoded.decode("utf-8"))
-
+# functionController.add_function("./Moudles/Functions/MixedDistance.py")
 
 # userController.RegisterUser("reg", "reg", 0)
 # userController.RegisterUser("analyst", "analyst", 1)
@@ -44,10 +32,20 @@ modelsController = ModelsController()
 # dataSet2Path= "dataset2/adult.data2"
 # databaseController.CreateDataset("lympho",dataSet1Path)
 # databaseController.CreateDataset("adults",dataSet2Path)
-# dataSet = databaseController.GetDataset("adults")
+# dataSet2 = databaseController.GetDataset("adults")
 # print(dataSet.FeatureNames)
 # print(dataSet.Data)
 
-dfProccesor = DatasetPreProcessor()
-dataSet2Path= "dataset2/adult.data2"
-dfProccesor.dataSetPreProcess("adults",dataSet2Path)
+# dataSet = databaseController.GetDataset("lympho")
+# modelsController.CreateModel("lympho-MixedDistance",dataSet,"MixedDistance")
+# model = modelsController.GetModel("lympho-MixedDistance")
+# print(model.JsonData)
+#
+# modelsController.CreateModel("lympho-Hamming",dataSet,"Hamming")
+# model = modelsController.GetModel("lympho-Hamming")
+# print(model.JsonData)
+
+print(modelsController.GetAllModelsNamesList())
+print(modelsController.GetAllInstances())
+
+

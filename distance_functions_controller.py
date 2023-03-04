@@ -22,6 +22,9 @@ class Distance_Functions_Controller:
         # make sure the functions dir exists and create it if it doesnt
         if not os.path.exists(modular_distance_utils.DISTANCE_FUNCTIONS_PATH):
             os.makedirs(modular_distance_utils.DISTANCE_FUNCTIONS_PATH)
+        else:
+            file_to_delete = open(modular_distance_utils.DISTANCE_FUNCTIONS_PATH, 'w')
+            file_to_delete.close()
 
         self.reload_functions_from_mongo()
 

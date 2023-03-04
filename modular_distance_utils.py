@@ -132,3 +132,8 @@ def get_function_reference(index):
 def get_function_name(index):
     return function_list[index][0]
 # refresh_functions_list()
+
+def get_function_by_name(name):
+    for tpl in function_list:
+        if tpl[0] == name:
+            return tpl[1]
