@@ -14,3 +14,5 @@ def Hamming(u,v,type_values):
             if v[i] != u[i]:
                 distance += 1
         return distance    
+
+

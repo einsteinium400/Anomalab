@@ -185,9 +185,9 @@ class ManageDatasets(Screen):
             ],
             row_data = self.data
         )
-        self.table.bind(on_row_press=self.row_press)
         self.ids['table_place'].clear_widgets()
         self.ids['table_place'].add_widget(self.table)
+        self.table.bind(on_row_press=self.row_press)
     def row_press(self, instance_table, instance_row):
         print(instance_row.children)
         print ("BLAH BLAH2")
@@ -300,9 +300,9 @@ class ManageDistanceFunctions(Screen):
             ],
             row_data = self.data
         )
-        self.table.bind(on_row_press=self.row_press)
         self.ids['table_place'].clear_widgets()
         self.ids['table_place'].add_widget(self.table)
+        self.table.bind(on_row_press=self.row_press)
 
     def row_press(self, instance_table, instance_row):
         index = instance_row.index
@@ -333,7 +333,7 @@ class AddDistanceFunction(Screen):
     def selected(self, filename):
         try:
             self.ids.path.text = filename[0]
-            print(filename[0])
+            #print(filename[0])
         except:
             pass
     def on_add(self, path):
@@ -380,18 +380,26 @@ class UDDistanceFunction(Screen):
         self.manager.current = 'login'
 #---10---
 class UpdateModels(Screen):
-    ##MICHAEL - data=GET ALL MODELS FUNCTION()
-    ##MICHAEL - datasetIDlist=ID's of ALL DATASETS FUNCTION()
-    ##MICHAEL - distancefunctionsIDlist=ID's of ALL Distance functions FUNCTION()    
     def on_enter(self):
-        modelsData = [
-            ("1-1", "ly-Ha", "lymphography", "Hamming", "5.2", "22-02-2023, 10:51:12"),
-            ("1-2", "ly-Eu", "lymphography", "Euclidian", "4.7", "22-02-2023, 10:50:32"),
-            ("1-3", "ly-Mi", "lymphography", "Mixed", "3.7", "22-02-2023, 10:50:32"),
-            ("2-1", "ad-Ha", "adult", "Hamming", "14.2", "22-02-2023, 10:51:12"),
-            ("2-2", "ad-Eu", "adult", "Euclidian", "5.5", "22-02-2023, 10:50:32"),
-            ("2-3", "ad-Mi", "adult", "Mixed", "2.5", "22-02-2023, 10:50:32"),
-        ]
+        '''modelsData = [
+            ("ly-Ha", "lymphography", "Hamming", "5.2", "22-02-2023, 10:51:12"),
+            ("ly-Eu", "lymphography", "Euclidian", "4.7", "22-02-2023, 10:50:32"),
+            ("ly-Mi", "lymphography", "Mixed", "3.7", "22-02-2023, 10:50:32"),
+            ("ad-Ha", "adult", "Hamming", "14.2", "22-02-2023, 10:51:12"),
+            ("ad-Eu", "adult", "Euclidian", "5.5", "22-02-2023, 10:50:32"),
+            ("ad-Mi", "adult", "Mixed", "2.5", "22-02-2023, 10:50:32"),
+        ]'''
+        app = MDApp.get_running_app()
+        modelsData = app.modelController.GetAllInstances()
+        self.data=[]
+        for model in modelsData:
+            row = []
+            row.append(model.Name)
+            row.append("datasetName") #TO CHANGE LATER
+            row.append(model.DistanceFunction)
+            row.append(model.Wcss)
+            row.append(model.Timestamp)
+            self.data.append(row)
         dataRows = len(modelsData)
         pagination = False
         print (f'row of data = {dataRows}')
@@ -399,7 +407,7 @@ class UpdateModels(Screen):
             pagination = True
             dataRows = 5
         table_width = dp(Window.size[0]*9/50)
-        table = MDDataTable(
+        self.table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
             size_hint= (0.9, 0.9),
             check = True,
@@ -407,19 +415,18 @@ class UpdateModels(Screen):
             rows_num = dataRows,
             column_data = [
                 #HERE COME CHECK MARK width
-                ("ID", dp (table_width*0.1)),
-                ("Model Name", dp (table_width*0.18)),
-                ("Dataset", dp (table_width*0.18)),
-                ("Distance Function", dp (table_width*0.18)),
+                ("Model Name", dp (table_width*0.2)),
+                ("Dataset", dp (table_width*0.2)),
+                ("Distance Function", dp (table_width*0.2)),
                 ("SSE", dp (table_width*0.1)),
-                ("Time stamp", dp (table_width*0.23)),
+                ("Time stamp", dp (table_width*0.25)),
             ],
             row_data = modelsData
         )
-        table.bind(on_check_press=self.checked)
-        table.bind(on_row_press=self.row_checked)
         self.ids['table_place'].clear_widgets()
-        self.ids['table_place'].add_widget(table)
+        self.ids['table_place'].add_widget(self.table)
+        self.table.bind(on_check_press=self.checked)
+        self.table.bind(on_row_press=self.row_checked)
     # Function for check presses
     def checked (self, instance_table, current_row):
         print(instance_table, current_row)
@@ -427,6 +434,10 @@ class UpdateModels(Screen):
     def row_checked(self, instance_table, instance_row):
         print(instance_table, instance_row)
 
+    def on_update(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'dataanalystmenu'
+    
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'dataanalystmenu'
@@ -435,9 +446,6 @@ class UpdateModels(Screen):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
 
-    ##MICHAEL - SAMPLE OF UPDATE MODEL FUNCTION METHOD
-    ##MICHAEL - SAMPLE OF DELETE DISTANCE FUNCTION METHOd
-    ##MICHAEL - SAMPLE OF CREATE DISTANCE FUNCTION METHOd
 #---11---
 class ManageUsers(Screen):
     def on_enter(self):
@@ -469,12 +477,11 @@ class ManageUsers(Screen):
             row_data = self.data
         )
         # bind function to row press
-        self.table.bind(on_row_press=self.row_press)
         self.ids['table_place'].clear_widgets()
         self.ids['table_place'].add_widget(self.table)
+        self.table.bind(on_row_press=self.row_press)
     # Function for row presses
     def row_press(self, instance_table, instance_row):
-        
         index = instance_row.index
         cols_num = len(instance_table.column_data)
         row_num = int(index/cols_num)
