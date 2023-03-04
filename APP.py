@@ -79,9 +79,9 @@ class ChooseDataset(Screen):
         self.manager.current = 'login'
 #---3---
 class Query(Screen):
-    attributesRefs=[]
-    attributesTypes=[]
     def on_enter(self):
+        self.attributesRefs=[]
+        self.attributesTypes=[]
         self.ids.attributes_box.clear_widgets()
         app = MDApp.get_running_app()
         for i in range(len(app.dataSetObject.AttributesInfo)):
@@ -93,23 +93,25 @@ class Query(Screen):
                 self.attributesRefs[i].bind(text=self.on_text)
             else:
                 self.attributesTypes.append(True)
-                self.attributesRefs.append(Spinner(text="", values=app.dataSetObject.AttributesInfo[i]["values"].values()))
+                options = []
+                for value in app.dataSetObject.AttributesInfo[i]["values"].values():
+                    #BUG: Don't know to handle with NA
+                    if str(value) != "nan":
+                        options.append(str(value))
+                self.attributesRefs.append(Spinner(text="", values=options))
                 self.attributesRefs[i].bind(text=self.on_text)
             self.ids.attributes_box.add_widget(self.attributesRefs[i])
-
     def on_text(self, instance, value):
         if (value == ""):
             instance.background_color = (1,0,0,1)
         else:
             instance.background_color = (0,1,0,1)
-
-
     def on_apply(self):
         query = []
         app = MDApp.get_running_app()
         for i in range(len(self.attributesRefs)):
             if (self.attributesRefs[i].text==""):
-                show_popup(f'MUST FILL ALL FIELDS check field number {i}')
+                show_popup(f'MUST FILL ALL FIELDS check field number {i+1}')
                 return
             if (self.attributesTypes.pop(0)):
                 ## get the numeric value for categorical attribute
@@ -185,9 +187,12 @@ class ManageDatasets(Screen):
             ],
             row_data = self.data
         )
-        self.ids['table_place'].clear_widgets()
-        self.ids['table_place'].add_widget(self.table)
-        self.table.bind(on_row_press=self.row_press)
+        try: 
+            self.ids['table_place'].clear_widgets()
+            self.ids['table_place'].add_widget(self.table)
+            self.table.bind(on_row_press=self.row_press)
+        except Exception as e:
+            print(str(e))
     def row_press(self, instance_table, instance_row):
         print(instance_row.children)
         print ("BLAH BLAH2")
@@ -219,7 +224,7 @@ class AddDataset(Screen):
     def selected(self, filename):
         try:
             self.ids.path.text = filename[0]
-            print(filename[0])
+            #print(filename[0])
         except:
             pass
     def on_add(self, name, path):
@@ -243,7 +248,7 @@ class AddDataset(Screen):
         self.manager.current = 'login'
     def resetForm(self):
         self.ids['name'].text = ""
-        self.ids['path'].text = ""
+        #self.ids['path'].text = ""
 class UDDataset(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
@@ -445,7 +450,6 @@ class UpdateModels(Screen):
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
-
 #---11---
 class ManageUsers(Screen):
     def on_enter(self):
