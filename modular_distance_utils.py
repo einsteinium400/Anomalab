@@ -73,35 +73,36 @@ def load_user_distance_functions(content):
 # filename = 'dest.py'
 # function_name = 'subtraction'
 
-def delete_user_function(function_name):
+#def delete_user_function(function_name):
+
     #function_name=get_function_name(function_index)
-
-
-    # Load the module dynamically and get the source code for the function
-    module = __import__(os.path.splitext(DISTANCE_FUNCTIONS_PATH)[0])
-    function_source = inspect.getsource(getattr(module, function_name))
-
-    # Open the file in read mode to read its contents
-    with open(DISTANCE_FUNCTIONS_PATH, 'r') as f:
-        lines = f.readlines()
-
-    # Open the file in write mode to modify its contents
-    with open(DISTANCE_FUNCTIONS_PATH, 'w') as f:
-        i = 0
-        while i < len(lines):
-            # Check if the current line defines the function to be deleted
-            if lines[i].startswith('def ' + function_name):
-                # Remove all lines that define the function
-                while i < len(lines) and (lines[i].startswith('def ') or lines[i].startswith(' ')):
-                    i += 1
-            else:
-                # Write the line to the modified file
-                f.write(lines[i])
-                i += 1
-
-    # refresh distance function module
-    importlib.reload(DISTANCE_FUNCTIONS_PATH)
-    refresh_functions_list()
+    #
+    #
+    # # Load the module dynamically and get the source code for the function
+    # module = __import__(os.path.splitext(DISTANCE_FUNCTIONS_PATH)[0])
+    # function_source = inspect.getsource(getattr(module, function_name))
+    #
+    # # Open the file in read mode to read its contents
+    # with open(DISTANCE_FUNCTIONS_PATH, 'r') as f:
+    #     lines = f.readlines()
+    #
+    # # Open the file in write mode to modify its contents
+    # with open(DISTANCE_FUNCTIONS_PATH, 'w') as f:
+    #     i = 0
+    #     while i < len(lines):
+    #         # Check if the current line defines the function to be deleted
+    #         if lines[i].startswith('def ' + function_name):
+    #             # Remove all lines that define the function
+    #             while i < len(lines) and (lines[i].startswith('def ') or lines[i].startswith(' ')):
+    #                 i += 1
+    #         else:
+    #             # Write the line to the modified file
+    #             f.write(lines[i])
+    #             i += 1
+    #
+    # # refresh distance function module
+    # importlib.reload(DISTANCE_FUNCTIONS_PATH)
+    # refresh_functions_list()
 
 
 def refresh_functions_list():
