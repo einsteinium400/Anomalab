@@ -1,9 +1,14 @@
+
 import numpy as np
+import traceback
+import uuid
+import time
 
 from Moudles.Storage.StorageFactory import StorageFactory
 from Moudles.Models.Model import Model
 from Moudles.Clustring.KMeanClusterer import KMeansClusterer
-
+import modular_distance_utils
+from Moudles.Utils.utils import csv_to_nested_list
 
 
 class ModelsController:
@@ -11,27 +16,36 @@ class ModelsController:
     storage = operationFactory.CreateOperationItem()
 
     def CreateModel(self, name, dataset, distanceName):
-        '''dataSet = dataset
-        distanceFunction = MixedDistance()
-        mean  =dataSet.MeanValues
+        dataSet = dataset
+        distanceFunction = modular_distance_utils.get_function_by_name(distanceName)
+        mean = dataSet.MeanValues
         types = dataSet.getAttributesTypesList()
         print(dataSet.Data)
-        clusterer = KMeansClusterer(num_means=2,
+        clusterer = KMeansClusterer(num_means=3, # TODO: Change to elbow to get the right K for the dataset
                                     distance=distanceFunction,
-                                    repeats=9,
+                                    repeats=1,
                                     mean_values=mean,
                                     type_of_fields=types)
         data = np.array(dataSet.Data)
+        #TODO: Deal with bad seeds
         trained = 0
         while trained == 0:
             try:
                 clusterer.cluster(data)
                 trained =1
-            except:
+            except Exception as e:
+                print(f"Error {e}")
+                traceback.print_exc()
                 trained = 0
         modelJson = clusterer.getModelData()
-        self.storage.Save(name, modelJson, "MODEL")'''
-        pass
+        modelJson['datasetName']=dataset.Name
+        modelJson['function'] = distanceName
+        modelJson['name'] = name
+        modelJson['id'] = str(uuid.uuid1())
+        modelJson['timestamp'] = time.time()
+
+        self.storage.Save(name, modelJson, "MODEL")
+
 
     def GetAllModelsNamesList(self):
         operationFactory = StorageFactory()

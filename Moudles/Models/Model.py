@@ -1,10 +1,6 @@
-import json
-from abc import abstractmethod
-import os
+
 import uuid
-import pandas as pd
 import time
-from dotenv import load_dotenv
 
 from Moudles.Storage.StorageFactory import StorageFactory
 
@@ -30,8 +26,11 @@ class Model:
             self._id = str(uuid.uuid1())
             self._timeStamp = time.time()
             self._distanceFunction = modelJson['function']
-            self._distanceFunctionId = modelJson['functionId']
+            # self._distanceFunctionId = modelJson['functionId']
+            self._datasetName = modelJson['datasetName']
             self._jsonData = modelJson
+            self._jsonData['id'] = self._id
+            self._jsonData['timeStamp'] = self._timeStamp
             self._wcss = modelJson['wcss_score_of_model']
             self._numberOfClusters = len(modelJson['clusters_info'])
             self._clusters = modelJson['clusters_info']
@@ -40,11 +39,12 @@ class Model:
             self._jsonData = self.LoadModel()
             self._id = self._jsonData['id']
             self._timeStamp = self._jsonData['timestamp']
-            self._distanceFunctionId = self._jsonData['functionId']
+            # self._distanceFunctionId = self._jsonData['functionId']
             self._distanceFunction = self._jsonData['function']
             self._wcss = self._jsonData['wcss_score_of_model']
             self._numberOfClusters = len(self._jsonData['clusters_info'])
             self._clusters = self._jsonData['clusters_info']
+            self._datasetName = self._jsonData['datasetName']
 
     def __str__(self):
         return f"The model name is {self._name}"
@@ -80,6 +80,15 @@ class Model:
     @DistanceFunction.setter
     def ImportFeatures(self, value):
         self._distanceFunction = value
+        self.SaveModel()
+
+    @property
+    def DatasetName(self):
+        return self._datasetName
+
+    @DatasetName.setter
+    def DatasetName(self, value):
+        self._datasetName = value
         self.SaveModel()
 
     @property
