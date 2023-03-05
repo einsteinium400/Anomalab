@@ -79,9 +79,9 @@ class ChooseDataset(Screen):
         self.manager.current = 'login'
 #---3---
 class Query(Screen):
-    attributesRefs=[]
-    attributesTypes=[]
     def on_enter(self):
+        self.attributesRefs=[]
+        self.attributesTypes=[]
         self.ids.attributes_box.clear_widgets()
         app = MDApp.get_running_app()
         for i in range(len(app.dataSetObject.AttributesInfo)):
@@ -93,23 +93,25 @@ class Query(Screen):
                 self.attributesRefs[i].bind(text=self.on_text)
             else:
                 self.attributesTypes.append(True)
-                self.attributesRefs.append(Spinner(text="", values=app.dataSetObject.AttributesInfo[i]["values"].values()))
+                options = []
+                for value in app.dataSetObject.AttributesInfo[i]["values"].values():
+                    #BUG: Don't know to handle with NA
+                    if str(value) != "nan":
+                        options.append(str(value))
+                self.attributesRefs.append(Spinner(text="", values=options))
                 self.attributesRefs[i].bind(text=self.on_text)
             self.ids.attributes_box.add_widget(self.attributesRefs[i])
-
     def on_text(self, instance, value):
         if (value == ""):
             instance.background_color = (1,0,0,1)
         else:
             instance.background_color = (0,1,0,1)
-
-
     def on_apply(self):
         query = []
         app = MDApp.get_running_app()
         for i in range(len(self.attributesRefs)):
             if (self.attributesRefs[i].text==""):
-                show_popup(f'MUST FILL ALL FIELDS check field number {i}')
+                show_popup(f'MUST FILL ALL FIELDS check field number {i+1}')
                 return
             if (self.attributesTypes.pop(0)):
                 ## get the numeric value for categorical attribute
@@ -185,9 +187,12 @@ class ManageDatasets(Screen):
             ],
             row_data = self.data
         )
-        self.ids['table_place'].clear_widgets()
-        self.ids['table_place'].add_widget(self.table)
-        self.table.bind(on_row_press=self.row_press)
+        try: 
+            self.ids['table_place'].clear_widgets()
+            self.ids['table_place'].add_widget(self.table)
+            self.table.bind(on_row_press=self.row_press)
+        except Exception as e:
+            print(str(e))
     def row_press(self, instance_table, instance_row):
         print(instance_row.children)
         print ("BLAH BLAH2")
@@ -219,7 +224,7 @@ class AddDataset(Screen):
     def selected(self, filename):
         try:
             self.ids.path.text = filename[0]
-            print(filename[0])
+            #print(filename[0])
         except:
             pass
     def on_add(self, name, path):
@@ -243,7 +248,8 @@ class AddDataset(Screen):
         self.manager.current = 'login'
     def resetForm(self):
         self.ids['name'].text = ""
-        self.ids['path'].text = ""
+        #self.ids['path'].text = ""
+#---8---
 class UDDataset(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
@@ -272,7 +278,7 @@ class UDDataset(Screen):
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
-#---8---
+#---9---
 class ManageDistanceFunctions(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
@@ -328,7 +334,7 @@ class ManageDistanceFunctions(Screen):
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
-#---9---
+#---10---
 class AddDistanceFunction(Screen):
     def selected(self, filename):
         try:
@@ -357,6 +363,7 @@ class AddDistanceFunction(Screen):
         self.manager.current = 'login'
     def resetForm(self):
         self.ids['path'].text = ""
+#---11---
 class UDDistanceFunction(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
@@ -378,29 +385,21 @@ class UDDistanceFunction(Screen):
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
-#---10---
+#---12---
 class UpdateModels(Screen):
     def on_enter(self):
-        '''modelsData = [
-            ("ly-Ha", "lymphography", "Hamming", "5.2", "22-02-2023, 10:51:12"),
-            ("ly-Eu", "lymphography", "Euclidian", "4.7", "22-02-2023, 10:50:32"),
-            ("ly-Mi", "lymphography", "Mixed", "3.7", "22-02-2023, 10:50:32"),
-            ("ad-Ha", "adult", "Hamming", "14.2", "22-02-2023, 10:51:12"),
-            ("ad-Eu", "adult", "Euclidian", "5.5", "22-02-2023, 10:50:32"),
-            ("ad-Mi", "adult", "Mixed", "2.5", "22-02-2023, 10:50:32"),
-        ]'''
         app = MDApp.get_running_app()
         modelsData = app.modelController.GetAllInstances()
         self.data=[]
         for model in modelsData:
             row = []
             row.append(model.Name)
-            row.append("datasetName") #TO CHANGE LATER
+            row.append(model.DatasetName)
             row.append(model.DistanceFunction)
             row.append(model.Wcss)
             row.append(model.Timestamp)
             self.data.append(row)
-        dataRows = len(modelsData)
+        dataRows = len(self.data)
         pagination = False
         print (f'row of data = {dataRows}')
         if (dataRows > 5):
@@ -421,7 +420,7 @@ class UpdateModels(Screen):
                 ("SSE", dp (table_width*0.1)),
                 ("Time stamp", dp (table_width*0.25)),
             ],
-            row_data = modelsData
+            row_data = self.data
         )
         self.ids['table_place'].clear_widgets()
         self.ids['table_place'].add_widget(self.table)
@@ -435,8 +434,9 @@ class UpdateModels(Screen):
         print(instance_table, instance_row)
 
     def on_update(self):
-        self.manager.transition = SlideTransition(direction="right")
-        self.manager.current = 'dataanalystmenu'
+        pass
+        #self.manager.transition = SlideTransition(direction="right")
+        #self.manager.current = 'dataanalystmenu'
     
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
@@ -445,8 +445,7 @@ class UpdateModels(Screen):
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
-
-#---11---
+#---13---
 class ManageUsers(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
@@ -502,7 +501,7 @@ class ManageUsers(Screen):
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
-#---12---
+#---14---
 class AddUser(Screen):
     def on_apply(self, name, password, type):
         app = MDApp.get_running_app()
@@ -527,7 +526,7 @@ class AddUser(Screen):
         self.ids['name'].text = ""
         self.ids['password'].text = ""
         self.ids['type'].text = "Type"
-#~~~~~~~~~~~~~~~~~~~~~~~~~
+#---15---
 class UDUser(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
@@ -565,12 +564,12 @@ class UDUser(Screen):
         app = MDApp.get_running_app()
         self.ids['name'].text= str(app.dictionary['name'])
         self.ids['type'].text= str(app.dictionary['type'])
-#---13---
+#---16---
 class ChooseModels(Screen):
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
-#---14---
+#---17---
 class AnalystResults(Screen):
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
