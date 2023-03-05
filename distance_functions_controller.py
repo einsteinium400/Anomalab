@@ -1,6 +1,8 @@
 # functionality used by GUI
 import json
 import os
+import uuid
+
 import modular_distance_utils
 from Moudles.Storage.StorageFactory import StorageFactory
 from Moudles.Storage.OperationsMongo import OperationsMongo
@@ -80,14 +82,12 @@ class Distance_Functions_Controller:
             contents = source_file.read()
 
         encoded_string = base64.b64encode(contents.encode('utf-8')).decode('utf-8')
-        print(type(encoded_string))
-        print(encoded_string)
 
         new_func_name=modular_distance_utils.load_user_distance_functions(contents)
 
 
         data = {
-            "id": "y5",
+            "id": str(uuid.uuid1()),
             "function": encoded_string,
             "name": new_func_name
         }

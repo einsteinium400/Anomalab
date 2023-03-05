@@ -43,6 +43,11 @@ class ModelsController:
         modelJson['name'] = name
         modelJson['id'] = str(uuid.uuid1())
         modelJson['timestamp'] = time.time()
+        modelJson['fieldTypes'] = types
+        meanValues = []
+        for item in modelJson['clusters_info']:
+            meanValues.append(item['mean'])
+        modelJson['meanValues'] = meanValues
 
         self.storage.Save(name, modelJson, "MODEL")
 

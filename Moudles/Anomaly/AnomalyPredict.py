@@ -11,7 +11,7 @@ def mergeClassifcationData(model,classifedClusterIndex,classifedClusterDistances
         classicationData = {
             "classifiedCluster": classifedClusterIndex,
         }
-        modelData = model.getModelData()
+        modelData = model.JsonData
         classicationData['fullClusteringInfo'] = modelData
         for cluster in classicationData['fullClusteringInfo']['clusters_info']:
             for singleClassficationData in classifedClusterDistancesInfo:

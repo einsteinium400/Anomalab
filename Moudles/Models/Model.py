@@ -2,7 +2,9 @@
 import uuid
 import time
 
+import modular_distance_utils
 from Moudles.Storage.StorageFactory import StorageFactory
+from distance_functions_controller import Distance_Functions_Controller
 
 
 class Model:
@@ -34,6 +36,9 @@ class Model:
             self._wcss = modelJson['wcss_score_of_model']
             self._numberOfClusters = len(modelJson['clusters_info'])
             self._clusters = modelJson['clusters_info']
+            self._fieldTypes = modelJson['fieldTypes']
+            self._meanValues = modelJson['meanValues']
+            self._distanceFunctionRefrence = modular_distance_utils.get_function_by_name(self._distanceFunction)
         else:
             self._name = name
             self._jsonData = self.LoadModel()
@@ -45,6 +50,9 @@ class Model:
             self._numberOfClusters = len(self._jsonData['clusters_info'])
             self._clusters = self._jsonData['clusters_info']
             self._datasetName = self._jsonData['datasetName']
+            self._fieldTypes = self._jsonData['fieldTypes']
+            self._meanValues = self._jsonData['meanValues']
+            self._distanceFunctionRefrence = modular_distance_utils.get_function_by_name(self._distanceFunction)
 
     def __str__(self):
         return f"The model name is {self._name}"
@@ -119,3 +127,26 @@ class Model:
         loader = operationFactory.CreateOperationItem()
         jsonData = loader.Load(self._name, "MODEL")
         return jsonData
+
+    # Classify a new sample
+    def classify_vectorspace(self, vector):
+        # finds the closest cluster centroid
+        # returns that cluster's index
+        means = self._meanValues
+        types=self._fieldTypes
+        distanceFunc = self._distanceFunctionRefrence
+        best_distance = best_index = None
+        distances = []
+        for index in range(len(means)):
+            mean = means[index]
+            # dist = self._distance.calculate(vector, mean,self._type_of_fields)
+            dist = distanceFunc(vector, mean, types)
+            cluster_info = {
+                "cluster": index,
+                "distance": dist
+            }
+            distances.append(cluster_info)
+            if best_distance is None or dist < best_distance:
+                best_index, best_distance = index, dist
+
+        return best_index, distances
