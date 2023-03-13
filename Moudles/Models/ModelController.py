@@ -50,6 +50,15 @@ class ModelsController:
         modelJson['meanValues'] = meanValues
 
         self.storage.Save(name, modelJson, "MODEL")
+        if dataset.BestModel == "":
+            dataset.BestModel =modelJson['name']
+            dataset.SaveDataset()
+        else:
+            oldModel = self.GetModel(dataset.BestModel)
+            if oldModel.Wcss > modelJson['wcss_score_of_model']:
+                dataset.BestModel = modelJson['name']
+                dataset.SaveDataset()
+
 
 
     def GetAllModelsNamesList(self):
