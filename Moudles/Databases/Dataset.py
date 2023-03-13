@@ -13,7 +13,7 @@ class Dataset:
     _id = 0
     _jsonData = 0
     _name = 0
-    _bestModel = 0
+    _bestModel = ""
     _timeStamp = 0
     _featureNames = 0
     _importantFeatures = 0
@@ -37,7 +37,7 @@ class Dataset:
             self._featuresInfo = attribuesInfo
             self._data = self._name
             self._importantFeatures = []
-            self._bestModel = "none"
+            self._bestModel = ""
             self._meanValues = []
             # Get mean values
             for item in self._featureNames:

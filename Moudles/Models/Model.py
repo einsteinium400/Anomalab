@@ -55,7 +55,7 @@ class Model:
             self._distanceFunctionRefrence = modular_distance_utils.get_function_by_name(self._distanceFunction)
 
     def __str__(self):
-        return f"The model name is {self._name}"
+        return f"The model name is {self._name} function {self._distanceFunction} dataset {self._datasetName}"
 
     @property
     def Id(self):

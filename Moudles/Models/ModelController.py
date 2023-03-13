@@ -75,3 +75,21 @@ class ModelsController:
         for item in availableDatasets:
             finalList.append(self.GetModel(item))
         return finalList
+
+    def GetModelsStatus(self):
+        datasetList = self.storage.GetList("DATASET")
+        functionNames = self.storage.GetList("FUNCTION")
+        modelList = self.GetAllInstances()
+        finalList = {}
+        for dataset in datasetList:
+            # initialize an empty dictionary for the current key
+            innerDict = {}
+            # iterate through each item in the modelList and add it to the innerDict with a value of False
+            for function in functionNames:
+                innerDict[function] = False
+                for model in modelList:
+                    if(model.DatasetName == dataset and model.DistanceFunction == function):
+                        innerDict[function] = True
+            # add the innerDict to the newDict with the current key as its key
+            finalList[dataset] = innerDict
+        return finalList

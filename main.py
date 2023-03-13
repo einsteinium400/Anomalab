@@ -1,5 +1,6 @@
 import numpy
 
+from Moudles.Anomaly.AnomalyPredict import checkSampleForAnomaly
 from Moudles.Databases.DatasetPreProcessor import DatasetPreProcessor
 from Moudles.Databases.DatasetsController import DatasetsController
 from Moudles.Models.ModelController import ModelsController
@@ -40,12 +41,19 @@ functionController = Distance_Functions_Controller()
 # modelsController.CreateModel("lympho-MixedDistance",dataSet,"MixedDistance")
 # model = modelsController.GetModel("lympho-MixedDistance")
 # print(model.JsonData)
+# dataSample = [4, 2, 1, 1, 1, 1, 1, 2, 1, 2, 2, 2, 4, 8, 1, 1, 2, 2, 3]
+# print(model.classify_vectorspace(dataSample))
+# checkSampleForAnomaly(model,dataSample)
 #
 # modelsController.CreateModel("lympho-Hamming",dataSet,"Hamming")
 # model = modelsController.GetModel("lympho-Hamming")
 # print(model.JsonData)
 
-print(modelsController.GetAllModelsNamesList())
-print(modelsController.GetAllInstances())
+# print(modelsController.GetAllModelsNamesList())
+# for model in modelsController.GetAllInstances():
+#     print(model)
+
+print(modelsController.GetModelsStatus())
+
 
 
