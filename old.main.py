@@ -1,3 +1,4 @@
+import numpy
 from matplotlib import pyplot as plt
 
 from Moudles.Clustring.KMeanClusterer import KMeansClusterer
@@ -28,20 +29,21 @@ categoric_data = [numpy.array(f) for f in csv_to_nested_list("dataset1\labeled_d
 mixed_data = [numpy.array(f) for f in csv_to_nested_list("dataset1\labeled_data_numeric.csv")]
 
 # Cluster 1
-mixed = MixedDistance()
-
+#mixed = MixedDistance()
+print("hhh")
 # check elbow for mixed data
-k=elbow_method(mixed,mixed_data,MIXED_DATA_MEAN_VALUES,MIXED_DATA_TYPE_OF_FIELDS)
+k=3# elbow_method(MixedDistance,mixed_data,MIXED_DATA_MEAN_VALUES,MIXED_DATA_TYPE_OF_FIELDS)
 
-clusterer = KMeansClusterer(num_means=k, distance=mixed, repeats=9, mean_values=MIXED_DATA_MEAN_VALUES,
+print("number of means", k)
+
+clusterer = KMeansClusterer(num_means=k, distance=MixedDistance, repeats=9, mean_values=MIXED_DATA_MEAN_VALUES,
                             type_of_fields=MIXED_DATA_TYPE_OF_FIELDS)
 clusterer.cluster(mixed_data)
 clusterer.store_model("MixedCluster.json")
 
 
 # Cluster 2
-hammingFunc = Hamming()
-clusterer2 = KMeansClusterer(num_means=k, distance=hammingFunc, repeats=9, mean_values=MIXED_DATA_MEAN_VALUES,
+clusterer2 = KMeansClusterer(num_means=k, distance=Hamming, repeats=9, mean_values=MIXED_DATA_MEAN_VALUES,
                             type_of_fields=MIXED_DATA_TYPE_OF_FIELDS)
 clusterer2.cluster(mixed_data)
 clusterer2.store_model("HammingCluster.json")

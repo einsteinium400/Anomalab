@@ -155,8 +155,9 @@ class KMeansClusterer:
 
         # make _repeats repeats to get the best means
         for trial in range(self._repeats):
+
             # generate new means
-            self._means = utils.mean_generator(self._num_means, self._mean_values)
+            self._means = utils.mean_generator(self._num_means, vectors)
 
             # cluster the vectors to the given means
             self._cluster_vectorspace(vectors)
