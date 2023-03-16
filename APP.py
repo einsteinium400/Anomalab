@@ -2,7 +2,7 @@
 
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import Screen, SlideTransition
-from kivy.properties import StringProperty, NumericProperty, ObjectProperty
+from kivy.properties import StringProperty, ObjectProperty
 from kivy.lang import Builder
 from kivy.core.window import Window
 #table imports
@@ -390,6 +390,8 @@ class UpdateModels(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
         modelsData = app.modelController.GetAllInstances()
+        modelsList=app.modelController.GetModelsStatus()
+        print (modelsList)
         self.data=[]
         for model in modelsData:
             row = []
@@ -426,6 +428,8 @@ class UpdateModels(Screen):
         self.ids['table_place'].add_widget(self.table)
         self.table.bind(on_check_press=self.checked)
         self.table.bind(on_row_press=self.row_checked)
+
+
     # Function for check presses
     def checked (self, instance_table, current_row):
         print(instance_table, current_row)
@@ -435,8 +439,8 @@ class UpdateModels(Screen):
 
     def on_update(self):
         pass
-        #self.manager.transition = SlideTransition(direction="right")
-        #self.manager.current = 'dataanalystmenu'
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'dataanalystmenu'
     
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
