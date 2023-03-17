@@ -3,6 +3,7 @@
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import Screen, SlideTransition
 from kivy.properties import StringProperty, ObjectProperty
+import copy
 from kivy.lang import Builder
 from kivy.core.window import Window
 #table imports
@@ -387,20 +388,23 @@ class UDDistanceFunction(Screen):
         self.manager.current = 'login'
 #---12---
 class UpdateModels(Screen):
+    toUpdate = []
     def on_enter(self):
         app = MDApp.get_running_app()
-        modelsData = app.modelController.GetAllInstances()
-        modelsList=app.modelController.GetModelsStatus()
-        print (modelsList)
+        #modelsData = app.modelController.GetAllInstances()
+        self.modelsList=app.modelController.GetModelsStatus()
+        print (self.modelsList)
         self.data=[]
-        for model in modelsData:
-            row = []
-            row.append(model.Name)
-            row.append(model.DatasetName)
-            row.append(model.DistanceFunction)
-            row.append(model.Wcss)
-            row.append(model.Timestamp)
-            self.data.append(row)
+        for model in self.modelsList:
+            for function in model[1]:
+                row = []
+                row.append(model[0])    #datasetName
+                row.append(function[0]) #Name
+                if (function[1]):
+                    row.append("Exists")
+                else:
+                    row.append("Not Exists")
+                self.data.append(row)
         dataRows = len(self.data)
         pagination = False
         print (f'row of data = {dataRows}')
@@ -416,11 +420,9 @@ class UpdateModels(Screen):
             rows_num = dataRows,
             column_data = [
                 #HERE COME CHECK MARK width
-                ("Model Name", dp (table_width*0.2)),
-                ("Dataset", dp (table_width*0.2)),
-                ("Distance Function", dp (table_width*0.2)),
-                ("SSE", dp (table_width*0.1)),
-                ("Time stamp", dp (table_width*0.25)),
+                ("Dataset", dp (table_width*0.32)),
+                ("Distance Function", dp (table_width*0.32)),
+                ("Status", dp (table_width*0.32)),
             ],
             row_data = self.data
         )
@@ -432,10 +434,17 @@ class UpdateModels(Screen):
 
     # Function for check presses
     def checked (self, instance_table, current_row):
-        print(instance_table, current_row)
+        for model in self.toUpdate:
+            if (model[0]==current_row[0] and model[1]==current_row[1]):
+                self.toUpdate.remove(model)
+                print (self.toUpdate)
+                return
+        self.toUpdate.append(current_row)
+        print (self.toUpdate)
     # Function for row presses
     def row_checked(self, instance_table, instance_row):
-        print(instance_table, instance_row)
+        #print(instance_table, instance_row)
+        pass
 
     def on_update(self):
         pass
