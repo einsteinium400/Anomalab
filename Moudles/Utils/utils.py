@@ -1,13 +1,21 @@
 import csv
 import random
 
+
 def mean_generator(K, values):
-    means = []
-    for i in range(K):
-        means.append([])
-        for j in values:
-            means[i].append(random.randint(1, j))
-    return means
+    items = random.sample(values, K)
+    listed_items = [list(arr) for arr in items]
+    return listed_items
+
+    # means = []
+    # for i in range(K):
+    #     means.append([])
+    #     for j in values:
+    #         means[i].append(random.randint(1, j))
+    # print("inside mean generator")
+    # print(means)
+    # return means
+
 
 
 def csv_to_nested_list(file_name):

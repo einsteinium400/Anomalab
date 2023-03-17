@@ -1,3 +1,4 @@
+import numpy
 from matplotlib import pyplot as plt
 
 from Moudles.Clustring.KMeanClusterer import KMeansClusterer
@@ -5,6 +6,8 @@ from Moudles.Functions.DistanceFunctions import *
 from user_functions_stage_area.Hamming import Hamming
 from Moudles.Functions.MixedDistance import MixedDistance
 from Moudles.Functions.Euclidian import EuclideanDistance
+from Moudles.Functions.StatisticDistance import statisticdist
+
 from Moudles.Utils.utils import *
 from Moudles.Clustring.Elbow import elbow_method
 from Moudles.Utils.LoadUtils import loadItemFromJson
@@ -28,58 +31,61 @@ categoric_data = [numpy.array(f) for f in csv_to_nested_list("dataset1\labeled_d
 mixed_data = [numpy.array(f) for f in csv_to_nested_list("dataset1\labeled_data_numeric.csv")]
 
 # Cluster 1
-mixed = MixedDistance()
-
+#mixed = MixedDistance()
+print("hhh")
 # check elbow for mixed data
-k=elbow_method(mixed,mixed_data,MIXED_DATA_MEAN_VALUES,MIXED_DATA_TYPE_OF_FIELDS)
+k=3# elbow_method(MixedDistance,mixed_data,MIXED_DATA_MEAN_VALUES,MIXED_DATA_TYPE_OF_FIELDS)
 
-clusterer = KMeansClusterer(num_means=k, distance=mixed, repeats=9, mean_values=MIXED_DATA_MEAN_VALUES,
+print("number of means", k)
+
+clusterer = KMeansClusterer(num_means=k, distance=statisticdist, repeats=9, mean_values=MIXED_DATA_MEAN_VALUES,
                             type_of_fields=MIXED_DATA_TYPE_OF_FIELDS)
 clusterer.cluster(mixed_data)
 clusterer.store_model("MixedCluster.json")
 
+print("done")
 
-# Cluster 2
-hammingFunc = Hamming()
-clusterer2 = KMeansClusterer(num_means=k, distance=hammingFunc, repeats=9, mean_values=MIXED_DATA_MEAN_VALUES,
-                            type_of_fields=MIXED_DATA_TYPE_OF_FIELDS)
-clusterer2.cluster(mixed_data)
-clusterer2.store_model("HammingCluster.json")
+# # Cluster 2
+# clusterer2 = KMeansClusterer(num_means=k, distance=Hamming, repeats=9, mean_values=MIXED_DATA_MEAN_VALUES,
+#                             type_of_fields=MIXED_DATA_TYPE_OF_FIELDS)
+# clusterer2.cluster(mixed_data)
+# clusterer2.store_model("HammingCluster.json")
+#
 
 # Sample Load
-sample1 = loadItemFromJson('dataSample-1.json')
-sample2 = loadItemFromJson('dataSample-2.json')
-
-
-## POC ## Sample Checks
-print("Cluster 1: Distance Function: ", clusterer._distance.getName())
-print("Sample 1:")
-if(checkSampleForAnomaly(clusterer,sample1)):
-    print("Cluster 1 Sample 1: Anomaly Detected")
-
-else:
-    print("Cluster 1 Sample 1: Regular data")
-
-print("Sample 2:")
-if(checkSampleForAnomaly(clusterer,sample2)):
-    print("Cluster 1 Sample 2: Anomaly Detected")
-else:
-    print("Cluster 1 Sample 2: Regular data")
-
-print ("##################################################")
-print("Cluster 2: Distance Function: ", clusterer2._distance.getName())
-print("Sample 1:")
-if(checkSampleForAnomaly(clusterer2,sample1)):
-    print("Cluster 2 Sample 1: Anomaly Detected")
-else:
-    print("Cluster 2 Sample 1: Regular data")
-    
-print("Sample 2:")
-if(checkSampleForAnomaly(clusterer2,sample2)):
-    print("Cluster 2 Sample 2: Anomaly Detected")
-
-else:
-    print("Cluster 2 Sample 2: Regular data")
-
-
+# sample1 = loadItemFromJson('dataSample-1.json')
+# sample2 = loadItemFromJson('dataSample-2.json')
+#
+#
+# ## POC ## Sample Checks
+# print("Cluster 1: Distance Function: ", clusterer._distance.getName())
+# print("Sample 1:")
+# if(checkSampleForAnomaly(clusterer,sample1)):
+#     print("Cluster 1 Sample 1: Anomaly Detected")
+#
+# else:
+#     print("Cluster 1 Sample 1: Regular data")
+#
+# print("Sample 2:")
+# if(checkSampleForAnomaly(clusterer,sample2)):
+#     print("Cluster 1 Sample 2: Anomaly Detected")
+# else:
+#     print("Cluster 1 Sample 2: Regular data")
+#
+# print ("##################################################")
+# print("Cluster 2: Distance Function: ", clusterer2._distance.getName())
+# print("Sample 1:")
+# if(checkSampleForAnomaly(clusterer2,sample1)):
+#     print("Cluster 2 Sample 1: Anomaly Detected")
+# else:
+#     print("Cluster 2 Sample 1: Regular data")
+#
+# print("Sample 2:")
+# if(checkSampleForAnomaly(clusterer2,sample2)):
+#     print("Cluster 2 Sample 2: Anomaly Detected")
+#
+# else:
+#     print("Cluster 2 Sample 2: Regular data")
+#
+#
 
