@@ -24,6 +24,6 @@ def preProcess(vectors):
 
     params_dict["frequencies"] = frequencies_dict
     params_dict["minimum_freq_of_each_attribute"] = minimal_frequencies_dict
-    print(params_dict)
+    #print(params_dict)
 
     return params_dict

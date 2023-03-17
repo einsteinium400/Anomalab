@@ -400,10 +400,7 @@ class UpdateModels(Screen):
                 row = []
                 row.append(model[0])    #datasetName
                 row.append(function[0]) #Name
-                if (function[1]):
-                    row.append("Exists")
-                else:
-                    row.append("Not Exists")
+                row.append(function[1])
                 self.data.append(row)
         dataRows = len(self.data)
         pagination = False
@@ -422,7 +419,7 @@ class UpdateModels(Screen):
                 #HERE COME CHECK MARK width
                 ("Dataset", dp (table_width*0.32)),
                 ("Distance Function", dp (table_width*0.32)),
-                ("Status", dp (table_width*0.32)),
+                ("Exists", dp (table_width*0.32)),
             ],
             row_data = self.data
         )
@@ -437,17 +434,21 @@ class UpdateModels(Screen):
         for model in self.toUpdate:
             if (model[0]==current_row[0] and model[1]==current_row[1]):
                 self.toUpdate.remove(model)
-                print (self.toUpdate)
                 return
         self.toUpdate.append(current_row)
-        print (self.toUpdate)
     # Function for row presses
     def row_checked(self, instance_table, instance_row):
         #print(instance_table, instance_row)
         pass
 
     def on_update(self):
-        pass
+        print (self.toUpdate)
+        app = MDApp.get_running_app()
+        for model in self.toUpdate:
+            if model[2] == "":
+                app.modelController.CreateModel(f'{model[0]}-{model[1]}',app.datasetController.GetDataset(model[0]), model[1])
+            else:
+                app.modelController.DeleteModel(model[2])
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'dataanalystmenu'
     

@@ -66,34 +66,34 @@ ScreenManager:
     pos_hint: {"x":0, "top": 1}
     size_hint: (1, 0.2)
     spacing: 10
-    #canvas.before:
-        #Color:
-            #rgba: (1,0,0,1)
-        #Rectangle:
-            #pos: self.pos
-            #size: self.size
+    canvas.before:
+        Color:
+            rgba: (1,0,0,1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
 <Main@MDFloatLayout>:
     id: main
     orientation: "vertical"
     pos_hint: {"x":0, "top": 0.8}
     size_hint: (1, 0.65)
     spacing: 20
-    #canvas.before:
-        #Color:
-            #rgba: (0,1,0,1)
-        #Rectangle:
-            #pos: self.pos
-            #size: self.size
+    canvas.before:
+        Color:
+            rgba: (0,1,0,1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
 <Footer@MDFloatLayout>:
     id: footer
     pos_hint: {"x":0, "top": 0.15}
     size_hint: (1, 0.15)
-    #canvas.before:
-        #Color:
-            #rgba: (0,0,1,1)
-        #Rectangle:
-            #pos: self.pos
-            #size: self.size
+    canvas.before:
+        Color:
+            rgba: (0,0,1,1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
 
 # ---1---
 <Login>:
@@ -375,6 +375,12 @@ ScreenManager:
         Main:
             FreeTextInput:
                 id: path
+                canvas.before:
+                    Color:
+                        rgba: (0,0,1,1)
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
                 max_text_length: 100
                 pos_hint: {"x":0.1, "top": 0.95}
                 size_hint: (0.8, 0.2)
@@ -438,6 +444,7 @@ ScreenManager:
             FooterButton:
                 text: 'Update'
                 pos_hint: {"x":0.25, "top": 0.6}
+                on_press: root.on_update()
             FooterButton:
                 text: 'Back'
                 pos_hint: {"x":0.55, "top": 0.6}

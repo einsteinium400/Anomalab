@@ -59,8 +59,6 @@ class ModelsController:
                 dataset.BestModel = modelJson['name']
                 dataset.SaveDataset()
 
-
-
     def GetAllModelsNamesList(self):
         operationFactory = StorageFactory()
         self.storage = operationFactory.CreateOperationItem()
@@ -99,10 +97,10 @@ class ModelsController:
             for function in functionNames:
                 _model=[]
                 _model.append(function)
-                _model.append(False)
+                _model.append("")
                 for model in modelList:
                     if(model.DatasetName == dataset and model.DistanceFunction == function):
-                        _model[1]=True
+                        _model[1]=model.Name
                 _modelsList.append(_model)
             Item.append(_modelsList)
             # add the innerDict to the newDict with the current key as its key
