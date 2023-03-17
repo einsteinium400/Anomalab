@@ -1,6 +1,6 @@
 
 
-def MixedDistance(u, v, type_values):
+def MixedDistance(u, v, type_values, parameters):
     distance = 0
 
     for i in range(len(u)):
