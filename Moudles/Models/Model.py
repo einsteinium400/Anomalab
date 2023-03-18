@@ -17,6 +17,7 @@ class Model:
     _wcss = 0
     _numberOfClusters = 0
     _clusters = 0
+    _hyperParams = {}
 
     def __init__(
             self,
@@ -38,6 +39,7 @@ class Model:
             self._clusters = modelJson['clusters_info']
             self._fieldTypes = modelJson['fieldTypes']
             self._meanValues = modelJson['meanValues']
+            self._hyperParams = modelJson['hyperParams']
             self._distanceFunctionRefrence = modular_distance_utils.get_function_by_name(self._distanceFunction)
         else:
             self._name = name
@@ -52,6 +54,7 @@ class Model:
             self._datasetName = self._jsonData['datasetName']
             self._fieldTypes = self._jsonData['fieldTypes']
             self._meanValues = self._jsonData['meanValues']
+            self._hyperParams = self._jsonData['hyperParams']
             self._distanceFunctionRefrence = modular_distance_utils.get_function_by_name(self._distanceFunction)
 
     def __str__(self):
@@ -100,6 +103,15 @@ class Model:
         self.SaveModel()
 
     @property
+    def HyperParams(self):
+        return self._hyperParams
+
+    @HyperParams.setter
+    def HyperParams(self, value):
+        self._hyperParams = value
+        self.SaveModel()
+
+    @property
     def DistanceFunctionId(self):
         return self._distanceFunctionId
 
@@ -137,10 +149,11 @@ class Model:
         distanceFunc = self._distanceFunctionRefrence
         best_distance = best_index = None
         distances = []
+        hyperParmas = self._hyperParams
         for index in range(len(means)):
             mean = means[index]
             # dist = self._distance.calculate(vector, mean,self._type_of_fields)
-            dist = distanceFunc(vector, mean, types)
+            dist = distanceFunc(vector, mean, types, hyperParmas)
             cluster_info = {
                 "cluster": index,
                 "distance": dist
