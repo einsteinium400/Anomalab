@@ -42,7 +42,6 @@ class Dataset:
             # Get mean values
             for item in self._featureNames:
                self._meanValues.append(int(newData[item].max()))
-            print(self._meanValues)
             self._jsonData = {
                 "name": self._name,
                 "id": self._id,

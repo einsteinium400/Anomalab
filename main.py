@@ -37,7 +37,7 @@ functionController = Distance_Functions_Controller()
 # print(dataSet.FeatureNames)
 # print(dataSet.Data)
 
-# dataSet = databaseController.GetDataset("lympho")
+dataSet = databaseController.GetDataset("lympho")
 # modelsController.CreateModel("lympho-MixedDistance",dataSet,"MixedDistance")
 # model = modelsController.GetModel("lympho-MixedDistance")
 # print(model.JsonData)
@@ -45,15 +45,15 @@ functionController = Distance_Functions_Controller()
 # print(model.classify_vectorspace(dataSample))
 # checkSampleForAnomaly(model,dataSample)
 #
-# modelsController.CreateModel("lympho-Hamming",dataSet,"Hamming")
-# model = modelsController.GetModel("lympho-Hamming")
-# print(model.JsonData)
+
 
 # print(modelsController.GetAllModelsNamesList())
 # for model in modelsController.GetAllInstances():
 #     print(model)
 
-print(modelsController.GetModelsStatus())
+# print(modelsController.GetModelsStatus())
 
 
-
+modelsController.CreateModel("lympho2-MixedDistance",dataSet,"MixedDistance")
+model = modelsController.GetModel("lympho2-MixedDistance")
+print(model.JsonData)

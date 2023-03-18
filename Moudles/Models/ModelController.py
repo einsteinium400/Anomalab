@@ -20,7 +20,6 @@ class ModelsController:
         distanceFunction = modular_distance_utils.get_function_by_name(distanceName)
         mean = dataSet.MeanValues
         types = dataSet.getAttributesTypesList()
-        print(dataSet.Data)
         clusterer = KMeansClusterer(num_means=3, # TODO: Change to elbow to get the right K for the dataset
                                     distance=distanceFunction,
                                     repeats=1,

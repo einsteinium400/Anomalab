@@ -1,4 +1,4 @@
-def Hamming(u,v,type_values):
+def Hamming(u,v,type_values,hyper_parameters=0):
         distance = 0
         for i in range(len(u)):
             if v[i] != u[i]:
@@ -7,7 +7,7 @@ def Hamming(u,v,type_values):
 
 
 
-def MixedDistance(u, v, type_values):
+def MixedDistance(u, v, type_values,hyper=0):
     distance = 0
 
     for i in range(len(u)):

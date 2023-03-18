@@ -2,8 +2,9 @@ import csv
 import random
 
 
+
 def mean_generator(K, values):
-    items = random.sample(values, K)
+    items = random.sample(list(values), K)
     listed_items = [list(arr) for arr in items]
     return listed_items
 
