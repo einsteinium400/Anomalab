@@ -62,38 +62,44 @@ ScreenManager:
 # ---SECTIONS---
 <Window@MDFloatLayout>:
     size: root.width, root.height
+    canvas.before:
+        Color:
+            rgba: (0,0.3,1,0.2)
+        Rectangle:
+            pos: self.pos
+            size: self.size
 <Header@MDFloatLayout>:
     pos_hint: {"x":0, "top": 1}
     size_hint: (1, 0.2)
     spacing: 10
-    canvas.before:
-        Color:
-            rgba: (1,0,0,1)
-        Rectangle:
-            pos: self.pos
-            size: self.size
+    #canvas.before:
+        #Color:
+            #rgba: (1,0,0,1)
+        #Rectangle:
+            #pos: self.pos
+            #size: self.size
 <Main@MDFloatLayout>:
     id: main
     orientation: "vertical"
     pos_hint: {"x":0, "top": 0.8}
     size_hint: (1, 0.65)
     spacing: 20
-    canvas.before:
-        Color:
-            rgba: (0,1,0,1)
-        Rectangle:
-            pos: self.pos
-            size: self.size
+    #canvas.before:
+        #Color:
+            #rgba: (0,1,0,1)
+        #Rectangle:
+            #pos: self.pos
+            #size: self.size
 <Footer@MDFloatLayout>:
     id: footer
     pos_hint: {"x":0, "top": 0.15}
     size_hint: (1, 0.15)
-    canvas.before:
-        Color:
-            rgba: (0,0,1,1)
-        Rectangle:
-            pos: self.pos
-            size: self.size
+    #canvas.before:
+        #Color:
+            #rgba: (0,0,1,1)
+        #Rectangle:
+            #pos: self.pos
+            #size: self.size
 
 # ---1---
 <Login>:
@@ -187,10 +193,11 @@ ScreenManager:
                 on_release: root.logout()
         Main: 
             MDLabel:
+                id: results
                 text: "results will come here"
-                font_size: 40
-                pos_hint: {"x":0.3, "top": 0.65}
-                size_hint: (0.4, 0.3)
+                font_size: 24
+                pos_hint: {"x":0.1, "top": 0.9}
+                size_hint: (0.8, 0.8)
                 halign: "center"
         Footer:
             FooterButton:
@@ -375,12 +382,6 @@ ScreenManager:
         Main:
             FreeTextInput:
                 id: path
-                canvas.before:
-                    Color:
-                        rgba: (0,0,1,1)
-                    Rectangle:
-                        pos: self.pos
-                        size: self.size
                 max_text_length: 100
                 pos_hint: {"x":0.1, "top": 0.95}
                 size_hint: (0.8, 0.2)
