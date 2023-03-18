@@ -64,7 +64,7 @@ class KMeansClusterer:
                       separators=(',', ': '))
 
     def cluster(self, vectors):
-        self._hyper_parameters = Preprocess.preProcess(vectors)
+        self._hyper_parameters = Preprocess.preProcess(vectors, self._type_of_fields)
         # call abstract method to cluster the vectors
         self.cluster_vectorspace(vectors)
 

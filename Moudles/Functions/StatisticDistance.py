@@ -13,6 +13,7 @@ minimum_freq_of_each_attribute={0:1, 1:4, 2:2}
 }
 
 '''
+import numpy as np
 import math
 
 
@@ -44,16 +45,21 @@ def statisticdist(u, v, type_values, parameters):
             else:
                 specific_domain_size = parameters["domain sizes"][i]
                 f_v_ak = f_freq(specific_domain_size,theta1,betha,theta2,gamma)
-                fr_u = f_freq(parameters["frequencies"][i][u[i]],theta1,betha,theta2,gamma)
-                fr_v = f_freq(parameters["frequencies"][i][v[i]],theta1,betha,theta2,gamma)
-                m_fk = parameters["minimum_freq_of_each_attribute"][i]
-
+                try:
+                    fr_u = f_freq(parameters["frequencies"][str(int(i))][str(int(u[int(i)]))],theta1,betha,theta2,gamma)
+                    fr_v = f_freq(parameters["frequencies"][str(int(i))][str(int(v[int(i)]))],theta1,betha,theta2,gamma)
+                    m_fk = parameters["minimum_freq_of_each_attribute"][str(i)]
+                except Exception as e:
+                    print('-------',str(int(i)))
+                    print(str(int(u[int(i)])), str(int(v[int(i)])))
+                
                 d_fr = (abs(fr_u - fr_v) + m_fk) / max(fr_u, fr_v)
 
                 categoric_dist += max(d_fr, theta, f_v_ak)
 
         # numberic handle
         else:
-            numeric_dist += (u[i] - v[i]) ** 2
+            numeric_dist += pow((np.int64(u[i]) - np.int64(v[i])),2)
 
+    categoric_dist=pow(categoric_dist,2)
     return math.sqrt(categoric_dist + numeric_dist)
