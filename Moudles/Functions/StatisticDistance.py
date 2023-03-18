@@ -16,16 +16,16 @@ minimum_freq_of_each_attribute={0:1, 1:4, 2:2}
 import math
 
 
-def f_freq(z, theta1, betha, theta2, gamma):
-    if z <= theta1:
-        return 1
-    if theta1 < z <= theta2:
-        return 1 - betha * (z - theta1)
-    if z > theta2:
-        return 1 - betha * (theta2 - theta1) - gamma * (z - theta2)
-
-
 def statisticdist(u, v, type_values, parameters):
+
+    def f_freq(z, theta1, betha, theta2, gamma):
+        if z <= theta1:
+            return 1
+        if theta1 < z <= theta2:
+            return 1 - betha * (z - theta1)
+        if z > theta2:
+            return 1 - betha * (theta2 - theta1) - gamma * (z - theta2)
+
     betha=parameters["betha"]
     theta1=parameters["theta1"]
     theta2=parameters["theta2"]
