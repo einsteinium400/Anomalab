@@ -49,6 +49,7 @@ class KMeansClusterer:
                 }
             )
         jsonData['clusters_info'] = listObj
+        jsonData['hyperParams'] = self._hyper_parameters
         self._model_json_info = jsonData
 
     def getModelData(self):
