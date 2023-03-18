@@ -3,7 +3,6 @@
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import Screen, SlideTransition
 from kivy.properties import StringProperty, ObjectProperty
-import copy
 from kivy.lang import Builder
 from kivy.core.window import Window
 #table imports
@@ -55,7 +54,7 @@ class ChooseDataset(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
         self.datasetsNames = app.datasetController.GetAllDatasetsNamesList()
-        
+
         if (self.datasetsNames == []):
             show_popup("THERE ARE NO DATASETS IN THE SYSTEM")
             self.manager.transition = SlideTransition(direction="right")
@@ -456,6 +455,7 @@ class UpdateModels(Screen):
             if model[2] == "":
                 app.modelController.CreateModel(f'{model[0]}-{model[1]}',app.datasetController.GetDataset(model[0]), model[1])
             else:
+                print (f'try to delete model {model[2]}')
                 app.modelController.DeleteModel(model[2])
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'dataanalystmenu'
