@@ -22,12 +22,18 @@ def mergeClassifcationData(model,classifedClusterIndex,classifedClusterDistances
 def checkSampleForAnomaly(model,sample):
     fakeSample = sample
     cluster,distances = model.classify_vectorspace(fakeSample)
+    str = ""
+    str += f'distances: {distances}\n'
     print(distances)
     print("Classifed Cluster", cluster)
+    str += f'classified Cluster {cluster}\n'
     predictionFullData = mergeClassifcationData(model,cluster,distances)
     for clusterJson in predictionFullData['fullClusteringInfo']['clusters_info']:
         if clusterJson['cluster'] == cluster:
+            str+=f'Distance form centroid: {clusterJson["distance_from_centroid"]}\n'
+            str+=f'variance: {3*clusterJson["variance"]}\n'
+            str+=f'average_cluster_distance: {clusterJson["average_cluster_distance"]}\n'
             if(checkAnomaly(clusterJson)):
-                return True
+                return True,str
             else:
-                return False
+                return False,str

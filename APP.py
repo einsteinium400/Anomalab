@@ -19,6 +19,7 @@ from distance_functions_controller import Distance_Functions_Controller
 from Moudles.Databases.DatasetsController import DatasetsController
 from Moudles.Models.ModelController import ModelsController
 from Moudles.Users.UsersController import UsersController
+from Moudles.Anomaly.AnomalyPredict import checkSampleForAnomaly
 
 from gui.popup import show_popup
 
@@ -118,14 +119,18 @@ class Query(Screen):
                 ## get the numeric value for categorical attribute
                 dict = app.dataSetObject.AttributesInfo[i]["values"]
                 value = [k for k, v in dict.items() if v == self.attributesRefs[i].text][0]
-                query.append(value)
+                query.append(int(value))
             else:
-                query.append(self.attributesRefs[i].text)
+                # numeric feature
+                query.append(int(self.attributesRefs[i].text))
         print (f'query is {query}')
+        model = app.modelController.GetModel(app.dataSetObject.BestModel)
         ## MICHAEL - TODO: Work on model controller yet to be done sorry
         ## MICHAEL- get BEST MODEL ID for model ID in app.DatasetID ,if no model return 0
         ## DANA- SEND QUERY (query - arr of values, ModelID) get answer to app.results=PREDICT(query)
-        app.results= {}
+        app.results,self.msg= checkSampleForAnomaly(model, query)
+        print (app.results)
+        print (self.msg)
         
         self.manager.transition = SlideTransition(direction="left")
         self.manager.current = 'results'
