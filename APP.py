@@ -3,7 +3,6 @@
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import Screen, SlideTransition
 from kivy.properties import StringProperty, ObjectProperty
-import copy
 from kivy.lang import Builder
 from kivy.core.window import Window
 #table imports
@@ -55,6 +54,7 @@ class ChooseDataset(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
         self.datasetsNames = app.datasetController.GetAllDatasetsNamesList()
+
         if (self.datasetsNames == []):
             show_popup("THERE ARE NO DATASETS IN THE SYSTEM")
             self.manager.transition = SlideTransition(direction="right")
@@ -125,13 +125,11 @@ class Query(Screen):
                 query.append(int(self.attributesRefs[i].text))
         print (f'query is {query}')
         model = app.modelController.GetModel(app.dataSetObject.BestModel)
-        ## MICHAEL - TODO: Work on model controller yet to be done sorry
-        ## MICHAEL- get BEST MODEL ID for model ID in app.DatasetID ,if no model return 0
-        ## DANA- SEND QUERY (query - arr of values, ModelID) get answer to app.results=PREDICT(query)
-        app.results,self.msg= checkSampleForAnomaly(model, query)
-        print (app.results)
-        print (self.msg)
-        
+        x,y=checkSampleForAnomaly(model, query)
+        app.dictionary =  {
+            "results": x,
+            "msg": y,
+        }
         self.manager.transition = SlideTransition(direction="left")
         self.manager.current = 'results'
 
@@ -144,6 +142,10 @@ class Query(Screen):
         self.manager.current = 'login'
 #---4---
 class Results(Screen):
+    def on_enter(self):
+        app = MDApp.get_running_app()
+        self.ids.results.text=f'Is anomaly: {app.dictionary["results"]}\n\n{app.dictionary["msg"]}'
+
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'query'
@@ -453,6 +455,7 @@ class UpdateModels(Screen):
             if model[2] == "":
                 app.modelController.CreateModel(f'{model[0]}-{model[1]}',app.datasetController.GetDataset(model[0]), model[1])
             else:
+                print (f'try to delete model {model[2]}')
                 app.modelController.DeleteModel(model[2])
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'dataanalystmenu'
@@ -613,7 +616,7 @@ class AnomalabApp(MDApp):
     
     def build(self):
         self.theme_cls.theme_style = "Light"
-        self.theme_cls.primary_palette = "BlueGray"
+        self.theme_cls.primary_palette = "Gray"
         return Builder.load_file('App.kv')
 # MAIN ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if __name__ == '__main__':
