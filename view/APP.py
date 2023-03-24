@@ -14,11 +14,11 @@ from kivymd.uix.textfield import MDTextFieldRect
 from kivy.uix.spinner import Spinner
 
 # Controllers import
-from distance_functions_controller import Distance_Functions_Controller
-from Moudles.Databases.DatasetsController import DatasetsController
-from Moudles.Models.ModelController import ModelsController
-from Moudles.Users.UsersController import UsersController
-from Moudles.Anomaly.AnomalyPredict import checkSampleForAnomaly
+from ..controller.DistanceFunctionsController import Distance_Functions_Controller
+from ..controller.DatasetsController import DatasetsController
+from ..controller.ModelController import ModelsController
+from ..controller.UsersController import UsersController
+from ..controller.AnomalyPredict import checkSampleForAnomaly
 
 from gui.popup import show_popup
 

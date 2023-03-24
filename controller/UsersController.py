@@ -1,5 +1,5 @@
-from Moudles.Storage.StorageFactory import StorageFactory
-from Moudles.Users.User import User
+from ..model.Storage.StorageFactory import StorageFactory
+from ..model.User import User
 
 
 class UsersController:
