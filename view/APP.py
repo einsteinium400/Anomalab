@@ -20,7 +20,7 @@ from ..controller.ModelController import ModelsController
 from ..controller.UsersController import UsersController
 from ..controller.AnomalyPredict import checkSampleForAnomaly
 
-from gui.popup import show_popup
+from popup import show_popup
 
 #SCREENS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #---1---
