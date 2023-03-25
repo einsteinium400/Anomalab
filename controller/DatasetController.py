@@ -31,7 +31,7 @@ class DatasetController:
         return finalList
 
     def SetBestModel(self,databaseName,modelName):
-        modelsController = ModelsController()
+        modelsController = ModelController()
         self.GetDataset(databaseName).BestModel = modelsController.GetModel(modelName)
 
     def GetDataset(self, DatasetName):
