@@ -1,10 +1,10 @@
 from model.Dataset import Dataset
-from controller import ModelsController
+from controller.ModelController import ModelController
 from model.Storage.StorageFactory import StorageFactory
 import pandas as pd
 
 
-class DatasetsController:
+class DatasetController:
     operationFactory = StorageFactory()
     storage = operationFactory.CreateOperationItem()
 

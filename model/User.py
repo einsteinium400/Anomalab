@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 import hashlib
 
 
-from Moudles.Storage.StorageFactory import StorageFactory
+from model.Storage.StorageFactory import StorageFactory
+
 USERS_TYPE_LIST = ["regular"
     ,"analyst"
     ,"admin"]

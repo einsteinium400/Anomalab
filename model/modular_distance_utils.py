@@ -4,11 +4,21 @@ import ast
 #import astor
 import inspect
 import re
-import Moudles.Functions.DistanceFunctions
+#import ..distanceFunctions.DistanceFunctions
+## Get locations
+# get the absolute path of the current working directory
+current_dir = os.path.abspath(os.getcwd())
+# get the absolute path of the 'distancefunctions' directory
+distancefunctions_dir = os.path.join(current_dir, 'distancefunctions')
+distancefunctions_abs_path = os.path.abspath(distancefunctions_dir)
+distancefunctions_file = os.path.join(distancefunctions_abs_path, 'DistanceFunctions.py')
 
+print (f'distancefunctions_abs_path is: {distancefunctions_abs_path}')
+print (f'distancefunctions_file is: {distancefunctions_file}')
+
+DISTANCE_FUNCTIONS_PATH = distancefunctions_file
 function_list = []
-
-DISTANCE_FUNCTIONS_PATH = "Moudles/Functions/DistanceFunctions.py"
+# DISTANCE_FUNCTIONS_PATH = "../distanceFunctions/DistanceFunctions.py"
 
 
 def load_user_distance_functions(content):

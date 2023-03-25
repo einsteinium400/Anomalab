@@ -5,9 +5,9 @@ import uuid
 import pandas as pd
 import time
 
-from Moudles.Databases.DatasetPreProcessor import DatasetPreProcessor
-from Moudles.Databases.RawDatasetData import RawDatasetData
-from Moudles.Storage.StorageFactory import StorageFactory
+from model import DatasetPreProcessor
+from model import RawDatasetData
+from model.Storage.StorageFactory import StorageFactory
 
 class Dataset:
     _id = 0

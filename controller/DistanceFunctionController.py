@@ -3,18 +3,18 @@ import json
 import os
 import uuid
 
-import modular_distance_utils
-from Moudles.Storage.StorageFactory import StorageFactory
-from Moudles.Storage.OperationsMongo import OperationsMongo
-from Moudles.Storage.OperationsMongo import Operations
+from model.Storage.StorageFactory import StorageFactory
+from model import modular_distance_utils
+#from model.Storage.OperationsMongo import OperationsMongo
+#from model.Storage.OperationsMongo import Operations
 
 import base64
-import inspect
+#import inspect
 
 # path = modular_distance_utils.DISTANCE_FUNCTIONS_PATH
 
 
-class Distance_Functions_Controller:
+class DistanceFunctionController:
 
     def __init__(self):
         #  self.mongo_operations = OperationsMongo()

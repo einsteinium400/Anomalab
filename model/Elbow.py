@@ -1,6 +1,5 @@
-from Moudles.Clustring.KMeanClusterer import KMeansClusterer
-from Moudles.Functions.DistanceFunctions import *
 import matplotlib.pyplot as plt
+from model.KMeanClusterer import KMeansClusterer
 
 import numpy as np
 

@@ -1,8 +1,8 @@
-from ..model.Storage.StorageFactory import StorageFactory
-from ..model.User import User
+from model.Storage.StorageFactory import StorageFactory
+from model.User import User
 
 
-class UsersController:
+class UserController:
     operationFactory = StorageFactory()
     storage = operationFactory.CreateOperationItem()
 

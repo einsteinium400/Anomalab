@@ -14,13 +14,13 @@ from kivymd.uix.textfield import MDTextFieldRect
 from kivy.uix.spinner import Spinner
 
 # Controllers import
-from ..controller.DistanceFunctionsController import Distance_Functions_Controller
-from ..controller.DatasetsController import DatasetsController
-from ..controller.ModelController import ModelsController
-from ..controller.UsersController import UsersController
-from ..controller.AnomalyPredict import checkSampleForAnomaly
+from controller.DistanceFunctionController import DistanceFunctionController
+from controller.DatasetController import DatasetController
+from controller.ModelController import ModelController
+from controller.UserController import UserController
+from controller.AnomalyDetectionController import checkSampleForAnomaly
 
-from popup import show_popup
+from view.popup import show_popup
 
 #SCREENS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #---1---
@@ -599,14 +599,14 @@ class AnalystResults(Screen):
 # WINDOW MANAGER ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class AnomalabApp(MDApp):
     #GENERAL
-    logo = StringProperty('gui/images/logo.jpg')
-    icon = StringProperty('gui/images/icon.jpg')
+    logo = StringProperty('view/images/logo.jpg')
+    icon = StringProperty('view/images/icon.jpg')
     title = StringProperty('Anomalab')
     #CONTROLLERS
-    userController=UsersController()
-    datasetController=DatasetsController()
-    modelController=ModelsController()
-    distanceController=Distance_Functions_Controller()
+    userController=UserController()
+    datasetController=DatasetController()
+    modelController=ModelController()
+    distanceController=DistanceFunctionController()
     #INNER VALUES
     dataSetObject = ObjectProperty(None)
     distanceFunctionObject = ObjectProperty(None)
@@ -617,12 +617,4 @@ class AnomalabApp(MDApp):
     def build(self):
         self.theme_cls.theme_style = "Light"
         self.theme_cls.primary_palette = "Gray"
-        return Builder.load_file('App.kv')
-# MAIN ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-if __name__ == '__main__':
-    app = AnomalabApp()
-    Window.fullscreen = False
-    Window.minimum_height = 600
-    Window.minimum_width = 800
-    app.run()
-    app.root_window.close()
+        return Builder.load_file('view/App.kv')

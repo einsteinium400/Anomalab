@@ -2,8 +2,8 @@ import json
 
 import numpy as np
 
-from Moudles.Utils import utils as utils
-from Moudles.Utils import Preprocess
+import model.utils as utils
+import model.Preprocess
 
 
 class KMeansClusterer:

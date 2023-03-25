@@ -2,8 +2,8 @@ from abc import abstractmethod
 from dotenv import load_dotenv
 import os
 
-from Moudles.Storage.OperationsLocal import OperationsLocal
-from Moudles.Storage.OperationsMongo import OperationsMongo
+from model.Storage.OperationsLocal import OperationsLocal
+from model.Storage.OperationsMongo import OperationsMongo
 
 
 class StorageFactory:

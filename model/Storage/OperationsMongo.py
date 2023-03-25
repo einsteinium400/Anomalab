@@ -5,7 +5,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import pymongo
 
-from Moudles.Storage.Operations import Operations
+from model.Storage import Operations
 
 COLLECTION_DICT = {
     "FUNCTION": "functions",
@@ -14,7 +14,7 @@ COLLECTION_DICT = {
     "USER": "users",
     "RAW_DATASET": "raw-dataset"
 }
-from Moudles.Storage import Operations
+
 
 
 class OperationsMongo(Operations.Operations):

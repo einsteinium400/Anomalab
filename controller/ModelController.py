@@ -4,14 +4,14 @@ import traceback
 import uuid
 import time
 
-from Moudles.Storage.StorageFactory import StorageFactory
-from Moudles.Models.Model import Model
-from Moudles.Clustring.KMeanClusterer import KMeansClusterer
-import modular_distance_utils
-from Moudles.Utils.utils import csv_to_nested_list
+from model.Storage.StorageFactory import StorageFactory
+from model.Model import Model
+from model.KMeanClusterer import KMeansClusterer
+from model import modular_distance_utils
+from model.utils import csv_to_nested_list
 
 
-class ModelsController:
+class ModelController:
     operationFactory = StorageFactory()
     storage = operationFactory.CreateOperationItem()
 

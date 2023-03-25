@@ -2,9 +2,9 @@
 import uuid
 import time
 
-import modular_distance_utils
-from Moudles.Storage.StorageFactory import StorageFactory
-from distance_functions_controller import Distance_Functions_Controller
+from model import modular_distance_utils
+from model.Storage.StorageFactory import StorageFactory
+from controller.DistanceFunctionController import DistanceFunctionController
 
 
 class Model:
