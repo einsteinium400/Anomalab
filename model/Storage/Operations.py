@@ -19,9 +19,13 @@ class Operations:
         pass
 
     @abstractmethod
-    def GetList(self, type):
+    def GetNamesList(self, type):
         pass
 
     @abstractmethod
     def GetFullItemsList(self, type):
+        pass
+
+    @abstractmethod
+    def GetListWithSpecificAttributes(self, type, attributeList):
         pass

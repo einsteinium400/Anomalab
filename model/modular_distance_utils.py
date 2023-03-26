@@ -13,8 +13,8 @@ distancefunctions_dir = os.path.join(current_dir, 'distancefunctions')
 distancefunctions_abs_path = os.path.abspath(distancefunctions_dir)
 distancefunctions_file = os.path.join(distancefunctions_abs_path, 'DistanceFunctions.py')
 
-print (f'distancefunctions_abs_path is: {distancefunctions_abs_path}')
-print (f'distancefunctions_file is: {distancefunctions_file}')
+#print (f'distancefunctions_abs_path is: {distancefunctions_abs_path}')
+#print (f'distancefunctions_file is: {distancefunctions_file}')
 
 DISTANCE_FUNCTIONS_PATH = distancefunctions_file
 function_list = []

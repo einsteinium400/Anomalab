@@ -46,9 +46,10 @@ class OperationsMongo(Operations.Operations):
         query = {"name": name}
         collection.delete_one(query)
 
-    def GetList(self, type):
+    def GetNamesList(self, type):
         collection = self.PROJECTDB[COLLECTION_DICT[type]]
-        mongoList = collection.find()
+        projection = { 'name': 1 }
+        mongoList = collection.find({},projection)
 
         finalNamesList = []
         for item in mongoList:
@@ -59,6 +60,15 @@ class OperationsMongo(Operations.Operations):
         collection = self.PROJECTDB[COLLECTION_DICT[type]]
         mongoList = collection.find()
 
+        finalNamesList = []
+        for item in mongoList:
+            finalNamesList.append(item)
+        return finalNamesList
+
+    def GetListWithSpecificAttributes(self, type, attributeList):
+        collection = self.PROJECTDB[COLLECTION_DICT[type]]
+        projection = {key: 1 if key in attributeList else 0 for key in attributeList}
+        mongoList = collection.find({},projection)
         finalNamesList = []
         for item in mongoList:
             finalNamesList.append(item)

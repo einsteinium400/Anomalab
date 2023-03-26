@@ -5,8 +5,8 @@ import uuid
 import pandas as pd
 import time
 
-from model import DatasetPreProcessor
-from model import RawDatasetData
+from model.DatasetPreProcessor import DatasetPreProcessor
+from model.RawDatasetData import RawDatasetData
 from model.Storage.StorageFactory import StorageFactory
 
 class Dataset:
@@ -190,5 +190,15 @@ class Dataset:
                         finalList.append(True)
                     else:
                         finalList.append(False)
+        return finalList
+    
+    def getAttributesTypesAndValuesList(self):
+        featuresList = self._featureNames
+        featuresInfo = self._featuresInfo
+        finalList = []
+        for item in featuresList:
+            for feature in featuresInfo:
+                if(item == feature['name']):
+                    finalList.append(feature)
         return finalList
 

@@ -78,11 +78,15 @@ class DistanceFunctionController:
         #modular_distance_utils.delete_user_function(name)
 
     def add_function(self, file_dir):
-        with open(file_dir, 'r') as source_file:
-            contents = source_file.read()
+        try:
+
+            with open(file_dir, 'r') as source_file:
+                contents = source_file.read()
+        except :   
+            return FileNotFoundError
+
 
         encoded_string = base64.b64encode(contents.encode('utf-8')).decode('utf-8')
-
         new_func_name=modular_distance_utils.load_user_distance_functions(contents)
 
 

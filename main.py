@@ -1,3 +1,5 @@
+#CREATE VIRTUAL ENVITONMENT IN NOAM COMPUTER: kivy_venv\Scripts\activate
+
 from view.APP import AnomalabApp
 from kivy.core.window import Window
 

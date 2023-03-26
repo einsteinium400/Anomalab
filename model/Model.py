@@ -17,7 +17,7 @@ class Model:
     _wcss = 0
     _numberOfClusters = 0
     _clusters = 0
-    _hyperParams = {}
+    _hyperParams = 0
 
     def __init__(
             self,

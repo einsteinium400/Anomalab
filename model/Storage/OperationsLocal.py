@@ -48,7 +48,7 @@ class OperationsLocal(Operations.Operations):
             os.remove(filePath)
             return 1
         return 0
-    def GetList(self, type):
+    def GetNamesList(self, type):
         filePath = f"{DATAPATH}\{FILEPATH_DICT[type]}"
         if (os.path.exists(filePath)):
             itemsList = os.listdir(filePath)
@@ -57,4 +57,6 @@ class OperationsLocal(Operations.Operations):
         return []
 
     def GetFullItemsList(self, type):
+        pass
+    def GetListWithSpecificAttributes(self, type, attributeList):
         pass

@@ -18,7 +18,6 @@ import math
 
 
 def statisticdist(u, v, type_values, parameters):
-
     def f_freq(z, theta1, betha, theta2, gamma):
         if z <= theta1:
             return 1
@@ -36,6 +35,7 @@ def statisticdist(u, v, type_values, parameters):
     categoric_dist = 0
     for i in range(len(v)):
         # catrgorical handle
+
         if type_values[i]:
             # if attributes are same
             if u[i] == v[i]:
@@ -45,13 +45,10 @@ def statisticdist(u, v, type_values, parameters):
             else:
                 specific_domain_size = parameters["domain sizes"][i]
                 f_v_ak = f_freq(specific_domain_size,theta1,betha,theta2,gamma)
-                try:
-                    fr_u = f_freq(parameters["frequencies"][str(int(i))][str(int(u[int(i)]))],theta1,betha,theta2,gamma)
-                    fr_v = f_freq(parameters["frequencies"][str(int(i))][str(int(v[int(i)]))],theta1,betha,theta2,gamma)
-                    m_fk = parameters["minimum_freq_of_each_attribute"][str(i)]
-                except Exception as e:
-                    print('-------',str(int(i)))
-                    print(str(int(u[int(i)])), str(int(v[int(i)])))
+
+                fr_u = f_freq(parameters["frequencies"][str(int(i))][str(int(u[int(i)]))],theta1,betha,theta2,gamma)
+                fr_v = f_freq(parameters["frequencies"][str(int(i))][str(int(v[int(i)]))],theta1,betha,theta2,gamma)
+                m_fk = parameters["minimum_freq_of_each_attribute"][str(i)]
                 
                 d_fr = (abs(fr_u - fr_v) + m_fk) / max(fr_u, fr_v)
 

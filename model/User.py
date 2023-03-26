@@ -13,11 +13,7 @@ from model.Storage.StorageFactory import StorageFactory
 USERS_TYPE_LIST = ["regular"
     ,"analyst"
     ,"admin"]
-USERS_TYPE_DICT = {
-    0: "regular",
-    1: "analyst",
-    2: "admin"
-}
+
 REVERSE_USERS_TYPE_DICT = {
     "regular": 1,
     "analyst":2,

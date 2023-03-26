@@ -6,48 +6,48 @@ class UserController:
     operationFactory = StorageFactory()
     storage = operationFactory.CreateOperationItem()
 
-    def UpdateUserType(self, username, newType):
-        user = self.GetUser(username)
-        user.Type = newType
+    def __GetAllUsers(self):
+        return self.storage.GetNamesList("USER")
 
-    def GetAllUsers(self):
-        operationFactory = StorageFactory()
-        self.storage = operationFactory.CreateOperationItem()
-        return self.storage.GetList("USER")
-
-    def GetUser(self, username):
+    def __GetUser(self, username):
         usersList = self.GetAllUsers()
         if (username not in usersList):
             raise Exception("User does not exist")
         return User(username)
+    
+    def UpdateUserType(self, username, newType):
+        user = self.__GetUser(username)
+        user.Type = newType
 
     def RegisterUser(self, username, password, type):
-        usersList = self.GetAllUsers()
+        usersList = self.__GetAllUsers()
         if (username in usersList):
             raise Exception("User Exists")
         newUser = User(username, password, type)
         newUser.SaveUser()
 
     def DeleteUser(self, username):
-        usersList = self.GetAllUsers()
+        usersList = self.__GetAllUsers()
         if (username not in usersList):
             raise Exception("User Does not exist")
         self.storage.Delete(username, "USER")
 
     def LoginUser(self, username, suggestedPass):
-        usersList = self.GetAllUsers()
+        usersList = self.__GetAllUsers()
         if username not in usersList:
             raise Exception("User Does not exist")
         attemptedLoggedUser = User(username)
         if attemptedLoggedUser.VerifyPassword(suggestedPass):
-            return attemptedLoggedUser
+            return attemptedLoggedUser.Type
         else:
             raise Exception("Incorrect Password")
-        raise Exception("Login Error")
 
-    def GetAllInstances(self):
-        availableDatasets = self.GetAllUsers()
-        finalList = []
-        for item in availableDatasets:
-            finalList.append(self.GetUser(item))
-        return finalList
+    def GetListForManager(self):
+        return self.storage.GetListWithSpecificAttributes("USER",['name','type'])
+    
+    '''def GetAllInstances(self):
+            availableUsers = self.GetAllUsers()
+            finalList = []
+            for item in availableUsers:
+                finalList.append(self.__GetUser(item))
+            return finalList'''

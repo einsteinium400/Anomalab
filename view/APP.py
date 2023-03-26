@@ -1,5 +1,3 @@
-#CREATE VIRTUAL ENVITONMENT IN NOAM COMPUTER: kivy_venv\Scripts\activate
-
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import Screen, SlideTransition
 from kivy.properties import StringProperty, ObjectProperty
@@ -31,18 +29,18 @@ class Login(Screen):
         try:
             if (name == '' or password == ''):
                 raise Exception(f"Must enter user name and password")
-            app.userObject = app.userController.LoginUser(name, password)
+            app.userTypeObject = app.userController.LoginUser(name, password)
         except Exception as e:
             self.resetForm()
             show_popup(str(e))
             return
-        print (f'login successful: {str(app.userObject)} type is: {app.userObject.Type}')
+        print (f'login successful type is: {app.userTypeObject}')
         self.manager.transition = SlideTransition(direction="left")
-        if (app.userObject.Type == 'regular'):
+        if (app.userTypeObject == 'regular'):
             self.manager.current = 'choosedataset'
-        elif (app.userObject.Type == 'analyst'):
+        elif (app.userTypeObject == 'analyst'):
             self.manager.current = 'dataanalystmenu'
-        elif (app.userObject.Type == 'admin'):
+        elif (app.userTypeObject == 'admin'):
             self.manager.current = 'manageusers'
     def resetForm(self):
         self.ids['user_name'].text = ""
@@ -71,7 +69,7 @@ class ChooseDataset(Screen):
         print (f'choose dataset name: {app.dataSetObject.Name}')
         #IF USER IS REG GO TO QUERY ELSE GO TO CHOOSE MODELS
         self.manager.transition = SlideTransition(direction="left")
-        if (app.userObject.Type=="regular"):
+        if (app.userTypeObject=="regular"):
             self.manager.current = 'query'
         else:
             self.manager.current = 'choosemodels'
@@ -84,19 +82,21 @@ class Query(Screen):
     def on_enter(self):
         self.attributesRefs=[]
         self.attributesTypes=[]
+        self.attributesList=[]
         self.ids.attributes_box.clear_widgets()
         app = MDApp.get_running_app()
-        for i in range(len(app.dataSetObject.AttributesInfo)):
-            print (app.dataSetObject.AttributesInfo[i])
-            self.ids.attributes_box.add_widget(MDLabel(text=f'{app.dataSetObject.AttributesInfo[i]["name"]}:', halign="center"))
-            if (app.dataSetObject.AttributesInfo[i]["type"] == 'numeric'):
+        self.attributesList=app.dataSetObject.getAttributesTypesAndValuesList()
+        for i in range(len(self.attributesList)):
+            print (self.attributesList[i])
+            self.ids.attributes_box.add_widget(MDLabel(text=f'{self.attributesList[i]["name"]}:', halign="center"))
+            if (self.attributesList[i]["type"] == 'numeric'):
                 self.attributesTypes.append(False)
                 self.attributesRefs.append(MDTextFieldRect(multiline=False, hint_text=f"insert here", input_filter = 'float'))
                 self.attributesRefs[i].bind(text=self.on_text)
             else:
                 self.attributesTypes.append(True)
                 options = []
-                for value in app.dataSetObject.AttributesInfo[i]["values"].values():
+                for value in self.attributesList[i]["values"].values():
                     #BUG: Don't know to handle with NA
                     if str(value) != "nan":
                         options.append(str(value))
@@ -117,7 +117,7 @@ class Query(Screen):
                 return
             if (self.attributesTypes.pop(0)):
                 ## get the numeric value for categorical attribute
-                dict = app.dataSetObject.AttributesInfo[i]["values"]
+                dict = self.attributesList[i]["values"]
                 value = [k for k, v in dict.items() if v == self.attributesRefs[i].text][0]
                 query.append(int(value))
             else:
@@ -416,25 +416,27 @@ class UpdateModels(Screen):
             pagination = True
             dataRows = 5
         table_width = dp(Window.size[0]*9/50)
-        self.table = MDDataTable(
-            pos_hint = {'x': 0.05, 'top': 0.95},
-            size_hint= (0.9, 0.9),
-            check = True,
-            use_pagination = pagination,
-            rows_num = dataRows,
-            column_data = [
-                #HERE COME CHECK MARK width
-                ("Dataset", dp (table_width*0.32)),
-                ("Distance Function", dp (table_width*0.32)),
-                ("Exists", dp (table_width*0.32)),
-            ],
-            row_data = self.data
-        )
-        self.ids['table_place'].clear_widgets()
-        self.ids['table_place'].add_widget(self.table)
-        self.table.bind(on_check_press=self.checked)
-        self.table.bind(on_row_press=self.row_checked)
-
+        try:
+            self.table = MDDataTable(
+                pos_hint = {'x': 0.05, 'top': 0.95},
+                size_hint= (0.9, 0.9),
+                check = True,
+                use_pagination = pagination,
+                rows_num = dataRows,
+                column_data = [
+                    #HERE COME CHECK MARK width
+                    ("Dataset", dp (table_width*0.32)),
+                    ("Distance Function", dp (table_width*0.32)),
+                    ("Exists", dp (table_width*0.32)),
+                ],
+                row_data = self.data
+            )
+            self.ids['table_place'].clear_widgets()
+            self.ids['table_place'].add_widget(self.table)
+            self.table.bind(on_check_press=self.checked)
+            self.table.bind(on_row_press=self.row_checked)
+        except Exception as e:
+            show_popup(str(e))
 
     # Function for check presses
     def checked (self, instance_table, current_row):
@@ -472,13 +474,13 @@ class ManageUsers(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
         table_width = dp(Window.size[0]*9/50)
-        Allusers=app.userController.GetAllInstances()
+        Allusers=app.userController.GetListForManager()
         self.data=[]
         for user in Allusers:
-            print(f'("{user.Name}","{user.Type}"),')
+            #print(f'("{user['name']}","{user['type']}"),')
             row = []
-            row.append(user.Name)
-            row.append(user.Type)
+            row.append(user['name'])
+            row.append(user['type'])
             self.data.append(row)
         dataRows = len(self.data)
         pagination = False
@@ -611,7 +613,7 @@ class AnomalabApp(MDApp):
     dataSetObject = ObjectProperty(None)
     distanceFunctionObject = ObjectProperty(None)
     modelObject = ObjectProperty(None)
-    userObject = ObjectProperty(None)
+    userTypeObject = StringProperty(None)
     dictionary = {}
     
     def build(self):

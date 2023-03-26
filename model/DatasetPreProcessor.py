@@ -5,6 +5,7 @@ class DatasetPreProcessor:
     def dataSetPreProcess(self,name,df):
         featuresInfo =[]
         cols = df.columns
+        print (f'cols are: {cols}')
         num_cols = df._get_numeric_data().columns
         for col in num_cols:
             featuresInfo.append ({
@@ -23,4 +24,5 @@ class DatasetPreProcessor:
                 "type":"categorical",
                 "values":inv_map
             })
+        print (featuresInfo)
         return df,featuresInfo

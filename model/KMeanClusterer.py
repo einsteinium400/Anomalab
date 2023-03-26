@@ -3,7 +3,7 @@ import json
 import numpy as np
 
 import model.utils as utils
-import model.Preprocess
+from model.Preprocess import preProcess
 
 
 class KMeansClusterer:
@@ -64,7 +64,7 @@ class KMeansClusterer:
                       separators=(',', ': '))
 
     def cluster(self, vectors):
-        self._hyper_parameters = Preprocess.preProcess(vectors, self._type_of_fields)
+        self._hyper_parameters = preProcess(vectors, self._type_of_fields)
         # call abstract method to cluster the vectors
         self.cluster_vectorspace(vectors)
 
