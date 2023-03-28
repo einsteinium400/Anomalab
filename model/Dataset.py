@@ -203,14 +203,14 @@ class Dataset:
         return finalList
 
     def addNewModel(self,model):
-        self._bestModels.append({
+        self._bestModel.append({
             'name':model['name'],
             'wcss_score':model['wcss_score']
         })
-        self._bestModels = sorted(self._bestModels, key=lambda x: x.wcss_score, reverse=True)
+        self._bestModel = sorted(self._bestModel, key=lambda x: x['wcss_score'])
         self.SaveDataset()
 
-    def removeModel(self,model):
-        self._bestModels = [m for m in self._bestModels if m.name != model.Name]
+    def removeModel(self,modelName):
+        self._bestModel = [m for m in self._bestModel if m['name'] != modelName]
         self.SaveDataset()
 

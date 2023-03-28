@@ -15,7 +15,11 @@ class ModelController:
     operationFactory = StorageFactory()
     storage = operationFactory.CreateOperationItem()
 
-    def CreateModel(self, name, dataset, distanceName):
+    def CreateModel(self, dataset, distanceName):
+        name = f'{dataset}-{distanceName}'
+        modelsList = self.GetAllModelsNamesList()
+        if name in modelsList:
+            raise Exception(f"Model named {name} exist")
         dataSet = dataset
         distanceFunction = modular_distance_utils.get_function_by_name(distanceName)
         mean = dataSet.MeanValues
@@ -67,10 +71,7 @@ class ModelController:
         modelsList = self.GetAllModelsNamesList()
         if modelName not in modelsList:
             raise Exception(f"Model named {modelName} Does not exist")
-        dataset.removeModel({
-            'name':modelJson['name'],
-            'wcss_score':modelJson['wcss_score_of_model']
-            })
+        dataset.removeModel(modelName)
         self.storage.Delete(modelName, "MODEL")
 
     def GetAllInstances(self):
@@ -81,8 +82,8 @@ class ModelController:
         return finalList
 
     def GetModelsStatus(self):
-        datasetList = self.storage.GetList("DATASET")
-        functionNames = self.storage.GetList("FUNCTION")
+        datasetList = self.storage.GetNamesList("DATASET")
+        functionNames = self.storage.GetNamesList("FUNCTION")
         modelList = self.GetAllInstances()
         finalList = []
         for dataset in datasetList:

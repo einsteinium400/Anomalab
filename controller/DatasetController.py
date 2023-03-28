@@ -52,4 +52,7 @@ class DatasetController:
         filtered_list = list(filter(lambda x: bool(x['bestmodel']), dataSetList))
         return filtered_list
 
+    def GetListForManager(self):
+        return self.storage.GetListWithSpecificAttributes("DATASET",['name','timestamp','featuresNumber','instancesNumber'])
+
 
