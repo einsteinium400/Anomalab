@@ -13,7 +13,7 @@ class Dataset:
     _id = 0
     _jsonData = 0
     _name = 0
-    _bestModel = ""
+    _bestModel = []
     _timeStamp = 0
     _featureNames = 0
     _importantFeatures = 0
@@ -37,7 +37,7 @@ class Dataset:
             self._featuresInfo = attribuesInfo
             self._data = self._name
             self._importantFeatures = []
-            self._bestModel = ""
+            self._bestModel = []
             self._meanValues = []
             # Get mean values
             for item in self._featureNames:
@@ -201,4 +201,16 @@ class Dataset:
                 if(item == feature['name']):
                     finalList.append(feature)
         return finalList
+
+    def addNewModel(self,model):
+        self._bestModels.append({
+            'name':model['name'],
+            'wcss_score':model['wcss_score']
+        })
+        self._bestModels = sorted(self._bestModels, key=lambda x: x.wcss_score, reverse=True)
+        self.SaveDataset()
+
+    def removeModel(self,model):
+        self._bestModels = [m for m in self._bestModels if m.name != model.Name]
+        self.SaveDataset()
 

@@ -49,19 +49,13 @@ class ModelController:
         modelJson['meanValues'] = meanValues
 
         self.storage.Save(name, modelJson, "MODEL")
-        if dataset.BestModel == "":
-            dataset.BestModel =modelJson['name']
-            dataset.SaveDataset()
-        else:
-            oldModel = self.GetModel(dataset.BestModel)
-            if oldModel.Wcss > modelJson['wcss_score_of_model']:
-                dataset.BestModel = modelJson['name']
-                dataset.SaveDataset()
+        dataset.addNewModel({
+            'name':modelJson['name'],
+            'wcss_score':modelJson['wcss_score_of_model']
+        })
 
     def GetAllModelsNamesList(self):
-        operationFactory = StorageFactory()
-        self.storage = operationFactory.CreateOperationItem()
-        return self.storage.GetList("MODEL")
+        return self.storage.GetNamesList("MODEL")
 
     def GetModel(self, modelName):
         modelsList = self.GetAllModelsNamesList()
@@ -69,10 +63,14 @@ class ModelController:
             raise Exception(f"Model named {modelName} Does not exist")
         return Model(modelName)
 
-    def DeleteModel(self, modelName):
+    def DeleteModel(self, modelName,dataset):
         modelsList = self.GetAllModelsNamesList()
         if modelName not in modelsList:
             raise Exception(f"Model named {modelName} Does not exist")
+        dataset.removeModel({
+            'name':modelJson['name'],
+            'wcss_score':modelJson['wcss_score_of_model']
+            })
         self.storage.Delete(modelName, "MODEL")
 
     def GetAllInstances(self):

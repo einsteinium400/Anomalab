@@ -1,5 +1,4 @@
 from model.Dataset import Dataset
-from controller.ModelController import ModelController
 from model.Storage.StorageFactory import StorageFactory
 import pandas as pd
 
@@ -17,9 +16,7 @@ class DatasetController:
         self.storage.Save(dataSet.Name, dataSet.JsonData, "DATASET")
 
     def GetAllDatasetsNamesList(self):
-        operationFactory = StorageFactory()
-        self.storage = operationFactory.CreateOperationItem()
-        return self.storage.GetList("DATASET")
+        return self.storage.GetNamesList("DATASET")
 
     def GetAllDatasetsInfoList(self):
         operationFactory = StorageFactory()
@@ -30,9 +27,6 @@ class DatasetController:
             finalList.append(list((item['id'],item['name'],len(item['featureNames']),len(item['data']),item['timestamp'])))
         return finalList
 
-    def SetBestModel(self,databaseName,modelName):
-        modelsController = ModelController()
-        self.GetDataset(databaseName).BestModel = modelsController.GetModel(modelName)
 
     def GetDataset(self, DatasetName):
         dataSetsList = self.GetAllDatasetsNamesList()
@@ -52,5 +46,10 @@ class DatasetController:
         for item in availableDatasets:
             finalList.append(self.GetDataset(item))
         return finalList
+
+    def GetListForQuery(self):
+        dataSetList = self.storage.GetListWithSpecificAttributes("DATASET",['name','bestmodel'])
+        filtered_list = list(filter(lambda x: bool(x['bestmodel']), dataSetList))
+        return filtered_list
 
 
