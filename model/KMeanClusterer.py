@@ -15,7 +15,9 @@ class KMeansClusterer:
             repeats=1,
             mean_values=None,
             conv_test=1e-6,  # threshold for converging
-            type_of_fields=None):
+            type_of_fields=None,
+            hyper_params=dict()):
+
         self._num_means = num_means
         self._distance = distance
         self._repeats = repeats
@@ -28,7 +30,7 @@ class KMeansClusterer:
         self._average_distance_list = []
         self._clusters_info = []
         self._model_json_info = 0
-        self._hyper_parameters = dict()
+        self._hyper_parameters = hyper_params
 
     def createClusterJson(self):
         jsonData = {
@@ -64,7 +66,7 @@ class KMeansClusterer:
                       separators=(',', ': '))
 
     def cluster(self, vectors):
-        self._hyper_parameters = preProcess(vectors, self._type_of_fields)
+        # self._hyper_parameters = preProcess(vectors, self._type_of_fields)
         # call abstract method to cluster the vectors
         self.cluster_vectorspace(vectors)
 

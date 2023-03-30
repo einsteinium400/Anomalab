@@ -4,6 +4,7 @@ import traceback
 import uuid
 import time
 
+from model.Preprocess import preProcess
 from model.Storage.StorageFactory import StorageFactory
 from model.Model import Model
 from model.KMeanClusterer import KMeansClusterer
@@ -20,12 +21,16 @@ class ModelController:
         distanceFunction = modular_distance_utils.get_function_by_name(distanceName)
         mean = dataSet.MeanValues
         types = dataSet.getAttributesTypesList()
-        clusterer = KMeansClusterer(num_means=3, # TODO: Change to elbow to get the right K for the dataset
+
+        #####TODO: make k real
+        data = np.array(dataSet.Data)
+        hp, k = preProcess(data, types, distanceFunction)
+        clusterer = KMeansClusterer(num_means=k, # TODO: Change to elbow to get the right K for the dataset
                                     distance=distanceFunction,
                                     repeats=1,
                                     mean_values=mean,
-                                    type_of_fields=types)
-        data = np.array(dataSet.Data)
+                                    type_of_fields=types,
+                                    hyper_params=hp)
         #TODO: Deal with bad seeds
         trained = 0
         while trained == 0:
