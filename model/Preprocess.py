@@ -29,21 +29,19 @@ def preProcess(vectors, type_of_fields, distance_function):
 
     params_dict["frequencies"] = frequencies_dict
     params_dict["minimum_freq_of_each_attribute"] = minimal_frequencies_dict
-
-    print(params_dict)
+    params_dict["theta"] = 0.1
 
     #todo: get the k value
     k= 3
 
     # activate the genetic algorithm
-    theta1, theta2, betha, gamma = genetic_algorithm(params_dict, distance_function, k, vectors)
+    theta1, theta2, betha, gamma = genetic_algorithm(params_dict, distance_function, k, vectors, type_of_fields)
 
-    params_dict["theta"] = 0.1
     params_dict["theta1"] = theta1#3
     params_dict["theta2"] = theta2#10
     params_dict["betha"] = betha#0.05
     params_dict["gamma"] = gamma#0.01
-
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~dict is:", params_dict, k)
     return params_dict, k
 
 
