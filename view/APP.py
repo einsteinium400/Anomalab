@@ -1,3 +1,7 @@
+#python imports
+from datetime import datetime
+
+#kivy imports
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import Screen, SlideTransition
 from kivy.properties import StringProperty, ObjectProperty
@@ -182,7 +186,7 @@ class ManageDatasets(Screen):
             row.append(dataset['name'])
             row.append(dataset['featuresNumber'])
             row.append(dataset['instancesNumber'])
-            row.append(dataset['timestamp'])
+            row.append(datetime.fromtimestamp(dataset['timestamp']))
             self.data.append(row)
         dataRows = len(self.data)
         pagination = False
@@ -213,8 +217,6 @@ class ManageDatasets(Screen):
     def row_press(self, instance_table, instance_row):
         index = instance_row.index
         cols_num = len(instance_table.column_data)
-        if (instance_row.index)%cols_num==0:
-            print(instance_row.text)
         row_num = int(index/cols_num)
         print (f'press on row_num is: {row_num}')
         print (f'name of pressed line is: {self.table.row_data[row_num][0]}')

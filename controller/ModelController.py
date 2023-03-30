@@ -16,7 +16,7 @@ class ModelController:
     storage = operationFactory.CreateOperationItem()
 
     def CreateModel(self, dataset, distanceName):
-        name = f'{dataset}-{distanceName}'
+        name = f'{dataset.Name}-{distanceName}'
         modelsList = self.GetAllModelsNamesList()
         if name in modelsList:
             raise Exception(f"Model named {name} exist")
