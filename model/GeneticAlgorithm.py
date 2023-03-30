@@ -1,5 +1,5 @@
 import random
-import KMeanClusterer
+from model.KMeanClusterer import KMeansClusterer
 
 # Define the search space for each parameter
 z=10 # todo: this needs to be a parameter i get from the dictionary
@@ -134,8 +134,3 @@ def genetic_algorithm(params, distance_function, k, vectors):
 
     return best_solution # , best_fitness_score
 
-while(1):
-    h=genetic_algorithm()
-    print(h)
-    if h[0][0]>h[0][1]:
-        exit()

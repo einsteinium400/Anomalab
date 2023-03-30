@@ -1,5 +1,5 @@
 import pandas as pd
-from GeneticAlgorithm import genetic_algorithm
+from model.GeneticAlgorithm import genetic_algorithm
 
 def preProcess(vectors, type_of_fields, distance_function):
     params_dict = dict()
@@ -39,10 +39,10 @@ def preProcess(vectors, type_of_fields, distance_function):
     theta1, theta2, betha, gamma = genetic_algorithm(params_dict, distance_function, k, vectors)
 
     params_dict["theta"] = 0.1
-    params_dict["theta1"] = 3
-    params_dict["theta2"] = 10
-    params_dict["betha"] = 0.05
-    params_dict["gamma"] = 0.01
+    params_dict["theta1"] = theta1#3
+    params_dict["theta2"] = theta2#10
+    params_dict["betha"] = betha#0.05
+    params_dict["gamma"] = gamma#0.01
 
     return params_dict, k
 
