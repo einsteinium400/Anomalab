@@ -51,22 +51,28 @@ class Login(Screen):
 class ChooseDataset(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
-        self.datasetsNames = app.datasetController.GetAllDatasetsNamesList()
+        #self.datasetsNames = app.datasetController.GetAllDatasetsNamesList()
+        self.datasets = app.datasetController.GetListForQuery()
 
-        if (self.datasetsNames == []):
+        if (self.datasets == []):
             show_popup("THERE ARE NO DATASETS IN THE SYSTEM")
             self.manager.transition = SlideTransition(direction="right")
             self.manager.current = 'login'
-        self.ids['spinner_id'].values = self.datasetsNames
+        nameList = [self.datasets[i]['name'] for i in range(len(self.datasets))]
+        self.ids['spinner_id'].values = nameList
            
-    def on_choose(self, dataset):
-        if (dataset == 'Choose Dataset'or dataset == "THERE ARE NO DATASETS IN THE SYSTEM" or dataset == ""):
-            print (f'choose dataset: {dataset}')
+    def on_choose(self, datasetName):
+        app = MDApp.get_running_app()
+        #MUST CHOOSE DATASET
+        if (datasetName == 'Choose Dataset' or datasetName == ""):
             show_popup("you must choose dataset")
             return
-        app = MDApp.get_running_app()
-        app.dataSetObject = app.datasetController.GetDataset(dataset)
-        print (f'choose dataset name: {app.dataSetObject.Name}')
+        #KEEP DATASET NAME AND DATASET MODELS
+        for dataset in self.datasets:
+            if dataset['name']==datasetName:
+                print (f'choose dataset: {datasetName}')
+                app.dataSetName=datasetName
+                app.modelsList=dataset['bestmodel']
         #IF USER IS REG GO TO QUERY ELSE GO TO CHOOSE MODELS
         self.manager.transition = SlideTransition(direction="left")
         if (app.userTypeObject=="regular"):
@@ -85,7 +91,7 @@ class Query(Screen):
         self.attributesList=[]
         self.ids.attributes_box.clear_widgets()
         app = MDApp.get_running_app()
-        self.attributesList=app.dataSetObject.getAttributesTypesAndValuesList()
+        self.attributesList=app.datasetController.GetDataset(app.dataSetName).getAttributesTypesAndValuesList()
         for i in range(len(self.attributesList)):
             print (self.attributesList[i])
             self.ids.attributes_box.add_widget(MDLabel(text=f'{self.attributesList[i]["name"]}:', halign="center"))
@@ -103,11 +109,13 @@ class Query(Screen):
                 self.attributesRefs.append(Spinner(text="", values=options))
                 self.attributesRefs[i].bind(text=self.on_text)
             self.ids.attributes_box.add_widget(self.attributesRefs[i])
+    
     def on_text(self, instance, value):
         if (value == ""):
             instance.background_color = (1,0,0,1)
         else:
             instance.background_color = (0,1,0,1)
+    
     def on_apply(self):
         query = []
         app = MDApp.get_running_app()
@@ -124,7 +132,7 @@ class Query(Screen):
                 # numeric feature
                 query.append(int(self.attributesRefs[i].text))
         print (f'query is {query}')
-        model = app.modelController.GetModel(app.dataSetObject.BestModel)
+        model = app.modelController.GetModel(app.modelsList[0]['name'])
         x,y=checkSampleForAnomaly(model, query)
         app.dictionary =  {
             "results": x,
@@ -167,14 +175,14 @@ class ManageDatasets(Screen):
     def on_enter(self):
         table_width = dp(Window.size[0]*9/50)
         app = MDApp.get_running_app()
-        datasetsData = app.datasetController.GetAllInstances()
+        datasetsData = app.datasetController.GetListForManager()
         self.data=[]
         for dataset in datasetsData:
             row = []
-            row.append(dataset.Name)
-            row.append(dataset.featuresNumber)
-            row.append(dataset.instancesNumber)
-            row.append(dataset.Timestamp)
+            row.append(dataset['name'])
+            row.append(dataset['featuresNumber'])
+            row.append(dataset['instancesNumber'])
+            row.append(dataset['timestamp'])
             self.data.append(row)
         dataRows = len(self.data)
         pagination = False
@@ -201,11 +209,12 @@ class ManageDatasets(Screen):
             self.table.bind(on_row_press=self.row_press)
         except Exception as e:
             print(str(e))
+    
     def row_press(self, instance_table, instance_row):
-        print(instance_row.children)
-        print ("BLAH BLAH2")
         index = instance_row.index
         cols_num = len(instance_table.column_data)
+        if (instance_row.index)%cols_num==0:
+            print(instance_row.text)
         row_num = int(index/cols_num)
         print (f'press on row_num is: {row_num}')
         print (f'name of pressed line is: {self.table.row_data[row_num][0]}')
@@ -397,6 +406,7 @@ class UDDistanceFunction(Screen):
 class UpdateModels(Screen):
     toUpdate = []
     def on_enter(self):
+        self.toUpdate = []
         app = MDApp.get_running_app()
         #modelsData = app.modelController.GetAllInstances()
         self.modelsList=app.modelController.GetModelsStatus()
@@ -455,10 +465,10 @@ class UpdateModels(Screen):
         app = MDApp.get_running_app()
         for model in self.toUpdate:
             if model[2] == "":
-                app.modelController.CreateModel(f'{model[0]}-{model[1]}',app.datasetController.GetDataset(model[0]), model[1])
+                app.modelController.CreateModel(app.datasetController.GetDataset(model[0]), model[1])
             else:
                 print (f'try to delete model {model[2]}')
-                app.modelController.DeleteModel(model[2])
+                app.modelController.DeleteModel(model[2], app.datasetController.GetDataset(model[0]))
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'dataanalystmenu'
     
@@ -610,7 +620,8 @@ class AnomalabApp(MDApp):
     modelController=ModelController()
     distanceController=DistanceFunctionController()
     #INNER VALUES
-    dataSetObject = ObjectProperty(None)
+    dataSetName = StringProperty(None)
+    modelsList = ObjectProperty(None)
     distanceFunctionObject = ObjectProperty(None)
     modelObject = ObjectProperty(None)
     userTypeObject = StringProperty(None)

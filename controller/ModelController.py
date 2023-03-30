@@ -16,7 +16,11 @@ class ModelController:
     operationFactory = StorageFactory()
     storage = operationFactory.CreateOperationItem()
 
-    def CreateModel(self, name, dataset, distanceName):
+    def CreateModel(self, dataset, distanceName):
+        name = f'{dataset}-{distanceName}'
+        modelsList = self.GetAllModelsNamesList()
+        if name in modelsList:
+            raise Exception(f"Model named {name} exist")
         dataSet = dataset
         distanceFunction = modular_distance_utils.get_function_by_name(distanceName)
         mean = dataSet.MeanValues
@@ -54,19 +58,13 @@ class ModelController:
         modelJson['meanValues'] = meanValues
 
         self.storage.Save(name, modelJson, "MODEL")
-        if dataset.BestModel == "":
-            dataset.BestModel =modelJson['name']
-            dataset.SaveDataset()
-        else:
-            oldModel = self.GetModel(dataset.BestModel)
-            if oldModel.Wcss > modelJson['wcss_score_of_model']:
-                dataset.BestModel = modelJson['name']
-                dataset.SaveDataset()
+        dataset.addNewModel({
+            'name':modelJson['name'],
+            'wcss_score':modelJson['wcss_score_of_model']
+        })
 
     def GetAllModelsNamesList(self):
-        operationFactory = StorageFactory()
-        self.storage = operationFactory.CreateOperationItem()
-        return self.storage.GetList("MODEL")
+        return self.storage.GetNamesList("MODEL")
 
     def GetModel(self, modelName):
         modelsList = self.GetAllModelsNamesList()
@@ -74,10 +72,11 @@ class ModelController:
             raise Exception(f"Model named {modelName} Does not exist")
         return Model(modelName)
 
-    def DeleteModel(self, modelName):
+    def DeleteModel(self, modelName,dataset):
         modelsList = self.GetAllModelsNamesList()
         if modelName not in modelsList:
             raise Exception(f"Model named {modelName} Does not exist")
+        dataset.removeModel(modelName)
         self.storage.Delete(modelName, "MODEL")
 
     def GetAllInstances(self):
@@ -88,8 +87,8 @@ class ModelController:
         return finalList
 
     def GetModelsStatus(self):
-        datasetList = self.storage.GetList("DATASET")
-        functionNames = self.storage.GetList("FUNCTION")
+        datasetList = self.storage.GetNamesList("DATASET")
+        functionNames = self.storage.GetNamesList("FUNCTION")
         modelList = self.GetAllInstances()
         finalList = []
         for dataset in datasetList:
