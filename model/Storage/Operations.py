@@ -29,3 +29,6 @@ class Operations:
     @abstractmethod
     def GetListWithSpecificAttributes(self, type, attributeList):
         pass
+    @abstractmethod
+    def GetListWithSpecificAttributesWithName(self, name, type, attributeList):
+        pass

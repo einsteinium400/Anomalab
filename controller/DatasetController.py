@@ -6,6 +6,19 @@ import pandas as pd
 class DatasetController:
     operationFactory = StorageFactory()
     storage = operationFactory.CreateOperationItem()
+    __instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+            cls.__instance.__initialized = False
+        return cls.__instance
+
+    def __init__(self, *args, **kwargs):
+        if self.__initialized:
+            return
+        self.__initialized = True
+        # initialization code here
 
     def CreateDataset(self, name, csvFilePath):
         dataSetsList = self.GetAllDatasetsNamesList()
@@ -54,5 +67,7 @@ class DatasetController:
 
     def GetListForManager(self):
         return self.storage.GetListWithSpecificAttributes("DATASET",['name','timestamp','featuresNumber','instancesNumber'])
-
+    
+    def GetAttributesList(self,name):
+        return self.GetDataset(name).getAttributesTypesAndValuesList()
 

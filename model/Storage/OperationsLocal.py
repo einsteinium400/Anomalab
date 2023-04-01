@@ -1,7 +1,11 @@
 import json
 import os
 from pathlib import Path
+import time
+
+from dotenv import load_dotenv
 from model.Storage import Operations
+
 AbsolutePath = Path(os.path.abspath(__file__))
 
 
@@ -17,15 +21,26 @@ FILEPATH_DICT = {
 
 
 class OperationsLocal(Operations.Operations):
+    load_dotenv()
+    CACHE_TIME_IN_SEC = int(os.getenv('CACHE_TIME_IN_SEC',300))
     def __init__(self):
         self._name="Local"
 
     def getPath(self):
         return DATAPATH
+    def __checkFileCacheTime(self,fileName):
+        if os.path.exists(fileName):
+            ctime = os.path.getctime(fileName)
+            print(f"****{time.time()} - {ctime}) < {self.CACHE_TIME_IN_SEC}  -- {(time.time() - ctime) < self.CACHE_TIME_IN_SEC}")
+            if (time.time() - ctime) < self.CACHE_TIME_IN_SEC:
+                return False
+            return True
+        return True
 
     def Save(self,name, jsonData, type):
         filename = f"{DATAPATH}\{FILEPATH_DICT[type]}\{name}.json"
-        print(f"saving in {DATAPATH}\{FILEPATH_DICT[type]}\{name}.json")
+        print(f"Cache Created {DATAPATH}\{FILEPATH_DICT[type]}\{name}.json")
+        del jsonData['_id']
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         with open(filename, "w") as json_file:
             json.dump(jsonData, json_file,
@@ -34,12 +49,16 @@ class OperationsLocal(Operations.Operations):
 
     def Load(self, name, type):
         filePath = f"{DATAPATH}\{FILEPATH_DICT[type]}\{name}.json"
-        print(f"Path Load  {filePath}")
+        
         if (os.path.exists(filePath)):
-            f = open(filePath)
-            data = json.load(f)
-            return data
+            if (self.__checkFileCacheTime(filePath) is False): 
+                f = open(filePath)
+                data = json.load(f)
+                print(f"Cache hit  {filePath}")
+                return data
+            raise Exception("Cache time limit")
         else:
+            print(f"Cache miss  {filePath}")
             raise Exception("No File")
 
     def Delete(self, name, type):
@@ -48,6 +67,7 @@ class OperationsLocal(Operations.Operations):
             os.remove(filePath)
             return 1
         return 0
+    
     def GetNamesList(self, type):
         filePath = f"{DATAPATH}\{FILEPATH_DICT[type]}"
         if (os.path.exists(filePath)):
@@ -57,6 +77,50 @@ class OperationsLocal(Operations.Operations):
         return []
 
     def GetFullItemsList(self, type):
-        pass
+        filePath = f"{DATAPATH}\{FILEPATH_DICT[type]}"
+        if (os.path.exists(filePath)):
+            # Initialize an empty list to hold the objects
+            objects = []
+            
+            # Loop through each file in the data/datasets directory
+            for filename in os.listdir(filePath):
+                # Open the file and load its contents as a JSON object
+                with open(os.path.join("data/datasets", filename), "r") as f:
+                    json_obj = json.load(f)
+                        
+                    # Append the JSON object to the list of objects
+                    objects.append(json_obj)
+            # Return the list of objects
+            return objects
+        return []
+    
     def GetListWithSpecificAttributes(self, type, attributeList):
-        pass
+        filePath = f"{DATAPATH}\{FILEPATH_DICT[type]}"
+        if (os.path.exists(filePath)):
+            # Initialize an empty list to hold the objects
+            objects = []
+            
+            # Loop through each file in the data/datasets directory
+            for filename in os.listdir(filePath):
+                # Open the file and load its contents as a JSON object
+                with open(os.path.join(filePath, filename), "r") as f:
+                    json_obj = json.load(f)
+                        
+                    # Append the JSON object to the list of objects after filtering
+                    filtered_json_obj = {key: json_obj[key] for key in json_obj if key in attributeList}
+            # Return the list of objects
+            return filtered_json_obj
+        return []
+    
+    def GetListWithSpecificAttributesWithName(self, name, type, attributeList):
+        filePath = f"{DATAPATH}\{FILEPATH_DICT[type]}"
+            
+        # Open the file and load its contents as a JSON object
+        with open(os.path.join(filePath, name), "r") as f:
+            json_obj = json.load(f)
+                        
+            # Append the JSON object to the list of objects after filtering
+            filtered_json_obj = {key: json_obj[key] for key in json_obj if key in attributeList}
+        # Return the list of objects
+        return filtered_json_obj
+    

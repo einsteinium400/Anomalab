@@ -15,6 +15,19 @@ from model.utils import csv_to_nested_list
 class ModelController:
     operationFactory = StorageFactory()
     storage = operationFactory.CreateOperationItem()
+    __instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+            cls.__instance.__initialized = False
+        return cls.__instance
+
+    def __init__(self, *args, **kwargs):
+        if self.__initialized:
+            return
+        self.__initialized = True
+        # initialization code here
 
     def CreateModel(self, dataset, distanceName):
         name = f'{dataset.Name}-{distanceName}'
@@ -109,3 +122,6 @@ class ModelController:
             # add the innerDict to the newDict with the current key as its key
             finalList.append(Item)
         return finalList
+    
+    def GetListForManager(self):
+        return self.storage.GetListWithSpecificAttributes("MODEL",['name','timestamp','wcss_score_of_model','datasetName','function'])

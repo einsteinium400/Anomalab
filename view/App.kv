@@ -193,11 +193,18 @@ ScreenManager:
                 on_release: root.logout()
         Main: 
             MDLabel:
+                id: modelName
+                text: "model Name"
+                font_size: 24
+                pos_hint: {"x":0.1, "top": 0.95}
+                size_hint: (0.8, 0.1)
+                halign: "center"
+            MDLabel:
                 id: results
                 text: "results will come here"
                 font_size: 24
-                pos_hint: {"x":0.1, "top": 0.9}
-                size_hint: (0.8, 0.8)
+                pos_hint: {"x":0.1, "top": 0.8}
+                size_hint: (0.8, 0.7)
                 halign: "center"
         Footer:
             FooterButton:
@@ -574,10 +581,25 @@ ScreenManager:
             HeaderButton:
                 on_release: root.logout()
         Main:
-            MDLabel:
-                text: "results will come here"
-                font_size: 40
-                pos_hint: {"x":0.3, "top": 0.65}
-                size_hint: (0.4, 0.3)
-                halign: "center"
+            BoxLayout: ## left hand side 1/3
+                size_hint: (1, 1)
+                pos_hint: {"x":0, "top": 1}
+                canvas.before:
+                    Color:
+                        rgba: 0.3, 0.35, 0.9, 1
+                    Line:
+                        width: 5
+                        rectangle: self.x, self.y, self.width, self.height
+            BoxLayout:
+                orientation: 'vertical'
+                id: accordion_place
+                size_hint: (0.8, 0.9)
+                pos_hint: {"x":0.1, "top": 0.95}
+
+                
+
         Footer:
+            FooterButton:
+                text: 'Back'
+                pos_hint: {"x":0.4, "top": 0.6}
+                on_press: root.on_back()

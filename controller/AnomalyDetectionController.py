@@ -5,9 +5,9 @@ from model.KMeanClusterer import KMeansClusterer
 def checkSampleForAnomaly(model,sample):
     def checkAnomaly(clusterJson):
         print("Distance form centroid: ", clusterJson['distance_from_centroid'])
-        print("variance: ", 3*clusterJson['variance'])
+        print("variance: ", clusterJson['variance'])
         print("average_cluster_distance: ",clusterJson['average_cluster_distance'] )
-        return abs(clusterJson['distance_from_centroid'] >= (3*clusterJson['variance'] + clusterJson['average_cluster_distance']))
+        return abs(clusterJson['distance_from_centroid'] >= (1*clusterJson['variance'] + clusterJson['average_cluster_distance']))
 
     def mergeClassifcationData(model,classifedClusterIndex,classifedClusterDistancesInfo):
             classicationData = {
@@ -31,7 +31,7 @@ def checkSampleForAnomaly(model,sample):
     for clusterJson in predictionFullData['fullClusteringInfo']['clusters_info']:
         if clusterJson['cluster'] == cluster:
             str+=f'Distance form centroid: {clusterJson["distance_from_centroid"]}\n'
-            str+=f'variance: {3*clusterJson["variance"]}\n'
+            str+=f'variance: {clusterJson["variance"]}\n'
             str+=f'average_cluster_distance: {clusterJson["average_cluster_distance"]}\n'
             if(checkAnomaly(clusterJson)):
                 return True,str

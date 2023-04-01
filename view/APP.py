@@ -14,6 +14,7 @@ from kivy.metrics import dp
 from kivymd.uix.label import MDLabel
 from kivymd.uix.textfield import MDTextFieldRect
 from kivy.uix.spinner import Spinner
+from kivy.uix.accordion import Accordion, AccordionItem
 
 # Controllers import
 from controller.DistanceFunctionController import DistanceFunctionController
@@ -33,18 +34,18 @@ class Login(Screen):
         try:
             if (name == '' or password == ''):
                 raise Exception(f"Must enter user name and password")
-            app.userTypeObject = app.userController.LoginUser(name, password)
+            app.userType = app.userController.LoginUser(name, password)
         except Exception as e:
             self.resetForm()
             show_popup(str(e))
             return
-        print (f'login successful type is: {app.userTypeObject}')
+        print (f'login successful type is: {app.userType}')
         self.manager.transition = SlideTransition(direction="left")
-        if (app.userTypeObject == 'regular'):
+        if (app.userType == 'regular'):
             self.manager.current = 'choosedataset'
-        elif (app.userTypeObject == 'analyst'):
+        elif (app.userType == 'analyst'):
             self.manager.current = 'dataanalystmenu'
-        elif (app.userTypeObject == 'admin'):
+        elif (app.userType == 'admin'):
             self.manager.current = 'manageusers'
     def resetForm(self):
         self.ids['user_name'].text = ""
@@ -79,11 +80,8 @@ class ChooseDataset(Screen):
                 app.modelsList=dataset['bestmodel']
         #IF USER IS REG GO TO QUERY ELSE GO TO CHOOSE MODELS
         self.manager.transition = SlideTransition(direction="left")
-        if (app.userTypeObject=="regular"):
-            self.manager.current = 'query'
-        else:
-            self.manager.current = 'choosemodels'
-    
+        self.manager.current = 'query'
+
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
@@ -95,7 +93,8 @@ class Query(Screen):
         self.attributesList=[]
         self.ids.attributes_box.clear_widgets()
         app = MDApp.get_running_app()
-        self.attributesList=app.datasetController.GetDataset(app.dataSetName).getAttributesTypesAndValuesList()
+        #self.attributesList=app.datasetController.GetDataset(app.dataSetName).getAttributesTypesAndValuesList()
+        self.attributesList=app.datasetController.GetAttributesList(app.dataSetName)
         for i in range(len(self.attributesList)):
             print (self.attributesList[i])
             self.ids.attributes_box.add_widget(MDLabel(text=f'{self.attributesList[i]["name"]}:', halign="center"))
@@ -121,8 +120,8 @@ class Query(Screen):
             instance.background_color = (0,1,0,1)
     
     def on_apply(self):
-        query = []
         app = MDApp.get_running_app()
+        app.query = []
         for i in range(len(self.attributesRefs)):
             if (self.attributesRefs[i].text==""):
                 show_popup(f'MUST FILL ALL FIELDS check field number {i+1}')
@@ -131,19 +130,17 @@ class Query(Screen):
                 ## get the numeric value for categorical attribute
                 dict = self.attributesList[i]["values"]
                 value = [k for k, v in dict.items() if v == self.attributesRefs[i].text][0]
-                query.append(int(value))
+                app.query.append(int(value))
             else:
                 # numeric feature
-                query.append(int(self.attributesRefs[i].text))
-        print (f'query is {query}')
-        model = app.modelController.GetModel(app.modelsList[0]['name'])
-        x,y=checkSampleForAnomaly(model, query)
-        app.dictionary =  {
-            "results": x,
-            "msg": y,
-        }
-        self.manager.transition = SlideTransition(direction="left")
-        self.manager.current = 'results'
+                app.query.append(int(self.attributesRefs[i].text))
+        print (f'query is {app.query}')
+        if app.userType == 'regular':
+            self.manager.transition = SlideTransition(direction="left")
+            self.manager.current = 'results'
+        else:
+            self.manager.transition = SlideTransition(direction="left")
+            self.manager.current = 'choosemodels'
 
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
@@ -156,7 +153,10 @@ class Query(Screen):
 class Results(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
-        self.ids.results.text=f'Is anomaly: {app.dictionary["results"]}\n\n{app.dictionary["msg"]}'
+        self.ids.modelName.text=f'Model: {app.modelsList[0]["name"]}'
+        model = app.modelController.GetModel(app.modelsList[0]['name'])
+        x,y=checkSampleForAnomaly(model, app.query)
+        self.ids.results.text=f'Is anomaly: {x}\n\n{y}'
 
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
@@ -488,8 +488,8 @@ class ManageUsers(Screen):
         table_width = dp(Window.size[0]*9/50)
         Allusers=app.userController.GetListForManager()
         self.data=[]
+        print (Allusers)
         for user in Allusers:
-            #print(f'("{user['name']}","{user['type']}"),')
             row = []
             row.append(user['name'])
             row.append(user['type'])
@@ -602,17 +602,16 @@ class UDUser(Screen):
         self.ids['type'].text= str(app.dictionary['type'])
 #---16---
 class ChooseModels(Screen):
-    toApply = []
     def on_enter(self):
         app = MDApp.get_running_app()
+        app.modelsApplyList=[]
         app.modelsList[0]['name']
-        print (self.modelsList)
+        print (app.modelsList)
         self.data=[]
-        self.toApply = []
-        for model in self.modelsList:
+        for model in app.modelsList:
             row = []
             row.append(model['name'])   #Name
-            row.append(model['wcss'])   #wcss
+            row.append(model['wcss_score'])   #wcss
             self.data.append(row)
         dataRows = len(self.data)
         pagination = False
@@ -643,24 +642,21 @@ class ChooseModels(Screen):
 
     # Function for check presses
     def checked (self, instance_table, current_row):
-        for model in self.toApply:
+        app = MDApp.get_running_app()
+        for model in app.modelsApplyList:
             if (model==current_row[0]):
                 self.toApply.remove(model)
                 return
-        newItem = {}
-        newItem['name']=current_row[0]
-        newItem['wcss']=current_row[1]
-        self.toApply.append(newItem)
+        app.modelsApplyList.append(current_row[0])
 
     def on_choose(self):
-        print (self.toApply)
-        if self.toApply == []:
+        app = MDApp.get_running_app()
+        print (app.modelsApplyList)
+        if app.modelsApplyList == []:
             show_popup('Must choose at least one model')
             return
-        app = MDApp.get_running_app()
-        app.modelsList = self.toApply
         self.manager.transition = SlideTransition(direction="left")
-        self.manager.current = 'dataanalystmenu'
+        self.manager.current = 'analystresults'
     
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
@@ -671,6 +667,21 @@ class ChooseModels(Screen):
         self.manager.current = 'login'
 #---17---
 class AnalystResults(Screen):
+    def on_enter(self):
+        app = MDApp.get_running_app()
+        self.accord = Accordion(orientation ='vertical')
+        for modelname in app.modelsApplyList:
+            item=AccordionItem(title=modelname)
+            x,y=checkSampleForAnomaly(app.modelController.GetModel(modelname), app.query)
+            item.add_widget(MDLabel(text=f'Is anomaly: {x}\n\n{y}', halign="center"))
+            self.accord.add_widget(item)
+        self.ids['accordion_place'].clear_widgets()
+        self.ids['accordion_place'].add_widget(self.accord)
+
+    def on_back(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'choosemodels'
+    
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
@@ -687,10 +698,12 @@ class AnomalabApp(MDApp):
     distanceController=DistanceFunctionController()
     #INNER VALUES
     dataSetName = StringProperty(None)
-    modelsList = ObjectProperty(None)
-    distanceFunctionObject = ObjectProperty(None)
-    modelObject = ObjectProperty(None)
-    userTypeObject = StringProperty(None)
+    modelsList = ObjectProperty(None)   #USED FOR QUERIES
+    modelsApplyList = []                #USED FOR ANALYST QUERY
+    #distanceFunctionObject = ObjectProperty(None)
+    #modelObject = ObjectProperty(None)
+    userType = StringProperty(None)
+    query = []
     dictionary = {}
     
     def build(self):
