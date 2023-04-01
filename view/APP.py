@@ -602,6 +602,70 @@ class UDUser(Screen):
         self.ids['type'].text= str(app.dictionary['type'])
 #---16---
 class ChooseModels(Screen):
+    toApply = []
+    def on_enter(self):
+        app = MDApp.get_running_app()
+        app.modelsList[0]['name']
+        print (self.modelsList)
+        self.data=[]
+        self.toApply = []
+        for model in self.modelsList:
+            row = []
+            row.append(model['name'])   #Name
+            row.append(model['wcss'])   #wcss
+            self.data.append(row)
+        dataRows = len(self.data)
+        pagination = False
+        print (f'row of data = {dataRows}')
+        if (dataRows > 5):
+            pagination = True
+            dataRows = 5
+        table_width = dp(Window.size[0]*9/50)
+        try:
+            self.table = MDDataTable(
+                pos_hint = {'x': 0.05, 'top': 0.95},
+                size_hint= (0.9, 0.9),
+                check = True,
+                use_pagination = pagination,
+                rows_num = dataRows,
+                column_data = [
+                    #HERE COME CHECK MARK width
+                    ("Model Name", dp (table_width*0.47)),
+                    ("Wcss", dp (table_width*0.47)),
+                ],
+                row_data = self.data
+            )
+            self.ids['table_place'].clear_widgets()
+            self.ids['table_place'].add_widget(self.table)
+            self.table.bind(on_check_press=self.checked)
+        except Exception as e:
+            show_popup(str(e))
+
+    # Function for check presses
+    def checked (self, instance_table, current_row):
+        for model in self.toApply:
+            if (model==current_row[0]):
+                self.toApply.remove(model)
+                return
+        newItem = {}
+        newItem['name']=current_row[0]
+        newItem['wcss']=current_row[1]
+        self.toApply.append(newItem)
+
+    def on_choose(self):
+        print (self.toApply)
+        if self.toApply == []:
+            show_popup('Must choose at least one model')
+            return
+        app = MDApp.get_running_app()
+        app.modelsList = self.toApply
+        self.manager.transition = SlideTransition(direction="left")
+        self.manager.current = 'dataanalystmenu'
+    
+    def on_back(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'choosedataset'
+
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'

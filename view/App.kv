@@ -446,7 +446,7 @@ ScreenManager:
             FooterButton:
                 text: 'Update'
                 pos_hint: {"x":0.25, "top": 0.6}
-                on_press: root.on_update()
+                on_press: root.on_choose()
             FooterButton:
                 text: 'Back'
                 pos_hint: {"x":0.55, "top": 0.6}
@@ -553,7 +553,16 @@ ScreenManager:
             HeaderButton:
                 on_release: root.logout()
         Main:
+            id: table_place
         Footer:
+            FooterButton:
+                text: 'Choose'
+                pos_hint: {"x":0.25, "top": 0.6}
+                on_press: root.on_choose()
+            FooterButton:
+                text: 'Back'
+                pos_hint: {"x":0.55, "top": 0.6}
+                on_press: root.on_back()
 # ---17---
 <AnalystResults>:
     name: "analystresults"
