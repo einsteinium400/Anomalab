@@ -58,7 +58,6 @@ class ChooseDataset(Screen):
         app = MDApp.get_running_app()
         #self.datasetsNames = app.datasetController.GetAllDatasetsNamesList()
         self.datasets = app.datasetController.GetListForQuery()
-
         if (self.datasets == []):
             show_popup("THERE ARE NO DATASETS IN THE SYSTEM")
             self.manager.transition = SlideTransition(direction="right")
@@ -81,6 +80,15 @@ class ChooseDataset(Screen):
         #IF USER IS REG GO TO QUERY ELSE GO TO CHOOSE MODELS
         self.manager.transition = SlideTransition(direction="left")
         self.manager.current = 'query'
+
+    def on_back(self):
+        app = MDApp.get_running_app()
+        if app.userType == 'regular':
+            self.manager.transition = SlideTransition(direction="right")
+            self.manager.current = 'login'
+        else:
+            self.manager.transition = SlideTransition(direction="right")
+            self.manager.current = 'dataanalystmenu'
 
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
@@ -467,7 +475,10 @@ class UpdateModels(Screen):
         app = MDApp.get_running_app()
         for model in self.toUpdate:
             if model[2] == "":
+                self.manager.current = 'loadingscreen'
+                print ('hahaha')
                 app.modelController.CreateModel(app.datasetController.GetDataset(model[0]), model[1])
+                self.manager.current = 'updatemodels'
             else:
                 print (f'try to delete model {model[2]}')
                 app.modelController.DeleteModel(model[2], app.datasetController.GetDataset(model[0]))
@@ -685,6 +696,19 @@ class AnalystResults(Screen):
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
+#loading
+class Loading(Screen):
+    class PreLoadScreen(Screen):
+        def switchToNextScreen(self):
+            self.parent.current = 'LoadingScreen'
+
+    class LoadingScreen(Screen):
+        def switchToNextScreen(self):
+            self.parent.current = 'PreLoadScreen'
+
+    class PreLoadScreen(Screen):
+        def switchToNextScreen(self):
+            self.parent.current = 'PreLoadScreen'
 # WINDOW MANAGER ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class AnomalabApp(MDApp):
     #GENERAL
