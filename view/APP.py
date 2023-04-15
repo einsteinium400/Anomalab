@@ -1,5 +1,6 @@
 #python imports
 from datetime import datetime
+import asyncio
 
 #kivy imports
 from kivymd.app import MDApp
@@ -56,7 +57,6 @@ class Login(Screen):
 class ChooseDataset(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
-        #self.datasetsNames = app.datasetController.GetAllDatasetsNamesList()
         self.datasets = app.datasetController.GetListForQuery()
         if (self.datasets == []):
             show_popup("THERE ARE NO DATASETS IN THE SYSTEM")
@@ -280,20 +280,16 @@ class AddDataset(Screen):
 class UDDataset(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
-        self.ids['name'].text= str(app.dictionary['name'])
-        self.ids['features'].text= str(app.dictionary['featuresNumber'])
-        self.ids['instances'].text= str(app.dictionary['instancesNumber'])
-        self.ids['timestamp'].text= str(app.dictionary['timestamp'])
-    def on_update(self, name):
-        print (f"Update dataset: {name}")
-        self.manager.transition = SlideTransition(direction="right")
-        self.manager.current = 'managedatasets'
-    def on_delete(self, name):
-        print (f"delete dataset: {name}")
+        self.ids['name'].text= 'name: '+str(app.dictionary['name'])
+        self.ids['features'].text= 'number of features: '+str(app.dictionary['featuresNumber'])
+        self.ids['instances'].text= 'number of instances: '+str(app.dictionary['instancesNumber'])
+        self.ids['timestamp'].text= 'time stamp: '+str(app.dictionary['timestamp'])
+    def on_delete(self):
         app = MDApp.get_running_app()
+        print (f"delete dataset: {str(app.dictionary['name'])}")
         try:
-            app.datasetController.DeleteDataset(name)
-            show_popup(f"DELETE DATASET {name} SUCCESS")
+            app.datasetController.DeleteDataset(str(app.dictionary['name']))
+            show_popup(f"DELETE DATASET {str(app.dictionary['name'])} SUCCESS")
         except Exception as e:
             show_popup(str(e))
             return
@@ -475,13 +471,15 @@ class UpdateModels(Screen):
         app = MDApp.get_running_app()
         for model in self.toUpdate:
             if model[2] == "":
-                self.manager.current = 'loadingscreen'
-                print ('hahaha')
                 app.modelController.CreateModel(app.datasetController.GetDataset(model[0]), model[1])
+                self.manager.transition = SlideTransition(direction="right")
                 self.manager.current = 'updatemodels'
             else:
                 print (f'try to delete model {model[2]}')
                 app.modelController.DeleteModel(model[2], app.datasetController.GetDataset(model[0]))
+                show_popup(f'delete model {model[2]} success')
+                self.manager.transition = SlideTransition(direction="right")
+                self.manager.current = 'updatemodels'
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'dataanalystmenu'
     

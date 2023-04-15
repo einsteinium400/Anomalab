@@ -40,7 +40,10 @@ class OperationsLocal(Operations.Operations):
     def Save(self,name, jsonData, type):
         filename = f"{DATAPATH}\{FILEPATH_DICT[type]}\{name}.json"
         print(f"Cache Created {DATAPATH}\{FILEPATH_DICT[type]}\{name}.json")
-        del jsonData['_id']
+        try:
+            del jsonData['_id']
+        except:
+            pass
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         with open(filename, "w") as json_file:
             json.dump(jsonData, json_file,
@@ -123,4 +126,24 @@ class OperationsLocal(Operations.Operations):
             filtered_json_obj = {key: json_obj[key] for key in json_obj if key in attributeList}
         # Return the list of objects
         return filtered_json_obj
+    
+    def DeleteItemsByTypeAndFilter(self,itemType,filter):
+        filePath = f"{DATAPATH}\{FILEPATH_DICT[itemType]}"
+                # Extract the filter key and value from the filter argument
+        filter_key, filter_value = next(iter(filter.items())) if filter else (None, None)
+        if (os.path.exists(filePath)):
+            filesToDelete = []
+            # Loop through each file in the data/datasets directory
+            for filename in os.listdir(filePath):
+                # Open the file and load its contents as a JSON object
+                with open(os.path.join(filePath, filename), "r") as f:
+                    json_obj = json.load(f)
+                     # Check if the filter condition is met
+                    if filter_key is not None and json_obj.get(filter_key) == filter_value:
+                        # Add to delete file list
+                        filesToDelete.append(os.path.join(filePath, filename))
+                        
+            for filename in filesToDelete:
+                os.remove(filename)
+
     

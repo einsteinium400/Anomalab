@@ -23,7 +23,7 @@ class UserController:
         return self.storage.GetNamesList("USER")
 
     def __GetUser(self, username):
-        usersList = self.GetAllUsers()
+        usersList = self.__GetAllUsers()
         if (username not in usersList):
             raise Exception("User does not exist")
         return User(username)
@@ -59,7 +59,7 @@ class UserController:
         return self.storage.GetListWithSpecificAttributes("USER",['name','type'])
     
     '''def GetAllInstances(self):
-            availableUsers = self.GetAllUsers()
+            availableUsers = self.__GetAllUsers()
             finalList = []
             for item in availableUsers:
                 finalList.append(self.__GetUser(item))

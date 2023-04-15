@@ -18,6 +18,13 @@ import math
 
 
 def statisticdist(u, v, type_values, parameters):
+    
+    normalize_values = []
+    if "normalize_values" in parameters:
+        normalize_values= parameters["normalize_values"]
+    else:
+        normalize_values=[1]*len(v)
+
     def f_freq(z, theta1, betha, theta2, gamma):
         if z <= theta1:
             return 1
@@ -52,11 +59,13 @@ def statisticdist(u, v, type_values, parameters):
                 
                 d_fr = (abs(fr_u - fr_v) + m_fk) / max(fr_u, fr_v)
 
-                categoric_dist += max(d_fr, theta, f_v_ak)
+                #categoric_dist += max(d_fr, theta, f_v_ak)
+                categoric_dist += (max(d_fr, theta, f_v_ak) / normalize_values[i])
 
         # numberic handle
         else:
-            numeric_dist += pow((np.int64(u[i]) - np.int64(v[i])),2)
+           #numeric_dist += pow((np.int64(u[i]) - np.int64(v[i])),2)
+            numeric_dist += (pow((np.int64(u[i]) - np.int64(v[i])),2) / normalize_values[i])
 
     categoric_dist=pow(categoric_dist,2)
     return math.sqrt(categoric_dist + numeric_dist)

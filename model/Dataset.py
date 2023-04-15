@@ -163,7 +163,7 @@ class Dataset:
             "importantfeatures": self._importantFeatures,
             "instancesNumber": self._instancesNumber,
             "featuresInfo": self._featuresInfo,
-            # "meanValues":self._meanValues,
+            "meanValues": self._meanValues,
             "data": self._data
         }
         operationFactory = StorageFactory()

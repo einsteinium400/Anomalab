@@ -351,16 +351,12 @@ ScreenManager:
                 font_size: 24
         Footer:
             FooterButton:
-                text: 'UPDATE-notworking'
-                pos_hint: {"x":0.1, "top": 0.7}
-                on_press: root.on_update(name.text)
-            FooterButton:
                 text: 'Delete'
-                pos_hint: {"x":0.4, "top": 0.7}
-                on_press: root.on_delete(name.text)
+                pos_hint: {"x":0.25, "top": 0.7}
+                on_press: root.on_delete()
             FooterButton:
                 text: 'Back'
-                pos_hint: {"x":0.7, "top": 0.7}
+                pos_hint: {"x":0.55, "top": 0.7}
                 on_press: root.on_back()
 # ---9---
 <ManageDistanceFunctions>:

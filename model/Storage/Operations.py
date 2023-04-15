@@ -32,3 +32,7 @@ class Operations:
     @abstractmethod
     def GetListWithSpecificAttributesWithName(self, name, type, attributeList):
         pass
+
+    @abstractmethod
+    def DeleteItemsByTypeAndFilter(self,itemType,filter):
+        pass

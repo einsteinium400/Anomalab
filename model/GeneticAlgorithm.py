@@ -86,11 +86,13 @@ def apply_genetic_operators(selected_parents):
 
 
 def genetic_algorithm(params, distance_function, k, vectors, type_values):
+    
     # Generate an initial population
     population = generate_population()
 
     # Repeat the genetic algorithm for a maximum of max_generations
     for generation in range(max_generations):
+        print("hi hi")
         # Evaluate the fitness of the current population
         fitness_scores = evaluate_population(population)
 

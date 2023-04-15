@@ -18,47 +18,30 @@ class DatasetController:
         if self.__initialized:
             return
         self.__initialized = True
-        # initialization code here
 
+    def __GetAllDatasetsNamesList(self):
+        return self.storage.GetNamesList("DATASET")
+    
     def CreateDataset(self, name, csvFilePath):
-        dataSetsList = self.GetAllDatasetsNamesList()
+        dataSetsList = self.__GetAllDatasetsNamesList()
         if name in dataSetsList:
             raise Exception(f'Dataset name {name} already taken')
         df = pd.read_csv(csvFilePath)
         dataSet = Dataset(name, df)
         self.storage.Save(dataSet.Name, dataSet.JsonData, "DATASET")
 
-    def GetAllDatasetsNamesList(self):
-        return self.storage.GetNamesList("DATASET")
-
-    def GetAllDatasetsInfoList(self):
-        operationFactory = StorageFactory()
-        self.storage = operationFactory.CreateOperationItem()
-        fullList = self.storage.GetFullItemsList("DATASET")
-        finalList = []
-        for item in fullList:
-            finalList.append(list((item['id'],item['name'],len(item['featureNames']),len(item['data']),item['timestamp'])))
-        return finalList
-
-
     def GetDataset(self, DatasetName):
-        dataSetsList = self.GetAllDatasetsNamesList()
+        dataSetsList = self.__GetAllDatasetsNamesList()
         if DatasetName not in dataSetsList:
             raise Exception(f"Dataset named {DatasetName} Does not exist")
         return Dataset(DatasetName)
 
     def DeleteDataset(self, DatasetName):
-        dataSetsList = self.GetAllDatasetsNamesList()
+        dataSetsList = self.__GetAllDatasetsNamesList()
         if DatasetName not in dataSetsList:
             raise Exception(f"Dataset named {DatasetName} Does not exist")
         self.storage.Delete(DatasetName, "DATASET")
-
-    def GetAllInstances(self):
-        availableDatasets = self.GetAllDatasetsNamesList()
-        finalList = []
-        for item in availableDatasets:
-            finalList.append(self.GetDataset(item))
-        return finalList
+        self.storage.DeleteItemsByTypeAndFilter("MODEL",{"datasetName":DatasetName})
 
     def GetListForQuery(self):
         dataSetList = self.storage.GetListWithSpecificAttributes("DATASET",['name','bestmodel'])
@@ -71,3 +54,19 @@ class DatasetController:
     def GetAttributesList(self,name):
         return self.GetDataset(name).getAttributesTypesAndValuesList()
 
+    
+    # def GetAllDatasetsInfoList(self):
+    #     operationFactory = StorageFactory()
+    #     self.storage = operationFactory.CreateOperationItem()
+    #     fullList = self.storage.GetFullItemsList("DATASET")
+    #     finalList = []
+    #     for item in fullList:
+    #         finalList.append(list((item['id'],item['name'],len(item['featureNames']),len(item['data']),item['timestamp'])))
+    #     return finalList
+
+    # def GetAllInstances(self):
+    #     availableDatasets = self.__GetAllDatasetsNamesList()
+    #     finalList = []
+    #     for item in availableDatasets:
+    #         finalList.append(self.GetDataset(item))
+    #     return finalList

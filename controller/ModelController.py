@@ -28,10 +28,20 @@ class ModelController:
             return
         self.__initialized = True
         # initialization code here
+        
+    def __GetAllModelsNamesList(self):
+        return self.storage.GetNamesList("MODEL")
+    
+    def __GetAllInstances(self):
+        availableDatasets = self.__GetAllModelsNamesList()
+        finalList = []
+        for item in availableDatasets:
+            finalList.append(self.GetModel(item))
+        return finalList
 
     def CreateModel(self, dataset, distanceName):
         name = f'{dataset.Name}-{distanceName}'
-        modelsList = self.GetAllModelsNamesList()
+        modelsList = self.__GetAllModelsNamesList()
         if name in modelsList:
             raise Exception(f"Model named {name} exist")
         dataSet = dataset
@@ -76,33 +86,23 @@ class ModelController:
             'wcss_score':modelJson['wcss_score_of_model']
         })
 
-    def GetAllModelsNamesList(self):
-        return self.storage.GetNamesList("MODEL")
-
     def GetModel(self, modelName):
-        modelsList = self.GetAllModelsNamesList()
+        modelsList = self.__GetAllModelsNamesList()
         if modelName not in modelsList:
             raise Exception(f"Model named {modelName} Does not exist")
         return Model(modelName)
 
     def DeleteModel(self, modelName,dataset):
-        modelsList = self.GetAllModelsNamesList()
+        modelsList = self.__GetAllModelsNamesList()
         if modelName not in modelsList:
             raise Exception(f"Model named {modelName} Does not exist")
         dataset.removeModel(modelName)
         self.storage.Delete(modelName, "MODEL")
 
-    def GetAllInstances(self):
-        availableDatasets = self.GetAllModelsNamesList()
-        finalList = []
-        for item in availableDatasets:
-            finalList.append(self.GetModel(item))
-        return finalList
-
     def GetModelsStatus(self):
         datasetList = self.storage.GetNamesList("DATASET")
         functionNames = self.storage.GetNamesList("FUNCTION")
-        modelList = self.GetAllInstances()
+        modelList = self.__GetAllInstances()
         finalList = []
         for dataset in datasetList:
             # initialize an empty dictionary for the current key

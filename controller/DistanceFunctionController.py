@@ -73,6 +73,7 @@ class DistanceFunctionController:
     def delete_function(self, name):
         # delete in mongoDB
         self.mongo_operations.Delete(name, "FUNCTION")
+        self.mongo_operations.DeleteItemsByTypeAndFilter("FUNCTION",{"function":name})
         self.reload_functions_from_mongo()
         # delete in functions list
         #modular_distance_utils.delete_user_function(name)

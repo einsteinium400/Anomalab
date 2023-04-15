@@ -134,3 +134,12 @@ class OperationsMongo(Operations.Operations):
         else:
             print("### General Cache time hit 2")
             return self.__LocalCache.GetListWithSpecificAttributesWithName(name,type,attributeList)
+
+    def DeleteItemsByTypeAndFilter(self,itemType,filter):
+        if itemType in COLLECTION_DICT:
+            collection = self.PROJECTDB[COLLECTION_DICT[itemType]]
+            result = collection.delete_many(filter)
+            print(f'{result.deleted_count} documents were deleted.')
+            self.__LocalCache.DeleteItemsByTypeAndFilter(itemType,filter)
+        else:
+            raise Exception("Invalid itemType")
