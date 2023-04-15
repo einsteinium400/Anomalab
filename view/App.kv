@@ -19,6 +19,7 @@ ScreenManager:
     UDUser:
     ChooseModels:
     AnalystResults:
+    Loading:
 
 # ---HEADER WIDGETS---
 <LogoImage@Image>:
@@ -100,7 +101,6 @@ ScreenManager:
         #Rectangle:
             #pos: self.pos
             #size: self.size
-
 # ---1---
 <Login>:
     name: "login"
@@ -149,10 +149,17 @@ ScreenManager:
                 size_hint: (0.5, 0.2)
                 font_size: 24
         Footer:
+            id: footer_place
             FooterButton:
+                id: apply_button
                 text: "Apply"
-                pos_hint: {"x":0.4, "top": 0.6}
+                pos_hint: {"x":0.25, "top": 0.6}
                 on_press: root.on_choose(spinner_id.text)
+            FooterButton:
+                id: back_button
+                text: "Back"
+                pos_hint: {"x":0.55, "top": 0.6}
+                on_press: root.on_back()
 # ---3---
 <Query>:
     name: "query"
@@ -453,7 +460,7 @@ ScreenManager:
             FooterButton:
                 text: 'Update'
                 pos_hint: {"x":0.25, "top": 0.6}
-                on_press: root.on_choose()
+                on_press: root.on_update()
             FooterButton:
                 text: 'Back'
                 pos_hint: {"x":0.55, "top": 0.6}
@@ -603,3 +610,20 @@ ScreenManager:
                 text: 'Back'
                 pos_hint: {"x":0.4, "top": 0.6}
                 on_press: root.on_back()
+# ---Loadingscreen---
+<Loading>:
+    name: "loadingscreen"
+    Window:
+        Header:
+            LogoImage:
+            HeaderText:
+                text: "loadingscreen"
+        Main:
+            MDLabel:
+                id: modelName
+                text: "system is processing don't close app"
+                font_size: 36
+                pos_hint: {"x":0.1, "top": 0.6}
+                size_hint: (0.8, 0.2)
+                halign: "center"
+        Footer:
