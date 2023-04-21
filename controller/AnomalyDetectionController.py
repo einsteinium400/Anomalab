@@ -1,12 +1,6 @@
-import json
-from model.KMeanClusterer import KMeansClusterer
-
-
 def checkSampleForAnomaly(model,sample):
+    
     def checkAnomaly(clusterJson):
-        print("Distance form centroid: ", clusterJson['distance_from_centroid'])
-        print("variance: ", clusterJson['variance'])
-        print("average_cluster_distance: ",clusterJson['average_cluster_distance'] )
         return abs(clusterJson['distance_from_centroid'] >= (1*clusterJson['variance'] + clusterJson['average_cluster_distance']))
 
     def mergeClassifcationData(model,classifedClusterIndex,classifedClusterDistancesInfo):
@@ -20,20 +14,21 @@ def checkSampleForAnomaly(model,sample):
                     if(cluster['cluster'] == singleClassficationData['cluster']):
                         cluster['distance_from_centroid'] = singleClassficationData['distance']
             return classicationData
+    
     fakeSample = sample
-    cluster,distances = model.classify_vectorspace(fakeSample)
-    str = ""
-    str += f'distances: {distances}\n'
-    print(distances)
-    print("Classifed Cluster", cluster)
-    str += f'classified Cluster {cluster}\n'
+    cluster,distances,detailedDistances = model.classify_vectorspace(fakeSample)
+    print("detailed distances: ", detailedDistances)
+    print("Classifed Cluster: ", cluster)
     predictionFullData = mergeClassifcationData(model,cluster,distances)
-    for clusterJson in predictionFullData['fullClusteringInfo']['clusters_info']:
-        if clusterJson['cluster'] == cluster:
-            str+=f'Distance form centroid: {clusterJson["distance_from_centroid"]}\n'
-            str+=f'variance: {clusterJson["variance"]}\n'
-            str+=f'average_cluster_distance: {clusterJson["average_cluster_distance"]}\n'
-            if(checkAnomaly(clusterJson)):
-                return True,str
-            else:
-                return False,str
+    answer = {}
+    answer['anomaly'] = []
+    answer['clusters'] = cluster
+    answer['detailedDistances'] = detailedDistances
+    answer['predictionFullData'] = predictionFullData['fullClusteringInfo']['clusters_info']
+    for clusterJson in answer['predictionFullData']:
+        print ("clusterJson: ", clusterJson)
+        if(checkAnomaly(clusterJson)):
+            answer['anomaly'].append(True)
+        else:
+            answer['anomaly'].append(False)
+    return answer

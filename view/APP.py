@@ -101,10 +101,8 @@ class Query(Screen):
         self.attributesList=[]
         self.ids.attributes_box.clear_widgets()
         app = MDApp.get_running_app()
-        #self.attributesList=app.datasetController.GetDataset(app.dataSetName).getAttributesTypesAndValuesList()
         self.attributesList=app.datasetController.GetAttributesList(app.dataSetName)
         for i in range(len(self.attributesList)):
-            print (self.attributesList[i])
             self.ids.attributes_box.add_widget(MDLabel(text=f'{self.attributesList[i]["name"]}:', halign="center"))
             if (self.attributesList[i]["type"] == 'numeric'):
                 self.attributesTypes.append(False)
@@ -163,8 +161,8 @@ class Results(Screen):
         app = MDApp.get_running_app()
         self.ids.modelName.text=f'Model: {app.modelsList[0]["name"]}'
         model = app.modelController.GetModel(app.modelsList[0]['name'])
-        x,y=checkSampleForAnomaly(model, app.query)
-        self.ids.results.text=f'Is anomaly: {x}\n\n{y}'
+        answer=checkSampleForAnomaly(model, app.query)
+        self.ids.results.text=f'Is anomaly: {answer["anomaly"]}'
 
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")

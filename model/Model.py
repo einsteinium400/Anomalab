@@ -1,10 +1,11 @@
 
 import uuid
 import time
+import copy
 
 from model import modular_distance_utils
 from model.Storage.StorageFactory import StorageFactory
-from controller.DistanceFunctionController import DistanceFunctionController
+#from controller.DistanceFunctionController import DistanceFunctionController
 
 
 class Model:
@@ -149,10 +150,16 @@ class Model:
         distanceFunc = self._distanceFunctionRefrence
         best_distance = best_index = None
         distances = []
+        distancesVectors = []
         hyperParmas = self._hyperParams
         for index in range(len(means)):
             mean = means[index]
-            # dist = self._distance.calculate(vector, mean,self._type_of_fields)
+            distanceVector = []
+            for attribute in range(len(vector)):
+                vectorCopy=copy.deepcopy(mean)
+                vectorCopy[attribute]=vector[attribute]
+                distanceVector.append(distanceFunc(vectorCopy, mean, types, hyperParmas))
+            distancesVectors.append(distanceVector)
             dist = distanceFunc(vector, mean, types, hyperParmas)
             cluster_info = {
                 "cluster": index,
@@ -161,5 +168,4 @@ class Model:
             distances.append(cluster_info)
             if best_distance is None or dist < best_distance:
                 best_index, best_distance = index, dist
-
-        return best_index, distances
+        return best_index, distances, distancesVectors

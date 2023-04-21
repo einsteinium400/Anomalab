@@ -91,3 +91,5 @@ def statisticdist(u, v, type_values, parameters):
 
     categoric_dist=pow(categoric_dist,2)
     return math.sqrt(categoric_dist + numeric_dist)
+
+
