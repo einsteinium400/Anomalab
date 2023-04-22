@@ -162,7 +162,7 @@ class Results(Screen):
         self.ids.modelName.text=f'Model: {app.modelsList[0]["name"]}'
         model = app.modelController.GetModel(app.modelsList[0]['name'])
         answer=checkSampleForAnomaly(model, app.query)
-        self.ids.results.text=f'Is anomaly: {answer["anomaly"]}'
+        self.ids.results.text=f'I s anomaly: {answer["anomaly"]}'
 
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
