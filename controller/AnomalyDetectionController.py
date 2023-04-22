@@ -22,7 +22,7 @@ def checkSampleForAnomaly(model,sample):
     predictionFullData = mergeClassifcationData(model,cluster,distances)
     answer = {}
     answer['anomaly'] = []
-    answer['clusters'] = cluster
+    answer['clusterNumber'] = cluster
     answer['detailedDistances'] = detailedDistances
     answer['predictionFullData'] = predictionFullData['fullClusteringInfo']['clusters_info']
     for clusterJson in answer['predictionFullData']:

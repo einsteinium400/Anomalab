@@ -19,7 +19,6 @@ ScreenManager:
     UDUser:
     ChooseModels:
     AnalystResults:
-    Loading:
 
 # ---HEADER WIDGETS---
 <LogoImage@Image>:
@@ -203,13 +202,14 @@ ScreenManager:
                 id: modelName
                 text: "model Name"
                 font_size: 24
-                pos_hint: {"x":0.1, "top": 0.95}
-                size_hint: (0.8, 0.1)
+                pos_hint: {"x":0.1, "top": 1}
+                size_hint: (0.8, 0.05)
                 halign: "center"
             BoxLayout:
                 id: table_place
-                pos_hint: {"x":0.1, "top": 0.8}
-                size_hint: (0.8, 0.75)
+                font_size: 12
+                pos_hint: {"top": 0.95}
+                size_hint: (1, 0.95)
         Footer:
             FooterButton:
                 text: 'Another query'
@@ -587,20 +587,3 @@ ScreenManager:
                 text: 'Back'
                 pos_hint: {"x":0.4, "top": 0.6}
                 on_press: root.on_back()
-# ---Loadingscreen---
-<Loading>:
-    name: "loadingscreen"
-    Window:
-        Header:
-            LogoImage:
-            HeaderText:
-                text: "loadingscreen"
-        Main:
-            MDLabel:
-                id: modelName
-                text: "system is processing don't close app"
-                font_size: 36
-                pos_hint: {"x":0.1, "top": 0.6}
-                size_hint: (0.8, 0.2)
-                halign: "center"
-        Footer:

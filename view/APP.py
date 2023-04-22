@@ -23,12 +23,18 @@ from controller.DatasetController import DatasetController
 from controller.ModelController import ModelController
 from controller.UserController import UserController
 from controller.AnomalyDetectionController import checkSampleForAnomaly
+from controller.JobController import JobController
 
 from view.popup import show_popup
 
 #SCREENS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #---1---
 class Login(Screen):
+    def on_enter(self):
+        app = MDApp.get_running_app()
+        ## TO DELETE
+        for model in app.modelController.GetListForManager():
+            print (model)
     def do_login(self, name, password):
         print (f'login: name-{name} pass-{password}')
         app = MDApp.get_running_app()
@@ -98,20 +104,19 @@ class Query(Screen):
     def on_enter(self):
         self.attributesRefs=[]
         self.attributesTypes=[]
-        self.attributesList=[]
         self.ids.attributes_box.clear_widgets()
         app = MDApp.get_running_app()
-        self.attributesList=app.datasetController.GetAttributesList(app.dataSetName)
-        for i in range(len(self.attributesList)):
-            self.ids.attributes_box.add_widget(MDLabel(text=f'{self.attributesList[i]["name"]}:', halign="center"))
-            if (self.attributesList[i]["type"] == 'numeric'):
+        app.attributesList=app.datasetController.GetAttributesList(app.dataSetName)
+        for i in range(len(app.attributesList)):
+            self.ids.attributes_box.add_widget(MDLabel(text=f'{app.attributesList[i]["name"]}:', halign="center"))
+            if (app.attributesList[i]["type"] == 'numeric'):
                 self.attributesTypes.append(False)
                 self.attributesRefs.append(MDTextFieldRect(multiline=False, hint_text=f"insert here", input_filter = 'float'))
                 self.attributesRefs[i].bind(text=self.on_text)
             else:
                 self.attributesTypes.append(True)
                 options = []
-                for value in self.attributesList[i]["values"].values():
+                for value in app.attributesList[i]["values"].values():
                     #BUG: Don't know to handle with NA
                     if str(value) != "nan":
                         options.append(str(value))
@@ -134,7 +139,7 @@ class Query(Screen):
                 return
             if (self.attributesTypes.pop(0)):
                 ## get the numeric value for categorical attribute
-                dict = self.attributesList[i]["values"]
+                dict = app.attributesList[i]["values"]
                 value = [k for k, v in dict.items() if v == self.attributesRefs[i].text][0]
                 app.query.append(int(value))
             else:
@@ -162,8 +167,45 @@ class Results(Screen):
         self.ids.modelName.text=f'Model: {app.modelsList[0]["name"]}'
         model = app.modelController.GetModel(app.modelsList[0]['name'])
         answer=checkSampleForAnomaly(model, app.query)
-        self.ids.results.text=f'I s anomaly: {answer["anomaly"]}'
-
+        anomalies=answer['anomaly']
+        clusterNumber=answer['clusterNumber']
+        distances=answer['detailedDistances']
+        fullData=answer['predictionFullData']
+        table_width = dp(Window.size[0]*9/50)
+        self.data=[]
+        print ("attribute list: ", app.attributesList)
+        print ("anomalies: ", anomalies)
+        print ("classified cluster: ", clusterNumber)
+        print ("distances: ", distances)
+        print ("fullData: ", fullData)
+        for i in range(len(distances[clusterNumber])):
+            row = []
+            row.append(app.attributesList[i]['name'])
+            row.append(fullData[clusterNumber]['mean'][i])
+            row.append(app.query[i])
+            row.append(distances[clusterNumber][i])
+            self.data.append(row)
+        dataRows = len(self.data)
+        pagination = False
+        self.table = MDDataTable(
+            pos_hint = {'x': 0.05, 'top': 0.95},
+            size_hint= (0.9, 0.9),
+            use_pagination = pagination,
+            rows_num = dataRows,
+            column_data = [
+                ("Attribute", dp (table_width*0.25)),
+                ("Cluster mean", dp (table_width*0.25)),
+                ("Sample", dp (table_width*0.25)),
+                ("Distance", dp (table_width*0.25)),
+            ],
+            row_data = self.data
+        )
+        try: 
+            self.ids['table_place'].clear_widgets()
+            self.ids['table_place'].add_widget(self.table)
+            self.table.bind(on_row_press=self.row_press)
+        except Exception as e:
+            print(str(e))
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'query'
@@ -175,6 +217,18 @@ class Results(Screen):
 class DataAnalystMenu(Screen):
     def chooseScreen(self, screenName):
         self.manager.transition = SlideTransition(direction="left")
+        #if (screenName=='updatemodels'):
+            #app = MDApp.get_running_app()    
+            #print ('running process:')
+            #for jobID in app.jobController.get_running_jobs():
+                #print (app.jobController.get_job_status(jobID))
+            #for jobID in app.jobController.get_queued_jobs():
+                #print (app.jobController.get_queued_jobs(jobID))
+            #if (app.jobController.get_running_jobs()==[] and app.jobController.get_queued_jobs()==[]):
+                #self.manager.current = screenName
+            #else:
+                #show_popup("process of create models still working")        
+                #return
         self.manager.current = screenName
     
     def logout(self):
@@ -206,7 +260,7 @@ class ManageDatasets(Screen):
             use_pagination = pagination,
             rows_num = dataRows,
             column_data = [
-                ("Name", dp (table_width*0.25)),
+                ("Attribute", dp (table_width*0.25)),
                 ("Attributes", dp (table_width*0.25)),
                 ("Instances", dp (table_width*0.25)),
                 ("Time stamp", dp (table_width*0.25)),
@@ -412,7 +466,6 @@ class UpdateModels(Screen):
     def on_enter(self):
         self.toUpdate = []
         app = MDApp.get_running_app()
-        #modelsData = app.modelController.GetAllInstances()
         self.modelsList=app.modelController.GetModelsStatus()
         print (self.modelsList)
         self.data=[]
@@ -469,7 +522,8 @@ class UpdateModels(Screen):
         app = MDApp.get_running_app()
         for model in self.toUpdate:
             if model[2] == "":
-                app.modelController.CreateModel(app.datasetController.GetDataset(model[0]), model[1])
+                app.jobController.add_job(app.modelController.CreateModel, app.datasetController.GetDataset(model[0]), model[1])
+                #app.modelController.CreateModel(app.datasetController.GetDataset(model[0]), model[1])
                 self.manager.transition = SlideTransition(direction="right")
                 self.manager.current = 'updatemodels'
             else:
@@ -684,7 +738,50 @@ class AnalystResults(Screen):
             self.accord.add_widget(item)
         self.ids['accordion_place'].clear_widgets()
         self.ids['accordion_place'].add_widget(self.accord)
-
+        app = MDApp.get_running_app()
+        self.ids.modelName.text=f'Model: {app.modelsList[0]["name"]}'
+        model = app.modelController.GetModel(app.modelsList[0]['name'])
+        answer=checkSampleForAnomaly(model, app.query)
+        anomalies=answer['anomaly']
+        clusterNumber=answer['clusterNumber']
+        distances=answer['detailedDistances']
+        fullData=answer['predictionFullData']
+        table_width = dp(Window.size[0]*9/50)
+        self.data=[]
+        print ("attribute list: ", app.attributesList)
+        print ("anomalies: ", anomalies)
+        print ("classified cluster: ", clusterNumber)
+        print ("distances: ", distances)
+        print ("fullData: ", fullData)
+        for i in range(len(distances[clusterNumber])):
+            row = []
+            row.append(app.attributesList[i]['name'])
+            row.append(fullData[clusterNumber]['mean'][i])
+            row.append(app.query[i])
+            row.append(distances[clusterNumber][i])
+            self.data.append(row)
+        dataRows = len(self.data)
+        pagination = False
+        self.table = MDDataTable(
+            pos_hint = {'x': 0.05, 'top': 0.95},
+            size_hint= (0.9, 0.9),
+            use_pagination = pagination,
+            rows_num = dataRows,
+            column_data = [
+                ("model", dp (table_width*0.25)),
+                ("anomaly", dp (table_width*0.25)),
+                ("distance", dp (table_width*0.25)),
+                ("wcss", dp (table_width*0.25)),
+            ],
+            row_data = self.data
+        )
+        try: 
+            self.ids['table_place'].clear_widgets()
+            self.ids['table_place'].add_widget(self.table)
+            self.table.bind(on_row_press=self.row_press)
+        except Exception as e:
+            print(str(e))
+    
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'choosemodels'
@@ -692,19 +789,6 @@ class AnalystResults(Screen):
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
-#loading
-class Loading(Screen):
-    class PreLoadScreen(Screen):
-        def switchToNextScreen(self):
-            self.parent.current = 'LoadingScreen'
-
-    class LoadingScreen(Screen):
-        def switchToNextScreen(self):
-            self.parent.current = 'PreLoadScreen'
-
-    class PreLoadScreen(Screen):
-        def switchToNextScreen(self):
-            self.parent.current = 'PreLoadScreen'
 # WINDOW MANAGER ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class AnomalabApp(MDApp):
     #GENERAL
@@ -716,6 +800,7 @@ class AnomalabApp(MDApp):
     datasetController=DatasetController()
     modelController=ModelController()
     distanceController=DistanceFunctionController()
+    jobController=JobController()
     #INNER VALUES
     dataSetName = StringProperty(None)
     modelsList = ObjectProperty(None)   #USED FOR QUERIES
@@ -723,6 +808,7 @@ class AnomalabApp(MDApp):
     #distanceFunctionObject = ObjectProperty(None)
     #modelObject = ObjectProperty(None)
     userType = StringProperty(None)
+    attributesList = []
     query = []
     dictionary = {}
     

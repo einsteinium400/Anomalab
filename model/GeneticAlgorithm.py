@@ -2,11 +2,7 @@ import random
 from model.KMeanClusterer import KMeansClusterer
 
 # Define the search space for each parameter
-z=10 # todo: this needs to be a parameter i get from the dictionary
-theta1_space = [0, z]
-# theta2_space = [0, 1]
-beta_space = [0, 1]
-gamma_space = [0, 1]
+
 # Define the size of the population
 population_size = 30
 
@@ -14,15 +10,15 @@ population_size = 30
 max_generations = 30
 
 
-# Define the fitness function
-def hello(theta1, theta2, beta, gamma):
-    # Your implementation of the hello function here
-    score=theta1+theta2+beta+gamma
-    return score
+# # Define the fitness function
+# def hello(theta1, theta2, beta, gamma):
+#     # Your implementation of the hello function here
+#     score=theta1+theta2+beta+gamma
+#     return score
 
 
 # Generate an initial population of solutions
-def generate_population():
+def generate_population(beta_space, gamma_space, z):
     population = []
     for i in range(population_size):
         t=random.uniform(*[0,z])
@@ -37,11 +33,21 @@ def generate_population():
 
 
 # Evaluate the fitness of each solution
-def evaluate_population(population):
+def evaluate_population(params, vectors, population, distance_function, type_values, k):
     fitness_scores = []
+    i=0
     for solution in population:
-        fitness_score = hello(*solution)
-        fitness_scores.append(fitness_score)
+        i+=1
+        print("in eval pop", i)
+        params["theta1"] = solution[0]
+        params["theta2"] =  solution[1]#10
+        params["betha"] =  solution[2]#0.05
+        params["gamma"] =  solution[3]#0.01
+
+        model_for_population=KMeansClusterer(hyper_params=params, distance=distance_function, num_means=k, type_of_fields=type_values )
+        # activate model
+        model_for_population.cluster(vectors)
+        fitness_scores.append(model_for_population.get_wcss())
     return fitness_scores
 
 
@@ -58,7 +64,7 @@ def select_parents(population, fitness_scores):
 
 
 # Apply genetic operators to create a new generation
-def apply_genetic_operators(selected_parents):
+def apply_genetic_operators(selected_parents, beta_space, gamma_space, z):
     new_population = []
     for parent1, parent2 in selected_parents:
         # Crossover operator
@@ -85,22 +91,31 @@ def apply_genetic_operators(selected_parents):
     return new_population
 
 
-def genetic_algorithm(params, distance_function, k, vectors, type_values):
+def genetic_algorithm(params, distance_function, k, vectors, type_values, z):
+    print("inside genetic_algoritm")    
     
+    z = z
+    # theta1_space = [0, z]
+    # theta2_space = [0, 1]
+    beta_space = [0, 1]
+    gamma_space = [0, 1]
+
     # Generate an initial population
-    population = generate_population()
+    population = generate_population(beta_space, gamma_space, z)
 
     # Repeat the genetic algorithm for a maximum of max_generations
+    
     for generation in range(max_generations):
-        print("hi hi")
+        print(generation, "out of", max_generations)
+        
         # Evaluate the fitness of the current population
-        fitness_scores = evaluate_population(population)
+        fitness_scores = evaluate_population(params, vectors, population, distance_function, type_values, k)
 
         # Select parents for reproduction
         selected_parents = select_parents(population, fitness_scores)
 
         # Apply genetic operators to create a new generation
-        population = apply_genetic_operators(selected_parents)
+        population = apply_genetic_operators(selected_parents, beta_space, gamma_space, z)
 
     # Find the best solution in the final population
     best_solution = population[0]
