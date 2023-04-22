@@ -21,6 +21,12 @@ class DatasetController:
 
     def __GetAllDatasetsNamesList(self):
         return self.storage.GetNamesList("DATASET")
+    def __GetAllInstances(self):
+        availableDatasets = self.__GetAllDatasetsNamesList()
+        finalList = []
+        for item in availableDatasets:
+            finalList.append(self.GetDataset(item))
+        return finalList
     
     def CreateDataset(self, name, csvFilePath):
         dataSetsList = self.__GetAllDatasetsNamesList()
@@ -53,6 +59,13 @@ class DatasetController:
     
     def GetAttributesList(self,name):
         return self.GetDataset(name).getAttributesTypesAndValuesList()
+    
+    def CleanModelsFromDatasetsByFunction(self,name):
+        allDataSets = self.__GetAllInstances()
+        for dataset in allDataSets:
+            for modelName in dataset.BestModel:
+                if f"-{name}" in modelName['name']:
+                    dataset.removeModel(modelName['name'])
 
     
     # def GetAllDatasetsInfoList(self):
@@ -64,9 +77,3 @@ class DatasetController:
     #         finalList.append(list((item['id'],item['name'],len(item['featureNames']),len(item['data']),item['timestamp'])))
     #     return finalList
 
-    # def GetAllInstances(self):
-    #     availableDatasets = self.__GetAllDatasetsNamesList()
-    #     finalList = []
-    #     for item in availableDatasets:
-    #         finalList.append(self.GetDataset(item))
-    #     return finalList

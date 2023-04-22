@@ -3,6 +3,8 @@ import json
 import os
 import uuid
 
+from controller.DatasetController import DatasetController
+
 from model.Storage.StorageFactory import StorageFactory
 from model import modular_distance_utils
 #from model.Storage.OperationsMongo import OperationsMongo
@@ -71,9 +73,11 @@ class DistanceFunctionController:
         return function_names
 
     def delete_function(self, name):
+        datasetController = DatasetController()
+        datasetController.CleanModelsFromDatasetsByFunction(name)
         # delete in mongoDB
         self.mongo_operations.Delete(name, "FUNCTION")
-        self.mongo_operations.DeleteItemsByTypeAndFilter("FUNCTION",{"function":name})
+        self.mongo_operations.DeleteItemsByTypeAndFilter("MODEL",{"function":name})
         self.reload_functions_from_mongo()
         # delete in functions list
         #modular_distance_utils.delete_user_function(name)

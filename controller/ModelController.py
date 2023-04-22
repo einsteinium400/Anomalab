@@ -38,6 +38,9 @@ class ModelController:
         for item in availableDatasets:
             finalList.append(self.GetModel(item))
         return finalList
+    
+    def __GetAllModelsWithSpecificAttributes(self,attributesList):
+        return self.storage.GetListWithSpecificAttributes("MODEL",attributesList)
 
     def CreateModel(self, dataset, distanceName):
         name = f'{dataset.Name}-{distanceName}'
@@ -125,3 +128,8 @@ class ModelController:
     
     def GetListForManager(self):
         return self.storage.GetListWithSpecificAttributes("MODEL",['name','timestamp','wcss_score_of_model','datasetName','function'])
+    
+    def GetListOfModelsWithDistanceFunction(self,distanceFunctionName):
+        models = self.__GetAllModelsWithSpecificAttributes(['name','function'])
+        names = [model["name"] for model in models if model["function"] == distanceFunctionName]
+        return names

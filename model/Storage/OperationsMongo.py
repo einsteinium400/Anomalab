@@ -140,6 +140,10 @@ class OperationsMongo(Operations.Operations):
             collection = self.PROJECTDB[COLLECTION_DICT[itemType]]
             result = collection.delete_many(filter)
             print(f'{result.deleted_count} documents were deleted.')
+            deleted_names = []
+            for doc in collection.find(filter, {"name": 1}):
+                deleted_names.append(doc["name"])
             self.__LocalCache.DeleteItemsByTypeAndFilter(itemType,filter)
+            return deleted_names
         else:
             raise Exception("Invalid itemType")
