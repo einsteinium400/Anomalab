@@ -54,6 +54,7 @@ class OperationsMongo(Operations.Operations):
 
 
     def Save(self, name, jsonData, type):
+        print ('DEBUG JSON DATA:' , jsonData)
         collection = self.PROJECTDB[COLLECTION_DICT[type]]
         query = {"name": name}
         if(collection.find_one(query) == None):

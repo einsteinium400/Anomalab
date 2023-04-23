@@ -1,21 +1,21 @@
-,Age,Sex,Job,Housing,Saving accounts,Checking account,Credit amount,Duration,Purpose
-0,67,male,2,own,NA,little,1169,6,radio/TV
-1,22,female,2,own,little,moderate,5951,48,radio/TV
-2,49,male,1,own,little,NA,2096,12,education
-3,45,male,2,free,little,little,7882,42,furniture/equipment
-4,53,male,2,free,little,little,4870,24,car
-5,35,male,1,free,NA,NA,9055,36,education
-6,53,male,2,own,quite rich,NA,2835,24,furniture/equipment
-7,35,male,3,rent,little,moderate,6948,36,car
-8,61,male,1,own,rich,NA,3059,12,radio/TV
-9,28,male,3,own,little,moderate,5234,30,car
-10,25,female,2,rent,little,moderate,1295,12,car
-11,24,female,2,rent,little,little,4308,48,business
-12,22,female,2,own,little,moderate,1567,12,radio/TV
-13,60,male,1,own,little,little,1199,24,car
-14,28,female,2,rent,little,little,1403,15,car
-15,32,female,1,own,moderate,little,1282,24,radio/TV
-16,53,male,2,own,NA,NA,2424,24,radio/TV
-17,25,male,2,own,NA,little,8072,30,business
-18,44,female,3,free,little,moderate,12579,24,car
-19,31,male,2,own,quite rich,NA,3430,24,radio/TV
+Age,Sex,Job,Housing,Saving accounts,Checking account,Credit amount,Duration,Purpose
+67,male,2,own,?,little,1169,6,radio/TV
+22,female,2,own,little,moderate,5951,48,radio/TV
+49,male,1,own,little,?,2096,12,education
+45,male,2,free,little,little,7882,42,furniture/equipment
+53,male,2,free,little,little,4870,24,car
+35,male,1,free,?,?,9055,36,education
+53,male,2,own,quite rich,?,2835,24,furniture/equipment
+35,male,3,rent,little,moderate,6948,36,car
+61,male,1,own,rich,?,3059,12,radio/TV
+28,male,3,own,little,moderate,5234,30,car
+25,female,2,rent,little,moderate,1295,12,car
+24,female,2,rent,little,little,4308,48,business
+22,female,2,own,little,moderate,1567,12,radio/TV
+60,male,1,own,little,little,1199,24,car
+28,female,2,rent,little,little,1403,15,car
+32,female,1,own,moderate,little,1282,24,radio/TV
+53,male,2,own,?,?,2424,24,radio/TV
+25,male,2,own,?,little,8072,30,business
+44,female,3,free,little,moderate,12579,24,car
+31,male,2,own,quite rich,?,3430,24,radio/TV

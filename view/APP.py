@@ -1,6 +1,6 @@
 #python imports
 from datetime import datetime
-import asyncio
+import traceback
 
 #kivy imports
 from kivymd.app import MDApp
@@ -315,6 +315,7 @@ class AddDataset(Screen):
             show_popup(f"LOAD DATASET {name} SUCCESS")
         except Exception as e:
             self.resetForm()
+            print (traceback.print_exc())
             show_popup(str(e))
             return
         self.manager.transition = SlideTransition(direction="right")
