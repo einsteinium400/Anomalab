@@ -312,6 +312,7 @@ class AddDataset(Screen):
             if (name == '' or path == ''):
                 raise Exception(f"Must enter name & choose file")
             app.datasetController.CreateDataset(name, path)
+            self.resetForm()
             show_popup(f"LOAD DATASET {name} SUCCESS")
         except Exception as e:
             self.resetForm()
@@ -523,8 +524,14 @@ class UpdateModels(Screen):
         app = MDApp.get_running_app()
         for model in self.toUpdate:
             if model[2] == "":
-                app.jobController.add_job(app.modelController.CreateModel, app.datasetController.GetDataset(model[0]), model[1])
-                #app.modelController.CreateModel(app.datasetController.GetDataset(model[0]), model[1])
+                #app.jobController.add_job(app.modelController.CreateModel, app.datasetController.GetDataset(model[0]), model[1])
+                try:
+                    app.modelController.CreateModel(app.datasetController.GetDataset(model[0]), model[1])
+                    show_popup(f"CREATE MODEL {model[0]} {model[1]} SUCCESS")
+                except Exception as e:
+                    print (traceback.print_exc())
+                    show_popup(str(e))
+                    return
                 self.manager.transition = SlideTransition(direction="right")
                 self.manager.current = 'updatemodels'
             else:

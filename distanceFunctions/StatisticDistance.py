@@ -18,7 +18,6 @@ import math
 
 
 def statisticdist(u, v, type_values, parameters):
-    
     normalize_values = []
     if "normalize_values" in parameters:
         normalize_values= parameters["normalize_values"]
@@ -51,16 +50,23 @@ def statisticdist(u, v, type_values, parameters):
 
             # attributes are not the same - calculate max{f(|vak|), dfr(vi, ui), theta)
             else:
-                specific_domain_size = parameters["domain sizes"][i]
-                f_v_ak = f_freq(specific_domain_size,theta1,betha,theta2,gamma)
-                fr_u = f_freq(parameters["frequencies"][str(int(i))][str(int(u[int(i)]))],theta1,betha,theta2,gamma)
-                fr_v = f_freq(parameters["frequencies"][str(int(i))][str(int(v[int(i)]))],theta1,betha,theta2,gamma)
-                m_fk = parameters["minimum_freq_of_each_attribute"][str(i)]
-                d_fr = (abs(fr_u - fr_v) + m_fk) / max(fr_u, fr_v)
-                #categoric_dist += max(d_fr, theta, f_v_ak)
-                # print ("d_fr: ",d_fr," theta: ",theta, " f_v_ak: ", f_v_ak, "normalize: ", normalize_values[i])
-                categoric_dist += (max(d_fr, theta, f_v_ak) / normalize_values[i])
-
+                try:
+                    specific_domain_size = parameters["domain sizes"][i]
+                    f_v_ak = f_freq(specific_domain_size,theta1,betha,theta2,gamma)
+                    fr_u = f_freq(parameters["frequencies"][str(int(i))][str(int(u[int(i)]))],theta1,betha,theta2,gamma)
+                    fr_v = f_freq(parameters["frequencies"][str(int(i))][str(int(v[int(i)]))],theta1,betha,theta2,gamma)
+                    m_fk = parameters["minimum_freq_of_each_attribute"][str(i)]
+                    d_fr = (abs(fr_u - fr_v) + m_fk) / max(fr_u, fr_v)
+                    #categoric_dist += max(d_fr, theta, f_v_ak)
+                    # print ("d_fr: ",d_fr," theta: ",theta, " f_v_ak: ", f_v_ak, "normalize: ", normalize_values[i])
+                    categoric_dist += (max(d_fr, theta, f_v_ak) / normalize_values[i])
+                except:
+                    print("exception!")
+                    print(parameters)
+                    print("freqs",parameters["frequencies"])
+                    print(u)
+                    print(v)
+                    print("index", i)
         # numberic handle
         else:
            #numeric_dist += pow((np.int64(u[i]) - np.int64(v[i])),2)
