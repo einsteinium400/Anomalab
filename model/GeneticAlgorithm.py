@@ -21,6 +21,7 @@ max_generations = 30
 def generate_population(beta_space, gamma_space, z):
     population = []
     for i in range(population_size):
+        print("genetic generate population iteration", i)
         t=random.uniform(*[0,z])
         t2=random.uniform(*[0,z])
         theta1 = min(t,t2) #random.uniform(*theta1_space)
@@ -38,13 +39,14 @@ def evaluate_population(params, vectors, population, distance_function, type_val
     i=0
     for solution in population:
         i+=1
-        print("in eval pop", i)
+        ##print("in eval pop", i)
         params["theta1"] = solution[0]
         params["theta2"] =  solution[1]#10
         params["betha"] =  solution[2]#0.05
         params["gamma"] =  solution[3]#0.01
 
         model_for_population=KMeansClusterer(hyper_params=params, distance=distance_function, num_means=k, type_of_fields=type_values )
+
         # activate model
         model_for_population.cluster(vectors)
         fitness_scores.append(model_for_population.get_wcss())
@@ -92,7 +94,7 @@ def apply_genetic_operators(selected_parents, beta_space, gamma_space, z):
 
 
 def genetic_algorithm(params, distance_function, k, vectors, type_values, z):
-    print("inside genetic_algoritm")    
+    ##print("inside genetic_algoritm")    
     
     z = z
     # theta1_space = [0, z]
@@ -126,6 +128,7 @@ def genetic_algorithm(params, distance_function, k, vectors, type_values, z):
     params["gamma"] =  best_solution[3]#0.01
 
     model_for_population=KMeansClusterer(hyper_params=params, distance=distance_function, num_means=k, type_of_fields=type_values )
+
     # activate model
     model_for_population.cluster(vectors)
 
@@ -138,8 +141,9 @@ def genetic_algorithm(params, distance_function, k, vectors, type_values, z):
         params["betha"] = solution[2]  # 0.05
         params["gamma"] = solution[3]  # 0.01
 
+
         model_for_population = KMeansClusterer(hyper_params=params, distance=distance_function,
-                                                              num_means=k, type_of_fields=type_values)
+                                                             num_means=k, type_of_fields=type_values)
         # activate model
         model_for_population.cluster(vectors)
 

@@ -27,6 +27,10 @@ class JobController:
         with self.lock:
             return [job_id for job_id in self.jobs if self.get_job_status(job_id) == "queued"]
     
+    def get_error_jobs(self):
+        with self.lock:
+            return [job_id for job_id in self.jobs if self.get_job_status(job_id) == "error"]
+    
     def get_completed_jobs(self):
         with self.lock:
             return [job_id for job_id in self.jobs if self.get_job_status(job_id) == "completed"]

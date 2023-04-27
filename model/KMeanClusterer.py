@@ -4,8 +4,6 @@ import numpy as np
 
 import model.utils as utils
 
-
-
 class KMeansClusterer:
 
     def __init__(
@@ -73,7 +71,6 @@ class KMeansClusterer:
     # calculates the mean of a cluster
     def _centroid(self, cluster, mean):
         # initialize an empty list, with size of number of features
-
         if len(cluster):
 
             temp_centroid = [[] for columns in range(cluster[0].shape[0])]
@@ -96,11 +93,11 @@ class KMeansClusterer:
                     frequent_value_list.append(sum(temp_centroid[x]) / len(temp_centroid[x]))
 
             centroid = np.array(frequent_value_list)
+            print ('new centroid is: ', centroid)
             return centroid
 
         else:
-            print("bad seed")
-            raise Exception("bad seed")  # todo: handle this with re-run
+            raise Exception("bad seed")
 
     def get_wcss(self):
         return self._wcss
@@ -157,15 +154,12 @@ class KMeansClusterer:
     # cluster the data given to kmeans
     def cluster_vectorspace(self, vectors):
         meanss = []
-
         # make _repeats repeats to get the best means
         for trial in range(self._repeats):
             # generate new means
             self._means = utils.mean_generator(self._num_means, vectors)
-
             # cluster the vectors to the given means
             self._cluster_vectorspace(vectors)
-
             # add the new means each time
             meanss.append(self._means)
 
@@ -197,9 +191,20 @@ class KMeansClusterer:
                 for vector in vectors:
                     index, distances = self.classify_vectorspace(vector)
                     clusters[index].append(vector)
+                    print ('distances to clusters are: ', distances, ' the winner is: ', index )
+
+                while True:
+                    try:
+                        new_means = list(map(self._centroid, clusters, self._means))                  
+                        break  # Exit the loop if no exception is raised
+                    except Exception as e:
+                        if str(e) == "bad seed":
+                            pass
+                        else:
+                            raise e  # Re-raise any other exceptions
 
                 # recalculate cluster means by computing the centroid of each cluster
-                new_means = list(map(self._centroid, clusters, self._means))
+                ###### new_means = list(map(self._centroid, clusters, self._means))
 
                 # measure the degree of change from the previous step for convergence
                 difference = self._sum_distances(self._means, new_means)

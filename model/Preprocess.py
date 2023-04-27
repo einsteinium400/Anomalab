@@ -11,9 +11,6 @@ def create_array(i, len, v):
     return arr
 
 def max_combination(func, params_dict, type_of_fields, fieldsData):
-    #fields data: [{'name': 'Unnamed: 0', 'type': 'numeric'}, {'name': 'Age', 'type': 'numeric'}, {'name': 'Sex', 'type': 'categorical', 'values': {'0': 'female', '1': 'male'}}, {'name': 'Job', 'type': 'numeric'}, {'name': 'Housing', 'type': 'categorical', 'values': {'0': 'free', '1': 'own', '2': 'rent'}}, {'name': 'Saving accounts', 'type': 'categorical', 'values': {'0': 'little', '1': 'moderate', '2': 'quite rich', '3': 'rich', '4': nan}}, {'name': 'Checking account', 'type': 'categorical', 'values': {'0': 'little', '1': 'moderate', '2': nan}}, {'name': 'Credit amount', 'type': 'numeric'}, {'name': 'Duration', 'type': 'numeric'}, {'name': 
-    print("fields data:", fieldsData)
-    # exit()
     max_vals_array=[float('-inf')]*len(type_of_fields)
     for i in range(len(type_of_fields)):
         if type_of_fields[i]:
@@ -32,18 +29,10 @@ def max_combination(func, params_dict, type_of_fields, fieldsData):
                     max_vals_array[i] = result 
         else:
             max_vals_array[i]=fieldsData[i]['max']
-
-    print('max vals: ',max_vals_array)
-    #exit()
     return max_vals_array
 
 def preProcess(vectors, fieldsData, distance_function):
-    print ("fields data", fieldsData)
-    print ("vectors", vectors)
-#    exit()
-    #print("distance_function", distance_function)
     type_of_fields = [True if d['type'] == 'categorical' else False for d in fieldsData]
-    print(type_of_fields)
     params_dict = dict()
     df = pd.DataFrame(vectors)
     domain_sizes = df.nunique()
@@ -89,7 +78,6 @@ def preProcess(vectors, fieldsData, distance_function):
 
     params_dict["frequencies"] = frequencies_dict
     print("frequency dict done:", params_dict["frequencies"])
-    #exit()
     params_dict["minimum_freq_of_each_attribute"] = minimal_frequencies_dict
     params_dict["theta"] = 0.1
 

@@ -44,24 +44,31 @@ class OperationsMongo(Operations.Operations):
         self.PROJECTDB = self.CLIENT["AnomaLab"]
 
     def __cacheRule(self):
-        print(f"****{datetime.datetime.now()} >=  {self.__lastCacheTime} +  {datetime.timedelta(seconds=300)}  -- {datetime.datetime.now() >= self.__lastCacheTime + datetime.timedelta(seconds=300)}")
         if(datetime.datetime.now() >= self.__lastCacheTime + datetime.timedelta(seconds=300)):
             self.__lastCacheTime = datetime.datetime.now()
-            print("## __cacheRule True ")
             return True
-        print("## __cacheRule False ")
         return False
 
+    def __cast_keys_to_string(self, obj):
+        """
+        Recursively converts all dictionary keys to strings.
+        """
+        if isinstance(obj, dict):
+            return {str(k): self.__cast_keys_to_string(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [self.__cast_keys_to_string(elem) for elem in obj]
+        else:
+            return obj
 
     def Save(self, name, jsonData, type):
-        print ('DEBUG JSON DATA:' , jsonData)
+        safeJsonData = self.__cast_keys_to_string(jsonData)
         collection = self.PROJECTDB[COLLECTION_DICT[type]]
         query = {"name": name}
         if(collection.find_one(query) == None):
-            collection.insert_one(jsonData)
+            collection.insert_one(safeJsonData)
         else:
-            collection.update_one(query,{"$set":jsonData})
-        self.__LocalCache.Save(name, jsonData, type)
+            collection.update_one(query,{"$set":safeJsonData})
+        self.__LocalCache.Save(name, safeJsonData, type)
 
 
     def Load(self, name, type):

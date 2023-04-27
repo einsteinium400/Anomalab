@@ -40,7 +40,6 @@ class Login(Screen):
             self.resetForm()
             show_popup(str(e))
             return
-        print (f'login successful type is: {app.userType}')
         self.manager.transition = SlideTransition(direction="left")
         if (app.userType == 'regular'):
             self.manager.current = 'choosedataset'
@@ -71,17 +70,16 @@ class ChooseDataset(Screen):
            
     def on_choose(self, datasetName):
         app = MDApp.get_running_app()
-        #MUST CHOOSE DATASET
+        #must choose dataset
         if (datasetName == 'Choose Dataset' or datasetName == ""):
             show_popup("you must choose dataset")
             return
-        #KEEP DATASET NAME AND DATASET MODELS
+        #keep dataset name and dataset models
         for dataset in self.datasets:
             if dataset['name']==datasetName:
-                print (f'choose dataset: {datasetName}')
                 app.dataSetName=datasetName
                 app.modelsList=dataset['bestmodel']
-        #IF USER IS REG GO TO QUERY ELSE GO TO CHOOSE MODELS
+        #if user is reg go to query, if analyst go to choose models
         self.manager.transition = SlideTransition(direction="left")
         self.manager.current = 'query'
 
@@ -215,18 +213,14 @@ class Results(Screen):
 class DataAnalystMenu(Screen):
     def chooseScreen(self, screenName):
         self.manager.transition = SlideTransition(direction="left")
-        #if (screenName=='updatemodels'):
-            #app = MDApp.get_running_app()    
-            #print ('running process:')
-            #for jobID in app.jobController.get_running_jobs():
-                #print (app.jobController.get_job_status(jobID))
-            #for jobID in app.jobController.get_queued_jobs():
-                #print (app.jobController.get_queued_jobs(jobID))
-            #if (app.jobController.get_running_jobs()==[] and app.jobController.get_queued_jobs()==[]):
-                #self.manager.current = screenName
-            #else:
-                #show_popup("process of create models still working")        
-                #return
+        if (screenName=='updatemodels'):
+            app = MDApp.get_running_app()    
+            #check processes
+            if (app.jobController.get_running_jobs()==[]):
+                self.manager.current = screenName
+            else:
+                show_popup("process of create models still working")        
+                return
         self.manager.current = screenName
     
     def logout(self):
@@ -414,7 +408,6 @@ class AddDistanceFunction(Screen):
     def selected(self, filename):
         try:
             self.ids.path.text = filename[0]
-            #print(filename[0])
         except:
             pass
     def on_add(self, path):
@@ -467,7 +460,6 @@ class UpdateModels(Screen):
         self.toUpdate = []
         app = MDApp.get_running_app()
         self.modelsList=app.modelController.GetModelsStatus()
-        print (self.modelsList)
         self.data=[]
         for model in self.modelsList:
             for function in model[1]:
@@ -478,7 +470,6 @@ class UpdateModels(Screen):
                 self.data.append(row)
         dataRows = len(self.data)
         pagination = False
-        print (f'row of data = {dataRows}')
         if (dataRows > 5):
             pagination = True
             dataRows = 5
@@ -523,9 +514,9 @@ class UpdateModels(Screen):
         for model in self.toUpdate:
             if model[2] == "":
                 #TO DO: MICHAEL FORK
-                #app.jobController.add_job(app.modelController.CreateModel, app.datasetController.GetDataset(model[0]), model[1])
                 try:
-                    app.modelController.CreateModel(app.datasetController.GetDataset(model[0]), model[1])
+                    app.jobController.add_job(app.modelController.CreateModel, app.datasetController.GetDataset(model[0]), model[1])
+                    #app.modelController.CreateModel(app.datasetController.GetDataset(model[0]), model[1])
                     show_popup(f"CREATE MODEL {model[0]} {model[1]} SUCCESS")
                 except Exception as e:
                     print (traceback.print_exc())

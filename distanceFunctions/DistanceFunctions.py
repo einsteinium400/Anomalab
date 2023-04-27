@@ -1,11 +1,3 @@
-def Hamming(u,v,type_values, hyperparams):
-        distance = 0
-        for i in range(len(u)):
-            if v[i] != u[i]:
-                distance += 1
-        return distance    
-
-
 '''
 
 dict=
@@ -88,4 +80,12 @@ def statisticdist(u, v, type_values, parameters):
     categoric_dist=pow(categoric_dist,2)
     return math.sqrt(categoric_dist + numeric_dist)
 
+
+def Hamming(u,v,type_values, hyperparams):
+        distance = 0
+        for i in range(len(u)):
+            if int(v[i]) != int(u[i]):
+                distance += 1
+        return distance    
+        
 

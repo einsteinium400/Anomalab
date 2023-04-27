@@ -24,10 +24,16 @@ class JobQueueSingleton:
         return job_id
     
     def _run_job(self, job_id, fn, args, kwargs):
-        with self.lock:
-            self.status[job_id] = "running"
-        fn(*args, **kwargs)
-        with self.lock:
+        try:
+            with self.lock:
+                self.status[job_id] = "running"
+            fn(*args, **kwargs)
+            with self.lock:
+                self.status[job_id] = "completed"
+        except Exception as e:
+            with self.lock:
+                self.status[job_id] = "error"
+                print(f"Error in job {job_id}: {e}")
             self.status[job_id] = "completed"
     
     def get_status(self, job_id):

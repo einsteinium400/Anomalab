@@ -31,7 +31,6 @@ class OperationsLocal(Operations.Operations):
     def __checkFileCacheTime(self,fileName):
         if os.path.exists(fileName):
             ctime = os.path.getctime(fileName)
-            print(f"****{time.time()} - {ctime}) < {self.CACHE_TIME_IN_SEC}  -- {(time.time() - ctime) < self.CACHE_TIME_IN_SEC}")
             if (time.time() - ctime) < self.CACHE_TIME_IN_SEC:
                 return False
             return True
@@ -39,7 +38,6 @@ class OperationsLocal(Operations.Operations):
 
     def Save(self,name, jsonData, type):
         filename = f"{DATAPATH}\{FILEPATH_DICT[type]}\{name}.json"
-        print(f"Cache Created {DATAPATH}\{FILEPATH_DICT[type]}\{name}.json")
         try:
             del jsonData['_id']
         except:
@@ -57,11 +55,9 @@ class OperationsLocal(Operations.Operations):
             if (self.__checkFileCacheTime(filePath) is False): 
                 f = open(filePath)
                 data = json.load(f)
-                print(f"Cache hit  {filePath}")
                 return data
             raise Exception("Cache time limit")
         else:
-            print(f"Cache miss  {filePath}")
             raise Exception("No File")
 
     def Delete(self, name, type):
