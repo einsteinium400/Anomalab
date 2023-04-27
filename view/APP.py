@@ -30,13 +30,7 @@ from view.popup import show_popup
 #SCREENS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #---1---
 class Login(Screen):
-    def on_enter(self):
-        app = MDApp.get_running_app()
-        ## TO DELETE
-        for model in app.modelController.GetListForManager():
-            print (model)
     def do_login(self, name, password):
-        print (f'login: name-{name} pass-{password}')
         app = MDApp.get_running_app()
         try:
             if (name == '' or password == ''):
@@ -54,9 +48,11 @@ class Login(Screen):
             self.manager.current = 'dataanalystmenu'
         elif (app.userType == 'admin'):
             self.manager.current = 'manageusers'
+    
     def resetForm(self):
         self.ids['user_name'].text = ""
         self.ids['user_pass'].text = ""
+    
     def close(self):
         MDApp.get_running_app().stop()
 #---2---
@@ -64,10 +60,12 @@ class ChooseDataset(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
         self.datasets = app.datasetController.GetListForQuery()
+        ##check if there are models in the system
         if (self.datasets == []):
-            show_popup("THERE ARE NO DATASETS IN THE SYSTEM")
+            show_popup("There are no models in the system")
             self.manager.transition = SlideTransition(direction="right")
             self.manager.current = 'login'
+        ##fill options of datasets
         nameList = [self.datasets[i]['name'] for i in range(len(self.datasets))]
         self.ids['spinner_id'].values = nameList
            
@@ -524,6 +522,7 @@ class UpdateModels(Screen):
         app = MDApp.get_running_app()
         for model in self.toUpdate:
             if model[2] == "":
+                #TO DO: MICHAEL FORK
                 #app.jobController.add_job(app.modelController.CreateModel, app.datasetController.GetDataset(model[0]), model[1])
                 try:
                     app.modelController.CreateModel(app.datasetController.GetDataset(model[0]), model[1])
@@ -813,9 +812,7 @@ class AnomalabApp(MDApp):
     dataSetName = StringProperty(None)
     modelsList = ObjectProperty(None)   #USED FOR QUERIES
     modelsApplyList = []                #USED FOR ANALYST QUERY
-    #distanceFunctionObject = ObjectProperty(None)
-    #modelObject = ObjectProperty(None)
-    userType = StringProperty(None)
+    userType = StringProperty(None)     #USED FOR SCREENS NAVIGATION
     attributesList = []
     query = []
     dictionary = {}

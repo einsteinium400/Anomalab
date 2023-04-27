@@ -149,6 +149,5 @@ def genetic_algorithm(params, distance_function, k, vectors, type_values, z):
             best_solution = solution
             best_fitness_score = fitness_score
 
-    print("the best solution is:", best_solution)
     return best_solution # , best_fitness_score
 

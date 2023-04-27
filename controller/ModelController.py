@@ -51,7 +51,7 @@ class ModelController:
         distanceFunction = modular_distance_utils.get_function_by_name(distanceName)
         mean = dataSet.MeanValues
         fieldsData = dataSet.getAttributesTypesAndValuesList()
-        types = [True if d['type'] == 'categorical' else False for d in fieldsData]
+        types = [False if d['type'] == 'categorical' else False for d in fieldsData]
         data = np.array(dataSet.Data)
         hp, k = preProcess(data, fieldsData, distanceFunction)
         clusterer = KMeansClusterer(num_means=k, # TODO: Change to elbow to get the right K for the dataset

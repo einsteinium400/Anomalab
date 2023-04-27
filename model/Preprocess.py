@@ -38,9 +38,12 @@ def max_combination(func, params_dict, type_of_fields, fieldsData):
     return max_vals_array
 
 def preProcess(vectors, fieldsData, distance_function):
-    print (fieldsData)
+    print ("fields data", fieldsData)
+    print ("vectors", vectors)
+#    exit()
+    #print("distance_function", distance_function)
     type_of_fields = [True if d['type'] == 'categorical' else False for d in fieldsData]
-
+    print(type_of_fields)
     params_dict = dict()
     df = pd.DataFrame(vectors)
     domain_sizes = df.nunique()
