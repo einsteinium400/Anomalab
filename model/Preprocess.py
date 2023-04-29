@@ -89,12 +89,11 @@ def preProcess(vectors, fieldsData, distance_function):
     z = df.nunique().max() # max domain size
 
     theta1, theta2, betha, gamma = genetic_algorithm(params_dict, distance_function, k, vectors, type_of_fields, z)
-    print("done genetic")
     params_dict["theta1"] = theta1  # 3
     params_dict["theta2"] = theta2  # 10
     params_dict["betha"] = betha  # 0.05
     params_dict["gamma"] = gamma  # 0.01
-
+    print ('done genetics: ',params_dict)
     # calculate max possible distance for every feature, in order to normalize wcss
     # normalize_values=dict()
     normalize_values=max_combination(distance_function, params_dict, type_of_fields, fieldsData)

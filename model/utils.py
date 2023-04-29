@@ -6,7 +6,6 @@ import random
 def mean_generator(K, values):
     items = random.sample(list(values), K)
     listed_items = [list(arr) for arr in items]
-    print ('seeds: ', listed_items)
     return listed_items
 
 def csv_to_nested_list(file_name):

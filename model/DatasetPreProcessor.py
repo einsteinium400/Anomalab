@@ -10,8 +10,9 @@ class DatasetPreProcessor:
             featuresInfo.append({
                 "name":col,
                 "type": "numeric",
-                "min":int(df[col].min()),
-                "max":int(df[col].max())
+                "min":float(df[col].min()),
+                "max":float(df[col].max()),
+                "stdDev":float(df[col].std())
             })
         categorical_cols = list(set(cols) - set(num_cols))
         for col in categorical_cols:

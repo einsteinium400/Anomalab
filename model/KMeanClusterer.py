@@ -1,5 +1,5 @@
 import json
-
+import traceback
 import numpy as np
 
 import model.utils as utils
@@ -15,7 +15,7 @@ class KMeansClusterer:
             conv_test=1e-6,  # threshold for converging
             type_of_fields=None,
             hyper_params=dict()):
-
+        
         self._num_means = num_means
         self._distance = distance
         self._repeats = repeats
@@ -93,7 +93,6 @@ class KMeansClusterer:
                     frequent_value_list.append(sum(temp_centroid[x]) / len(temp_centroid[x]))
 
             centroid = np.array(frequent_value_list)
-            print ('new centroid is: ', centroid)
             return centroid
 
         else:
@@ -191,7 +190,7 @@ class KMeansClusterer:
                 for vector in vectors:
                     index, distances = self.classify_vectorspace(vector)
                     clusters[index].append(vector)
-                    print ('distances to clusters are: ', distances, ' the winner is: ', index )
+                    #print ('distances to clusters are: ', distances, ' the winner is: ', index )
 
                 while True:
                     try:
@@ -231,7 +230,6 @@ class KMeansClusterer:
         distances = []
         for index in range(len(self._means)):
             mean = self._means[index]
-            # dist = self._distance.calculate(vector, mean,self._type_of_fields)
             dist = self._distance(vector, mean, self._type_of_fields, self._hyper_parameters)
             cluster_info = {
                 "cluster": index,

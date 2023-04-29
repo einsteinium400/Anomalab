@@ -1,5 +1,6 @@
 import threading
 import uuid
+import traceback
 
 class JobQueueSingleton:
     __instance = None
@@ -33,6 +34,7 @@ class JobQueueSingleton:
         except Exception as e:
             with self.lock:
                 self.status[job_id] = "error"
+                print (traceback.print_exc())
                 print(f"Error in job {job_id}: {e}")
             self.status[job_id] = "completed"
     

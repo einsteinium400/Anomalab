@@ -242,7 +242,6 @@ class ManageDatasets(Screen):
             self.data.append(row)
         dataRows = len(self.data)
         pagination = False
-        print (f'row of data = {dataRows}')
         if (dataRows > 5):
             pagination = True
             dataRows = 5
@@ -295,7 +294,6 @@ class AddDataset(Screen):
     def selected(self, filename):
         try:
             self.ids.path.text = filename[0]
-            #print(filename[0])
         except:
             pass
     def on_add(self, name, path):
@@ -513,11 +511,9 @@ class UpdateModels(Screen):
         app = MDApp.get_running_app()
         for model in self.toUpdate:
             if model[2] == "":
-                #TO DO: MICHAEL FORK
                 try:
                     app.jobController.add_job(app.modelController.CreateModel, app.datasetController.GetDataset(model[0]), model[1])
-                    #app.modelController.CreateModel(app.datasetController.GetDataset(model[0]), model[1])
-                    show_popup(f"CREATE MODEL {model[0]} {model[1]} SUCCESS")
+                    print ('building model for ', model[0], '-', model[1])
                 except Exception as e:
                     print (traceback.print_exc())
                     show_popup(str(e))

@@ -53,17 +53,15 @@ class ModelController:
         fieldsData = dataSet.getAttributesTypesAndValuesList()
         types = [False if d['type'] == 'categorical' else False for d in fieldsData]
         data = np.array(dataSet.Data)
-        #NOAM
-        #hp, k = preProcess(data, fieldsData, distanceFunction)
+        hp, k = preProcess(data, fieldsData, distanceFunction)
         k=3
-        hp = dict()
         print ('start k means')
         clusterer = KMeansClusterer(num_means=k, # TODO: Change to elbow to get the right K for the dataset
-                                            distance=distanceFunction,
-                                            repeats=1,
-                                            mean_values=mean,
-                                            type_of_fields=types,
-                                            hyper_params=hp)
+                                    distance=distanceFunction,
+                                    repeats=1,
+                                    mean_values=mean,
+                                    type_of_fields=types,
+                                    hyper_params=hp)
 
         trained = 0
         while trained == 0:
