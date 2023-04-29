@@ -53,10 +53,11 @@ class ModelController:
         fieldsData = dataSet.getAttributesTypesAndValuesList()
         types = [False if d['type'] == 'categorical' else False for d in fieldsData]
         data = np.array(dataSet.Data)
+        print("started preprocess")
         hp, k = preProcess(data, fieldsData, distanceFunction)
-        k=3
+        print("done preprocess")
         print ('start k means')
-        clusterer = KMeansClusterer(num_means=k, # TODO: Change to elbow to get the right K for the dataset
+        clusterer = KMeansClusterer(num_means=k,
                                     distance=distanceFunction,
                                     repeats=1,
                                     mean_values=mean,

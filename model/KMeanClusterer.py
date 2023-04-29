@@ -96,6 +96,7 @@ class KMeansClusterer:
             return centroid
 
         else:
+            print("exception exception")
             raise Exception("bad seed")
 
     def get_wcss(self):
@@ -197,7 +198,9 @@ class KMeansClusterer:
                         new_means = list(map(self._centroid, clusters, self._means))                  
                         break  # Exit the loop if no exception is raised
                     except Exception as e:
+                        print("fuck", e)
                         if str(e) == "bad seed":
+                            print("fuck its bad seed")
                             pass
                         else:
                             raise e  # Re-raise any other exceptions

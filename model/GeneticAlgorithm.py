@@ -21,11 +21,10 @@ max_generations = 30
 def generate_population(beta_space, gamma_space, z):
     population = []
     for i in range(population_size):
-        print("genetic generate population iteration", i)
-        t=random.uniform(*[0,z])
-        t2=random.uniform(*[0,z])
-        theta1 = min(t,t2) #random.uniform(*theta1_space)
-        theta2 = max(t,t2) #random.uniform(*[theta1, z])
+        t = random.uniform(*[0, z])
+        t2 = random.uniform(*[0, z])
+        theta1 = min(t, t2)  # random.uniform(*theta1_space)
+        theta2 = max(t, t2)  # random.uniform(*[theta1, z])
         beta = random.uniform(*beta_space)
         gamma = random.uniform(*gamma_space)
         solution = (theta1, theta2, beta, gamma)
@@ -36,17 +35,16 @@ def generate_population(beta_space, gamma_space, z):
 # Evaluate the fitness of each solution
 def evaluate_population(params, vectors, population, distance_function, type_values, k):
     fitness_scores = []
-    i=0
+    i = 0
     for solution in population:
-        i+=1
-        ##print("in eval pop", i)
+        i += 1
+        print("in eval pop", i, params)
         params["theta1"] = solution[0]
-        params["theta2"] =  solution[1]#10
-        params["betha"] =  solution[2]#0.05
-        params["gamma"] =  solution[3]#0.01
-
-        model_for_population=KMeansClusterer(hyper_params=params, distance=distance_function, num_means=k, type_of_fields=type_values )
-
+        params["theta2"] = solution[1]  # 10
+        params["betha"] = solution[2]  # 0.05
+        params["gamma"] = solution[3]  # 0.01
+        model_for_population = KMeansClusterer(hyper_params=params, distance=distance_function, num_means=k,
+                                               type_of_fields=type_values)
         # activate model
         model_for_population.cluster(vectors)
         fitness_scores.append(model_for_population.get_wcss())
@@ -80,7 +78,7 @@ def apply_genetic_operators(selected_parents, beta_space, gamma_space, z):
             theta1 = random.uniform(*[0, child[1]])
             child = (theta1, child[1], child[2], child[3])
         if random.random() < 0.1:
-            theta2 = random.uniform(*[child[0],z])
+            theta2 = random.uniform(*[child[0], z])
             child = (child[0], theta2, child[2], child[3])
         if random.random() < 0.1:
             beta = random.uniform(*beta_space)
@@ -94,8 +92,13 @@ def apply_genetic_operators(selected_parents, beta_space, gamma_space, z):
 
 
 def genetic_algorithm(params, distance_function, k, vectors, type_values, z):
+    if distance_function.__name__ == "Hamming":
+        print("genetic_algorithm no matter")
+
+        return (0, 0, 0, 0)
+
     ##print("inside genetic_algoritm")    
-    
+
     z = z
     # theta1_space = [0, z]
     # theta2_space = [0, 1]
@@ -106,10 +109,10 @@ def genetic_algorithm(params, distance_function, k, vectors, type_values, z):
     population = generate_population(beta_space, gamma_space, z)
 
     # Repeat the genetic algorithm for a maximum of max_generations
-    
+
     for generation in range(max_generations):
-        print(generation, "out of", max_generations)
-        
+        print(generation, "###############3out of", max_generations)
+
         # Evaluate the fitness of the current population
         fitness_scores = evaluate_population(params, vectors, population, distance_function, type_values, k)
 
@@ -123,16 +126,17 @@ def genetic_algorithm(params, distance_function, k, vectors, type_values, z):
     best_solution = population[0]
 
     params["theta1"] = best_solution[0]
-    params["theta2"] =  best_solution[1]#10
-    params["betha"] =  best_solution[2]#0.05
-    params["gamma"] =  best_solution[3]#0.01
+    params["theta2"] = best_solution[1]  # 10
+    params["betha"] = best_solution[2]  # 0.05
+    params["gamma"] = best_solution[3]  # 0.01
 
-    model_for_population=KMeansClusterer(hyper_params=params, distance=distance_function, num_means=k, type_of_fields=type_values )
+    model_for_population = KMeansClusterer(hyper_params=params, distance=distance_function, num_means=k,
+                                           type_of_fields=type_values)
 
     # activate model
     model_for_population.cluster(vectors)
 
-    best_fitness_score =  model_for_population.get_wcss() #hello(*best_solution)
+    best_fitness_score = model_for_population.get_wcss()  # hello(*best_solution)
 
     for solution in population[1:]:
 
@@ -141,9 +145,8 @@ def genetic_algorithm(params, distance_function, k, vectors, type_values, z):
         params["betha"] = solution[2]  # 0.05
         params["gamma"] = solution[3]  # 0.01
 
-
         model_for_population = KMeansClusterer(hyper_params=params, distance=distance_function,
-                                                             num_means=k, type_of_fields=type_values)
+                                               num_means=k, type_of_fields=type_values)
         # activate model
         model_for_population.cluster(vectors)
 
@@ -153,5 +156,4 @@ def genetic_algorithm(params, distance_function, k, vectors, type_values, z):
             best_solution = solution
             best_fitness_score = fitness_score
 
-    return best_solution # , best_fitness_score
-
+    return best_solution  # , best_fitness_score

@@ -4,7 +4,9 @@ import random
 
 
 def mean_generator(K, values):
+    print(K, type(K))
     items = random.sample(list(values), K)
+    print(items)
     listed_items = [list(arr) for arr in items]
     return listed_items
 
