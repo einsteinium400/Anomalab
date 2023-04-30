@@ -49,21 +49,26 @@ class ModelController:
             raise Exception(f"Model named {name} exist")
         dataSet = dataset
         distanceFunction = modular_distance_utils.get_function_by_name(distanceName)
-        mean = dataSet.MeanValues
+        #mean = dataSet.MeanValues
         fieldsData = dataSet.getAttributesTypesAndValuesList()
-        types = [False if d['type'] == 'categorical' else False for d in fieldsData]
+        print ('fieldsData: ',fieldsData)
+        types = [True if d['type'] == 'categorical' else False for d in fieldsData]
         data = np.array(dataSet.Data)
-        print("started preprocess")
         hp, k = preProcess(data, fieldsData, distanceFunction)
-        print("done preprocess")
-        print ('start k means')
-        clusterer = KMeansClusterer(num_means=k,
-                                    distance=distanceFunction,
-                                    repeats=1,
-                                    mean_values=mean,
-                                    type_of_fields=types,
-                                    hyper_params=hp)
-
+        print("done preprocess - start k means")
+        try:
+            clusterer = KMeansClusterer(num_means=k,
+                distance=distanceFunction,
+                repeats=1,
+                #mean_values=mean,
+                type_of_fields=types,
+                hyper_params=hp)
+        except Exception as e:
+            print(f"Error {e}")
+            traceback.print_exc()
+            raise e
+        print ('done k means start training')
+        
         trained = 0
         while trained == 0:
             try:
@@ -73,6 +78,7 @@ class ModelController:
                 print(f"Error {e}")
                 traceback.print_exc()
                 trained = 0
+        print ('done training')
         modelJson = clusterer.getModelData()
         modelJson['datasetName']=dataset.Name
         modelJson['function'] = distanceName
@@ -91,7 +97,7 @@ class ModelController:
             'wcss_score':modelJson['wcss_score_of_model']
         })
 
-        print("########################## MODEL FINSHED TRANING #############################")
+        print("########################## MODEL FINISHED#############################")
 
     def GetModel(self, modelName):
         modelsList = self.__GetAllModelsNamesList()

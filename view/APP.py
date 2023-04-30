@@ -140,7 +140,7 @@ class Query(Screen):
                 app.query.append(int(value))
             else:
                 # numeric feature
-                app.query.append(int(self.attributesRefs[i].text))
+                app.query.append(float(self.attributesRefs[i].text))
         print (f'query is {app.query}')
         if app.userType == 'regular':
             self.manager.transition = SlideTransition(direction="left")
@@ -242,9 +242,6 @@ class ManageDatasets(Screen):
             self.data.append(row)
         dataRows = len(self.data)
         pagination = False
-        if (dataRows > 5):
-            pagination = True
-            dataRows = 5
         self.table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
             size_hint= (0.9, 0.9),

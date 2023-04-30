@@ -72,31 +72,24 @@ class KMeansClusterer:
     def _centroid(self, cluster, mean):
         # initialize an empty list, with size of number of features
         if len(cluster):
-
             temp_centroid = [[] for columns in range(cluster[0].shape[0])]
-
             for sample in cluster:
                 for j in range(len(temp_centroid)):
                     temp_centroid[j].append(sample[j])
-
             # temp_centroid.append(mean)
-
             # extract the most frequenct value in each index
             frequent_value_list = []
             for x in range(len(temp_centroid)):
-
                 # if type if categorical, take the most frequent value.
                 # if type is numerical, make avg
                 if self._type_of_fields[x]:
-                    frequent_value_list.append(max(set(temp_centroid[x]), key=temp_centroid[x].count))
+                    frequent_value_list.append(int(max(set(temp_centroid[x]), key=temp_centroid[x].count)))
                 else:
                     frequent_value_list.append(sum(temp_centroid[x]) / len(temp_centroid[x]))
-
+                
             centroid = np.array(frequent_value_list)
             return centroid
-
         else:
-            print("exception exception")
             raise Exception("bad seed")
 
     def get_wcss(self):
@@ -157,11 +150,15 @@ class KMeansClusterer:
         # make _repeats repeats to get the best means
         for trial in range(self._repeats):
             # generate new means
-            self._means = utils.mean_generator(self._num_means, vectors)
-            # cluster the vectors to the given means
-            self._cluster_vectorspace(vectors)
-            # add the new means each time
-            meanss.append(self._means)
+            try:
+                self._means = utils.mean_generator(self._num_means, vectors)
+                # cluster the vectors to the given means
+                self._cluster_vectorspace(vectors)
+                # add the new means each time
+                meanss.append(self._means)
+            except Exception as e:
+                print("bad seed", trial)
+                exit()
 
         # at this point meanss holds an array of arrays, each array has k means in it.
         if len(meanss) > 1:
@@ -188,22 +185,12 @@ class KMeansClusterer:
                 # assign the tokens to clusters based on minimum distance to
                 # the cluster means
                 clusters = [[] for m in range(self._num_means)]
+
                 for vector in vectors:
                     index, distances = self.classify_vectorspace(vector)
                     clusters[index].append(vector)
-                    #print ('distances to clusters are: ', distances, ' the winner is: ', index )
 
-                while True:
-                    try:
-                        new_means = list(map(self._centroid, clusters, self._means))                  
-                        break  # Exit the loop if no exception is raised
-                    except Exception as e:
-                        print("fuck", e)
-                        if str(e) == "bad seed":
-                            print("fuck its bad seed")
-                            pass
-                        else:
-                            raise e  # Re-raise any other exceptions
+                new_means = list(map(self._centroid, clusters, self._means))
 
                 # recalculate cluster means by computing the centroid of each cluster
                 ###### new_means = list(map(self._centroid, clusters, self._means))
@@ -223,6 +210,7 @@ class KMeansClusterer:
                     self._variance_average_calculate(clusters)
             self._clusters_info = clusters
             self.createClusterJson()
+            #print ('cluster means: ', self._means)
         else:
             pass  # todo: return error here
 
