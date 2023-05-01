@@ -1,19 +1,22 @@
+numberOfStdDev = 2
+
 def checkSampleForAnomaly(model,sample):
     
     def checkAnomaly(clusterJson):
-        return abs(clusterJson['distance_from_centroid'] >= (1*clusterJson['variance'] + clusterJson['average_cluster_distance']))
+        return (clusterJson['distance_from_centroid'] >= (numberOfStdDev*clusterJson['variance'] + clusterJson['average_cluster_distance']))
 
     def mergeClassifcationData(model,classifedClusterIndex,classifedClusterDistancesInfo):
-            classicationData = {
-                "classifiedCluster": classifedClusterIndex,
-            }
-            modelData = model.JsonData
-            classicationData['fullClusteringInfo'] = modelData
-            for cluster in classicationData['fullClusteringInfo']['clusters_info']:
-                for singleClassficationData in classifedClusterDistancesInfo:
-                    if(cluster['cluster'] == singleClassficationData['cluster']):
-                        cluster['distance_from_centroid'] = singleClassficationData['distance']
-            return classicationData
+        classicationData = {
+            "classifiedCluster": classifedClusterIndex,
+        }
+        modelData = model.JsonData
+        print ('modelData: ',modelData)
+        classicationData['fullClusteringInfo'] = modelData
+        for cluster in classicationData['fullClusteringInfo']['clusters_info']:
+            for singleClassficationData in classifedClusterDistancesInfo:
+                if(cluster['cluster'] == singleClassficationData['cluster']):
+                    cluster['distance_from_centroid'] = singleClassficationData['distance']
+        return classicationData
     
     fakeSample = sample
     cluster,distances,detailedDistances = model.classify_vectorspace(fakeSample)

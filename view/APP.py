@@ -70,16 +70,16 @@ class ChooseDataset(Screen):
            
     def on_choose(self, datasetName):
         app = MDApp.get_running_app()
-        #must choose dataset
+        ##must choose dataset
         if (datasetName == 'Choose Dataset' or datasetName == ""):
             show_popup("you must choose dataset")
             return
-        #keep dataset name and dataset models
+        ##keep dataset name and dataset models
         for dataset in self.datasets:
             if dataset['name']==datasetName:
                 app.dataSetName=datasetName
                 app.modelsList=dataset['bestmodel']
-        #if user is reg go to query, if analyst go to choose models
+        ##if user is reg go to query, if analyst go to choose models
         self.manager.transition = SlideTransition(direction="left")
         self.manager.current = 'query'
 
@@ -176,7 +176,7 @@ class Results(Screen):
         print ("fullData: ", fullData)
         for i in range(len(distances[clusterNumber])):
             row = []
-            row.append(app.attributesList[i]['name'])
+            row.append('[size=40]'+app.attributesList[i]['name']+'[/size]')
             row.append(fullData[clusterNumber]['mean'][i])
             row.append(app.query[i])
             row.append(distances[clusterNumber][i])
