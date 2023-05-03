@@ -4,4 +4,3 @@ def Hamming(u,v,type_values, hyperparams):
         if int(v[i]) != int(u[i]):
             distance += 1
     return distance
-        

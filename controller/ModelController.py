@@ -67,6 +67,8 @@ class ModelController:
             print(f"Error {e}")
             traceback.print_exc()
             raise e
+
+
         print ('done k means start training')
         
         trained = 0

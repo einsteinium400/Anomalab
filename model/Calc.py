@@ -1,3 +1,4 @@
+
 import math
 
 class Calc:
@@ -11,6 +12,10 @@ class Calc:
     
     def __str__(self):
         return f'sum is: {self.sum} squaresum: {self.squareSum} number: {self.n}'
+    
+    def addArr(self,values):
+        for value in values:
+            self.add(self, value)
 
     def add(self, value):
         if (self.n == 0):

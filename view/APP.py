@@ -53,6 +53,8 @@ class Login(Screen):
         self.ids['user_pass'].text = ""
     
     def close(self):
+        app = MDApp.get_running_app()
+        app.jobController.stop_all_running_jobs()
         MDApp.get_running_app().stop()
 #---2---
 class ChooseDataset(Screen):

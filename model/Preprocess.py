@@ -43,20 +43,20 @@ def max_combination(func, params_dict, type_of_fields, fieldsData):
             for permutation in unique_perms:
                 vec1 = create_array(i, len(type_of_fields), permutation[0])
                 vec2 = create_array(i, len(type_of_fields), permutation[1])
-                print ('cat vec1: ', vec1)
-                print ('cat vec2: ', vec2)
+                # print ('cat vec1: ', vec1)
+                # print ('cat vec2: ', vec2)
                 result = func(vec1, vec2, type_of_fields, params_dict)
-                print ('cat distance: ', result)
+                #print ('cat distance: ', result)
                 # Update max_value if the current result is greater
                 if result > max_vals_array[i]:
                     max_vals_array[i] = result
         else:
             vec1 = create_array(i, len(type_of_fields), fieldsData[i]['max'])
             vec2 = create_array(i, len(type_of_fields), fieldsData[i]['min'])
-            print ('num vec1: ', vec1)
-            print ('num vec2: ', vec2)
+            #print ('num vec1: ', vec1)
+            #print ('num vec2: ', vec2)
             result = func(vec1, vec2, type_of_fields, params_dict)
-            print ('num distance: ', result)
+            #print ('num distance: ', result)
             max_vals_array[i] = result
             #print("max_vals_array[i]", max_vals_array[i])
             #max_vals_array[i] = fieldsData[i]['max']

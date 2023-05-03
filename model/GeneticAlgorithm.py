@@ -4,10 +4,10 @@ from model.KMeanClusterer import KMeansClusterer
 # Define the search space for each parameter
 
 # Define the size of the population
-population_size = 2
+population_size = 10
 
 # Define the maximum number of generations
-max_generations = 2
+max_generations = 10
 
 
 # # Define the fitness function
@@ -38,11 +38,12 @@ def evaluate_population(params, vectors, population, distance_function, type_val
     i = 0
     for solution in population:
         i += 1
-        print("in eval pop", i)
         params["theta1"] = solution[0]
         params["theta2"] = solution[1]  # 10
         params["betha"] = solution[2]  # 0.05
         params["gamma"] = solution[3]  # 0.01
+
+
         model_for_population = KMeansClusterer(hyper_params=params, distance=distance_function, num_means=k,
                                                type_of_fields=type_values)
         # activate model

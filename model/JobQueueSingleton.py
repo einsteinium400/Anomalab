@@ -41,6 +41,15 @@ class JobQueueSingleton:
     def get_status(self, job_id):
         return self.status.get(job_id, None)
     
+    def stop_job(self, job_id):
+        with self.lock:
+            for i, (jid, thread) in enumerate(self.job_queue):
+                if jid == job_id:
+                    thread._stop()
+                    self.job_queue.pop(i)
+                    self.status[job_id] = "stopped"
+                    break
+    
 ## Run example with arguments
 # import modelController
 

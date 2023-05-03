@@ -17,12 +17,7 @@ import numpy as np
 import math
 
 
-def statisticdist(u, v, type_values, parameters):
-    normalize_values = []
-    if "normalize_values" in parameters:
-        normalize_values = parameters["normalize_values"]
-    else:
-        normalize_values = [1] * len(v)
+def Unormstatisticdist(u, v, type_values, parameters):
 
     def f_freq(z, theta1, betha, theta2, gamma):
         if z <= theta1:
@@ -57,7 +52,7 @@ def statisticdist(u, v, type_values, parameters):
                     d_fr = (abs(fr_u - fr_v) + m_fk) / max(fr_u, fr_v)
                     # categoric_dist += max(d_fr, theta, f_v_ak)
                     # print ("d_fr: ",d_fr," theta: ",theta, " f_v_ak: ", f_v_ak, "normalize: ", normalize_values[i])
-                    categoric_dist += (max(d_fr, theta, f_v_ak) / normalize_values[i])
+                    categoric_dist += max(d_fr, theta, f_v_ak)
                     # if categoric_dist > 1:
                     #     # print ('distance is: ',max(d_fr, theta, f_v_ak))
                     #     # print ('normalize distance is: ',categoric_dist)
@@ -81,7 +76,7 @@ def statisticdist(u, v, type_values, parameters):
                     exit()
         # numberic handle
         else:
-            numeric_dist += pow((np.int64(u[i]) - np.int64(v[i])),2) / normalize_values[i]
+            numeric_dist += pow((np.int64(u[i]) - np.int64(v[i])),2)
             #if numeric_dist > 1:
                         # print ('distance is: ',max(d_fr, theta, f_v_ak))
                         # print ('normalize distance is: ',categoric_dist)
