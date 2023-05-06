@@ -1,15 +1,3 @@
-def Hamming(u,v,type_values, hyperparams):
-    distance = 0
-    results = []
-    for i in range(len(u)):
-        if int(v[i]) != int(u[i]):
-            results.append(1)
-            distance += 1
-        else:
-            results.append(0)
-    return distance,results
-
-
 import numpy as np
 import math
 
@@ -54,15 +42,3 @@ def Statistic(u, v, type_values, parameters):
     
     distance = math.sqrt(distance)
     return distance,results
-
-
-from math import sqrt
-
-def EuclideanDistance(u, v, type_values, parameters):
-    distance = 0.0
-    results = []
-    for i in range(len(u)):
-        results.append((u[i] - v[i]) ** 2)
-        distance += results[i]
-    return sqrt(distance), results
-

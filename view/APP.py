@@ -34,7 +34,7 @@ class Login(Screen):
         app = MDApp.get_running_app()
         try:
             if (name == '' or password == ''):
-                raise Exception(f"Must enter user name and password")
+                raise Exception("Must enter user name and password")
             app.userType = app.userController.LoginUser(name, password)
         except Exception as e:
             self.resetForm()
@@ -60,15 +60,17 @@ class Login(Screen):
 class ChooseDataset(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
-        self.datasets = app.datasetController.GetListForQuery()
-        ##check if there are models in the system
-        if (self.datasets == []):
-            show_popup("There are no models in the system")
-            self.manager.transition = SlideTransition(direction="right")
-            self.manager.current = 'login'
-        ##fill options of datasets
-        nameList = [self.datasets[i]['name'] for i in range(len(self.datasets))]
-        self.ids['spinner_id'].values = nameList
+        try:
+            ##get datasets with atleast one models
+            self.datasets = app.datasetController.GetListForQuery()
+            ##check if there are models in the system
+            if (self.datasets == []):
+                raise Exception("There are no models in the system")
+            ##fill options of datasets
+            nameList = [self.datasets[i]['name'] for i in range(len(self.datasets))]
+            self.ids['spinner_id'].values = nameList
+        except Exception as e:
+            show_popup(str(e))
            
     def on_choose(self, datasetName):
         app = MDApp.get_running_app()
@@ -104,23 +106,28 @@ class Query(Screen):
         self.attributesTypes=[]
         self.ids.attributes_box.clear_widgets()
         app = MDApp.get_running_app()
-        app.attributesList=app.datasetController.GetAttributesList(app.dataSetName)
-        for i in range(len(app.attributesList)):
-            self.ids.attributes_box.add_widget(MDLabel(text=f'{app.attributesList[i]["name"]}:', halign="center"))
-            if (app.attributesList[i]["type"] == 'numeric'):
-                self.attributesTypes.append(False)
-                self.attributesRefs.append(MDTextFieldRect(multiline=False, hint_text=f"insert here", input_filter = 'float'))
-                self.attributesRefs[i].bind(text=self.on_text)
-            else:
-                self.attributesTypes.append(True)
-                options = []
-                for value in app.attributesList[i]["values"].values():
-                    #BUG: Don't know to handle with NA
-                    if str(value) != "nan":
-                        options.append(str(value))
-                self.attributesRefs.append(Spinner(text="", values=options))
-                self.attributesRefs[i].bind(text=self.on_text)
-            self.ids.attributes_box.add_widget(self.attributesRefs[i])
+        try:
+            app.attributesList=app.datasetController.GetAttributesList(app.dataSetName)
+            for i in range(len(app.attributesList)):
+                self.ids.attributes_box.add_widget(MDLabel(text=f'{app.attributesList[i]["name"]}:', halign="center"))
+                if (app.attributesList[i]["type"] == 'numeric'):
+                    ##NUMERIC ADD
+                    self.attributesTypes.append(False)
+                    self.attributesRefs.append(MDTextFieldRect(multiline=False, hint_text=f"insert here", input_filter = 'float'))
+                    self.attributesRefs[i].bind(text=self.on_text)
+                else:
+                    ##CATEGORY ADD
+                    self.attributesTypes.append(True)
+                    options = []
+                    for value in app.attributesList[i]["values"].values():
+                        ##DEAL WITH NA
+                        if str(value) != "nan":
+                            options.append(str(value))
+                    self.attributesRefs.append(Spinner(text="", values=options))
+                    self.attributesRefs[i].bind(text=self.on_text)
+                self.ids.attributes_box.add_widget(self.attributesRefs[i])
+        except Exception as e:
+            show_popup(str(e))
     
     def on_text(self, instance, value):
         if (value == ""):
@@ -659,8 +666,7 @@ class ChooseModels(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
         app.modelsApplyList=[]
-        app.modelsList[0]['name']
-        print (app.modelsList)
+        print ('model to choose form: ',app.modelsList)
         self.data=[]
         for model in app.modelsList:
             row = []
@@ -721,6 +727,68 @@ class ChooseModels(Screen):
         self.manager.current = 'login'
 #---17---
 class AnalystResults(Screen):
+    def on_enter(self):
+        app = MDApp.get_running_app()
+        results = []
+        try:
+            for modelname in app.modelsApplyList:
+                results.append(checkSampleForAnomaly(app.modelController.GetModel(modelname), app.query))
+        except Exception as e:
+            show_popup(str(e))
+            return
+        self.ids.modelName.text=f'Model: {app.modelsList[0]["name"]}'
+        model = app.modelController.GetModel(app.modelsList[0]['name'])
+        answer=checkSampleForAnomaly(model, app.query)
+        anomalies=answer['anomaly']
+        clusterNumber=answer['clusterNumber']
+        distances=answer['detailedDistances']
+        fullData=answer['predictionFullData']
+        table_width = dp(Window.size[0]*9/50)
+        self.data=[]
+        print ("attribute list: ", app.attributesList)
+        print ("anomalies: ", anomalies)
+        print ("classified cluster: ", clusterNumber)
+        print ("distances: ", distances)
+        print ("fullData: ", fullData)
+        for i in range(len(distances[clusterNumber])):
+            row = []
+            row.append('[size=40]'+app.attributesList[i]['name']+'[/size]')
+            row.append(fullData[clusterNumber]['mean'][i])
+            row.append(app.query[i])
+            row.append(distances[clusterNumber][i])
+            self.data.append(row)
+        dataRows = len(self.data)
+        pagination = False
+        self.table = MDDataTable(
+            pos_hint = {'x': 0.05, 'top': 0.95},
+            size_hint= (0.9, 0.9),
+            use_pagination = pagination,
+            rows_num = dataRows,
+            column_data = [
+                ("Attribute", dp (table_width*0.25)),
+                ("Cluster mean", dp (table_width*0.25)),
+                ("Sample", dp (table_width*0.25)),
+                ("Distance", dp (table_width*0.25)),
+            ],
+            row_data = self.data
+        )
+        try: 
+            self.ids['table_place'].clear_widgets()
+            self.ids['table_place'].add_widget(self.table)
+            self.table.bind(on_row_press=self.row_press)
+        except Exception as e:
+            print(str(e))
+    def on_back(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'query'
+    
+    def logout(self):
+        self.manager.transition = SlideTransition(direction="right")
+        self.manager.current = 'login'
+    
+    
+    
+    
     def on_enter(self):
         app = MDApp.get_running_app()
         self.accord = Accordion(orientation ='vertical')

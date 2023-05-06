@@ -22,6 +22,7 @@ class KMeansClusterer:
         self._mean_values = mean_values
         self._type_of_fields = type_of_fields
         self._means = None
+        self._meansStdDev = []
         self._max_difference = conv_test
         self._wcss = None
         self._normalized_wcss=None
@@ -39,16 +40,14 @@ class KMeansClusterer:
         }
         listObj = []
         for i in range(len(self._means)):
-            # cluster_info_list = []
-            # for item in self._clusters_info[i]:
-            #     cluster_info_list.append(item.tolist())
             listObj.append(
                 {
                     "cluster": i,
                     "average_cluster_distance": self._average_distance_list[i],
                     "variance": self._variance_list[i],
                     "mean": self._means[i].tolist(),
-                    # "dataPoints":cluster_info_list
+                    "averageDistances": self._averageOfDistances[i],
+                    "meansStdDev": self._meansStdDev[i],
                 }
             )
         jsonData['clusters_info'] = listObj
@@ -79,7 +78,8 @@ class KMeansClusterer:
 
         std = 0
         for i in range(len(vectors)):
-            std += (self._distance(vectors[i], self._overall_mean,self._type_of_fields ,self._hyper_parameters))**2
+            distance , results = self._distance(vectors[i], self._overall_mean,self._type_of_fields ,self._hyper_parameters)
+            std += distance**2
         
         std=math.sqrt(std/len(vectors)-1)
 
@@ -124,6 +124,12 @@ class KMeansClusterer:
 
     def get_means(self):
         return self._means
+    
+    def get_meansStdDev(self):
+        return self._meansStdDev
+    
+    def get_averageOfDistances(self):
+        return self._averageOfDistances
 
     def calculate_normalized_wcss(self, clusters):
 
@@ -141,10 +147,10 @@ class KMeansClusterer:
 
         for index in range(len(normalized_clusters)):
             for vec in clusters[index]:
-                # wcss += self._distance.calculate(vec, self._means[index],self._type_of_fields) ** 2
-                wcss += self._distance(vec, self._means[index], self._type_of_fields,self._hyper_parameters) ** 2
+                distance , results = self._distance(vec, self._means[index], self._type_of_fields,self._hyper_parameters)
+                wcss +=  distance** 2
 
-        self._normalized_wcss = wcss
+        self._wcss = wcss
         print("calculated normalize wcss!!!", wcss)
 
         # normalized_clusters = []
@@ -162,52 +168,67 @@ class KMeansClusterer:
 
         # for index in range(len(normalized_clusters)):
         #     for vec in clusters[index]:
-        #         # wcss += self._distance.calculate(vec, self._means[index],self._type_of_fields) ** 2
         #         wcss += self._distance(vec, self._means[index], self._type_of_fields,self._hyper_parameters) ** 2
 
         # self._normalized_wcss = wcss
         # print("calculated normalize wcss!!!", wcss)
 
     def _wcss_calculate(self, clusters):
-
+      #  self.calculate_normalized_wcss()
         wcss = 0
 
         for index in range(len(clusters)):
             for vec in clusters[index]:
-                # wcss += self._distance.calculate(vec, self._means[index],self._type_of_fields) ** 2
-                wcss += self._distance(vec, self._means[index], self._type_of_fields,self._hyper_parameters) ** 2
+                distance, results = self._distance(vec, self._means[index], self._type_of_fields,self._hyper_parameters)
+                wcss += distance ** 2
 
         self._wcss = wcss
-
+        #DO NOT DELETE THIS
     def _variance_average_calculate(self, clusters):
-
-        self._average_distance_list = [[0] for _ in range(len(self._means))]
-        self._variance_list = [[0] for _ in range(len(self._means))]
+        numberOfFeatures = len(self._means[0])
+        numberOfClusters = len(self._means)
+        self._average_distance_list = [[0] for _ in range(numberOfClusters)]
+        self._variance_list = [[0] for _ in range(numberOfClusters)]
+        self._meansStdDev = [[] for _ in range(numberOfClusters)]
+        self._averageOfDistances = [[] for _ in range(numberOfClusters)]
 
         # calculate average mean
-        for index in range(len(clusters)):
+        for index in range(numberOfClusters):
             self._average_distance_list[index] = 0
+            sumOfDistances = [0 for _ in range(numberOfFeatures)]
+            self._averageOfDistances[index] = [0 for _ in range(numberOfFeatures)]
             for vec in clusters[index]:
-                # self._average_distance_list[index] += self._distance.calculate(vec, self._means[index],
-                # self._type_of_fields)
-                self._average_distance_list[index] += self._distance(vec, self._means[index], self._type_of_fields,self._hyper_parameters)
+                distance , results = self._distance(vec, self._means[index], self._type_of_fields,self._hyper_parameters)
+                self._average_distance_list[index] += distance
+                for i in range(numberOfFeatures):
+                    sumOfDistances[i]+=results[i]
             self._average_distance_list[index] /= len(clusters[index])
-
+            for i in range (numberOfFeatures):
+                self._averageOfDistances[index][i] = sumOfDistances[i] / len(clusters[index])
         # calculate variance
-        for index in range(len(clusters)):
+        for index in range(numberOfClusters):
             self._variance_list[index] = 0
+            squareDeltaDistances = [0 for _ in range(numberOfFeatures)]
             for vec in clusters[index]:
-                # distance_of_element_from_mean = self._distance.calculate(vec, self._means[index],self._type_of_fields)
-                distance_of_element_from_mean = self._distance(vec, self._means[index], self._type_of_fields,self._hyper_parameters)
-
-                self._variance_list[index] += (distance_of_element_from_mean - self._average_distance_list[index]) ** 2
-            self._variance_list[index] /= len(clusters[index])
+                distance , results = self._distance(vec, self._means[index], self._type_of_fields,self._hyper_parameters)
+                for i in range(numberOfFeatures):
+                    squareDeltaDistances[i] += (results[i]-self._averageOfDistances[index][i])**2
+                self._variance_list[index] += (distance - self._average_distance_list[index]) ** 2
+            ##deal with clusters with only one data sample
+            if len(clusters[index])<2:
+                self._variance_list[index]=0
+                for i in range(numberOfFeatures):
+                    self._meansStdDev[index].append(0)
+            else:
+                self._variance_list[index] /= (len(clusters[index])-1)
+                for i in range(numberOfFeatures):
+                    self._meansStdDev[index].append(math.sqrt(squareDeltaDistances[i]/(len(clusters[index])-1)))
 
     def _sum_distances(self, vectors1, vectors2):
         difference = 0.0
         for u, v in zip(vectors1, vectors2):
-            # difference += self._distance.calculate(u, v,self._type_of_fields)
-            difference += self._distance(u, v, self._type_of_fields,self._hyper_parameters)
+            distance , results = self._distance(u, v, self._type_of_fields,self._hyper_parameters)
+            difference += distance
         return difference
 
     # cluster the data given to kmeans
@@ -223,9 +244,9 @@ class KMeansClusterer:
                 # add the new means each time
                 meanss.append(self._means)
             except Exception as e:
-                print("bad seed", trial)
-                exit()
-
+                print(e, ": ", trial)
+                raise e
+        ##NOAM WHY WE NEED THIS PART
         # at this point meanss holds an array of arrays, each array has k means in it.
         if len(meanss) > 1:
             # find the set of means that's minimally different from the others
@@ -258,10 +279,6 @@ class KMeansClusterer:
                     index, distances = self.classify_vectorspace(vector)
                     clusters[index].append(vector)
 
-                #print(clusters)
-                #for i in range (len(clusters)):
-                    #print (f'cluster {i}: {len(clusters[i])}')
-                #print("means: ", self._means)
                 new_means = list(map(self._centroid, clusters, self._means))
 
                 # recalculate cluster means by computing the centroid of each cluster
@@ -277,7 +294,7 @@ class KMeansClusterer:
                     converged = True
                     # calculate wcss score
                     self._wcss_calculate(clusters)
-                    self.calculate_normalized_wcss(clusters)
+                    #self.calculate_normalized_wcss(clusters)
                     # calculate variance and average distance
                     self._variance_average_calculate(clusters)
             self._clusters_info = clusters
@@ -293,13 +310,13 @@ class KMeansClusterer:
         distances = []
         for index in range(len(self._means)):
             mean = self._means[index]
-            dist = self._distance(vector, mean, self._type_of_fields, self._hyper_parameters)
+            distance , results = self._distance(vector, mean, self._type_of_fields, self._hyper_parameters)
             cluster_info = {
                 "cluster": index,
-                "distance": dist
+                "distance": distance
             }
             distances.append(cluster_info)
-            if best_distance is None or dist < best_distance:
-                best_index, best_distance = index, dist
+            if best_distance is None or distance < best_distance:
+                best_index, best_distance = index, distance
 
         return best_index, distances

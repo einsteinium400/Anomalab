@@ -10,7 +10,7 @@ def checkSampleForAnomaly(model,sample):
             "classifiedCluster": classifedClusterIndex,
         }
         modelData = model.JsonData
-        print ('modelData: ',modelData)
+        #print ('modelData: ',modelData)
         classicationData['fullClusteringInfo'] = modelData
         for cluster in classicationData['fullClusteringInfo']['clusters_info']:
             for singleClassficationData in classifedClusterDistancesInfo:
@@ -19,9 +19,9 @@ def checkSampleForAnomaly(model,sample):
         return classicationData
     
     fakeSample = sample
-    cluster,distances,detailedDistances = model.classify_vectorspace(fakeSample)
-    print("detailed distances: ", detailedDistances)
-    print("Classifed Cluster: ", cluster)
+    cluster,distances,detailedDistances, standardizeDistances = model.check_sample(fakeSample)
+    #print("detailed distances: ", detailedDistances)
+    #print("Classifed Cluster: ", cluster)
     predictionFullData = mergeClassifcationData(model,cluster,distances)
     answer = {}
     answer['anomaly'] = []
@@ -29,7 +29,7 @@ def checkSampleForAnomaly(model,sample):
     answer['detailedDistances'] = detailedDistances
     answer['predictionFullData'] = predictionFullData['fullClusteringInfo']['clusters_info']
     for clusterJson in answer['predictionFullData']:
-        print ("clusterJson: ", clusterJson)
+        #print ("clusterJson: ", clusterJson)
         if(checkAnomaly(clusterJson)):
             answer['anomaly'].append(True)
         else:

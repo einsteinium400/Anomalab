@@ -16,8 +16,15 @@ minimum_freq_of_each_attribute={0:1, 1:4, 2:2}
 import numpy as np
 import math
 
-
-def Unormstatisticdist(u, v, type_values, parameters):
+def statisticdist(u, v, type_values, parameters):
+    distance = 0
+    results = []
+    
+    normalize_values = []
+    if "normalize_values" in parameters:
+        normalize_values = parameters["normalize_values"]
+    else:
+        normalize_values = [1] * len(v)
 
     def f_freq(z, theta1, betha, theta2, gamma):
         if z <= theta1:
@@ -40,7 +47,6 @@ def Unormstatisticdist(u, v, type_values, parameters):
             # if attributes are same
             if u[i] == v[i]:
                 categoric_dist += 0
-
             # attributes are not the same - calculate max{f(|vak|), dfr(vi, ui), theta)
             else:
                 try:
@@ -50,24 +56,15 @@ def Unormstatisticdist(u, v, type_values, parameters):
                     fr_v = f_freq(parameters["frequencies"][str(i)][str(int(v[int(i)]))], theta1, betha, theta2, gamma)
                     m_fk = parameters["minimum_freq_of_each_attribute"][str(i)]
                     d_fr = (abs(fr_u - fr_v) + m_fk) / max(fr_u, fr_v)
-                    # categoric_dist += max(d_fr, theta, f_v_ak)
-                    # print ("d_fr: ",d_fr," theta: ",theta, " f_v_ak: ", f_v_ak, "normalize: ", normalize_values[i])
-                    categoric_dist += max(d_fr, theta, f_v_ak)
-                    # if categoric_dist > 1:
-                    #     # print ('distance is: ',max(d_fr, theta, f_v_ak))
-                    #     # print ('normalize distance is: ',categoric_dist)
-                    #     # print ("u is: ",u)
-                    #     # print ("v is: ",v)
-                    #     # print ('param index is: ',i)
+                    categoric_dist += (max(d_fr, theta, f_v_ak) / normalize_values[i])
 
                 except Exception as e:
-                    print("EXCEPTION!")
+                    print("EXCEPTION- ",e)
                     print(parameters["frequencies"])
                     print(str(int(i)))
                     print(str(int(u[int(i)])))
                     print("theta", theta)
                     print("f_v_ak", f_v_ak)
-                    print("exception!")
                     print(parameters)
                     print("freqs", parameters["frequencies"])
                     print(u)
@@ -76,14 +73,13 @@ def Unormstatisticdist(u, v, type_values, parameters):
                     exit()
         # numberic handle
         else:
-            numeric_dist += pow((np.int64(u[i]) - np.int64(v[i])),2)
+            numeric_dist += pow((np.int64(u[i]) - np.int64(v[i])),2) / normalize_values[i]
             #if numeric_dist > 1:
                         # print ('distance is: ',max(d_fr, theta, f_v_ak))
                         # print ('normalize distance is: ',categoric_dist)
                         # print ("u is: ",u)
                         # print ("v is: ",v)
                         # print ('param index is: ',i)
-            
 
     categoric_dist = pow(categoric_dist, 2)
     return math.sqrt(categoric_dist + numeric_dist)

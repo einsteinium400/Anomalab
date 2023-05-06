@@ -7,21 +7,47 @@ import matplotlib.pyplot as plt
 from distanceFunctions.Hamming import Hamming as hm
 from model.KMeanClusterer import KMeansClusterer
 
-def apply_elbow_method(fields_data, vectors):
+MAX_CLUSTERS_IN_ELBOW = 7
+DEFAULT_ELBOW = 3
+
+def apply_elbow_method(fields_data, vectors, distance_function):
     wcss=[]
-
-    for i in range(2, 6):
-        model = KMeansClusterer(hyper_params=dict(), distance=hm, num_means=int(i), type_of_fields=fields_data)
-        model.cluster(vectors)
-        wcss.append(model.get_wcss())
-        print (f'elbow for {i} clusters wcss is : {model.get_wcss()}')
-
-    kneedle = KneeLocator(range(2, 6), wcss, curve='convex', direction='decreasing')
+    tries = 0
+    i=1
+    while i < MAX_CLUSTERS_IN_ELBOW:
+        flag = False
+        try:
+            model = KMeansClusterer(hyper_params=dict(), distance=hm, num_means=int(i), type_of_fields=fields_data, repeats=2)
+            model.cluster(vectors)
+        except Exception as e:
+            print ('exception is:',e,'i:',i,'tries:',tries)
+            if str(e) == "bad seed":
+                if tries == 3:
+                    if i==1:
+                        raise e
+                    else:
+                        print ('three tries with',i)
+                        break
+                else:
+                    tries += 1
+                    i -= 1
+                    print ('another try')
+                    flag=True
+            else:
+                raise e
+        if flag==False:
+            wcss.append(model.get_wcss())
+            print (f'elbow for {i} clusters wcss is : {model.get_wcss()}')
+            tries = 0
+        i+=1
+    print("wcss list is: ", wcss)
+    kneedle = KneeLocator(range(1, i), wcss, curve='convex', direction='decreasing')
     elbow_point = kneedle.elbow
     if not isinstance(elbow_point,int):
-        elbow_point=3
-        print("could not generate elbow point, use default value")
-    print(elbow_point)
+        elbow_point=DEFAULT_ELBOW
+        print("could not generate elbow point, use default value", elbow_point)
+    else:
+        print('elbow point is:', elbow_point)
     return elbow_point
 
 def create_array(i, len, v):
@@ -43,21 +69,19 @@ def max_combination(func, params_dict, type_of_fields, fieldsData):
             for permutation in unique_perms:
                 vec1 = create_array(i, len(type_of_fields), permutation[0])
                 vec2 = create_array(i, len(type_of_fields), permutation[1])
-                # print ('cat vec1: ', vec1)
-                # print ('cat vec2: ', vec2)
-                result = func(vec1, vec2, type_of_fields, params_dict)
-                #print ('cat distance: ', result)
-                # Update max_value if the current result is greater
-                if result > max_vals_array[i]:
-                    max_vals_array[i] = result
+                
+                distance , results = func(vec1, vec2, type_of_fields, params_dict)
+                # Update max_value if the current distance is greater
+                if distance > max_vals_array[i]:
+                    max_vals_array[i] = distance
         else:
             vec1 = create_array(i, len(type_of_fields), fieldsData[i]['max'])
             vec2 = create_array(i, len(type_of_fields), fieldsData[i]['min'])
             #print ('num vec1: ', vec1)
             #print ('num vec2: ', vec2)
-            result = func(vec1, vec2, type_of_fields, params_dict)
+            distance , results = func(vec1, vec2, type_of_fields, params_dict)
             #print ('num distance: ', result)
-            max_vals_array[i] = result
+            max_vals_array[i] = distance
             #print("max_vals_array[i]", max_vals_array[i])
             #max_vals_array[i] = fieldsData[i]['max']
     print("max_vals_array: ", max_vals_array)
@@ -83,7 +107,7 @@ def preProcess(vectors, fieldsData, distance_function):
     params_dict["frequencies"] = frequencies_dict
     params_dict["minimum_freq_of_each_attribute"] = minimal_frequencies_dict
     params_dict["theta"] = 0.1
-    k = apply_elbow_method(fieldsData, vectors)
+    k = apply_elbow_method(fieldsData, vectors, distance_function )
     # activate the genetic algorithm
     z = df.nunique().max()  # max domain size
 

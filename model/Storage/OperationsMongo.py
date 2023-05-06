@@ -75,7 +75,6 @@ class OperationsMongo(Operations.Operations):
         try:
             return self.__LocalCache.Load(name, type)
         except Exception as e :
-            print(f"### LOAD Error {str(e)}")
             collection = self.PROJECTDB[COLLECTION_DICT[type]]
             query = {"name": name}
             item = collection.find_one(query)
@@ -115,15 +114,12 @@ class OperationsMongo(Operations.Operations):
         for item in mongoList:
             finalNamesList.append(item)
         return finalNamesList
-        if(self.__cacheRule() is True):
-            print("### General Cache time miss 1")
-            print(type)
-            thread = threading.Thread(target=self.GetFullItemsList, args = (type,))
-            thread.start()
+        # if(self.__cacheRule() is True):
+        #     thread = threading.Thread(target=self.GetFullItemsList, args = (type,))
+        #     thread.start()
             
-        else:
-            print("### General Cache time hit 1")
-            return self.__LocalCache.GetListWithSpecificAttributes(type, attributeList)
+        # else:
+        #     return self.__LocalCache.GetListWithSpecificAttributes(type, attributeList)
     
     def GetListWithSpecificAttributesWithName(self, name, type, attributeList):
         collection = self.PROJECTDB[COLLECTION_DICT[type]]
@@ -133,21 +129,18 @@ class OperationsMongo(Operations.Operations):
         for item in mongoList:
             finalNamesList.append(item)
         return finalNamesList
-        if(self.__cacheRule() is True):
-            print("### General Cache time miss 2")
-            thread = threading.Thread(target=self.GetFullItemsList, args = (type,))
-            thread.start()
+        # if(self.__cacheRule() is True):
+        #     thread = threading.Thread(target=self.GetFullItemsList, args = (type,))
+        #     thread.start()
             
         
-        else:
-            print("### General Cache time hit 2")
-            return self.__LocalCache.GetListWithSpecificAttributesWithName(name,type,attributeList)
+        # else:
+        #     return self.__LocalCache.GetListWithSpecificAttributesWithName(name,type,attributeList)
 
     def DeleteItemsByTypeAndFilter(self,itemType,filter):
         if itemType in COLLECTION_DICT:
             collection = self.PROJECTDB[COLLECTION_DICT[itemType]]
             result = collection.delete_many(filter)
-            print(f'{result.deleted_count} documents were deleted.')
             deleted_names = []
             for doc in collection.find(filter, {"name": 1}):
                 deleted_names.append(doc["name"])

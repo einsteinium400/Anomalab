@@ -142,30 +142,45 @@ class Model:
         return jsonData
 
     # Classify a new sample
-    def classify_vectorspace(self, vector):
-        # finds the closest cluster centroid
-        # returns that cluster's index
+    def check_sample(self, vector):
         means = self._meanValues
+        clustersInfo = self._clusters
+        print ('cluster info is: ', self._clusters)
+        print ('means: ',means)
         types=self._fieldTypes
         distanceFunc = self._distanceFunctionRefrence
         best_distance = best_index = None
         distances = []
         distancesVectors = []
+        standarizeDistancesVectors=[]
+
         hyperParmas = self._hyperParams
         for index in range(len(means)):
             mean = means[index]
-            distanceVector = []
-            for attribute in range(len(vector)):
-                vectorCopy=copy.deepcopy(mean)
-                vectorCopy[attribute]=vector[attribute]
-                distanceVector.append(distanceFunc(vectorCopy, mean, types, hyperParmas))
-            distancesVectors.append(distanceVector)
-            dist = distanceFunc(vector, mean, types, hyperParmas)
+            averageDistances = clustersInfo[index]['averageDistances']
+            stdDevs = clustersInfo[index]['meansStdDev']
+            print ('$$$$cluster number ',index,' $$$$$$$$$$$$$$$$')
+            print ('averageDistances: ',averageDistances)
+            print ('stdDevs: ',stdDevs)
+            distance, results = distanceFunc(vector, mean, types, hyperParmas)
+            distancesVectors.append(results)
+            print ('results: ', results)
+            standarizeDistances = []
+            for i in range(len(results)):
+                delta = results[i]-averageDistances[i]
+                if (delta <= 0):
+                    standarizeDistances.append(0)
+                elif (stdDevs[i]==0):
+                    standarizeDistances.append(5)
+                else:
+                    standarizeDistances.append(delta/(stdDevs[i]))
+            print ('standarizeDistances: ', standarizeDistances)
+            standarizeDistancesVectors.append(standarizeDistances)
             cluster_info = {
                 "cluster": index,
-                "distance": dist
+                "distance": distance
             }
             distances.append(cluster_info)
-            if best_distance is None or dist < best_distance:
-                best_index, best_distance = index, dist
-        return best_index, distances, distancesVectors
+            if best_distance is None or distance < best_distance:
+                best_index, best_distance = index, distance
+        return best_index, distances, distancesVectors, standarizeDistancesVectors
