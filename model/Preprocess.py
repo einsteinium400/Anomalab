@@ -3,18 +3,18 @@ from model.GeneticAlgorithm import genetic_algorithm
 import numpy as np
 from itertools import permutations
 from kneed import KneeLocator
+from model.elbow import elbowLocator
 import matplotlib.pyplot as plt
 from distanceFunctions.Hamming import Hamming as hm
 from model.KMeanClusterer import KMeansClusterer
 
-MAX_CLUSTERS_IN_ELBOW = 7
-DEFAULT_ELBOW = 3
+MAX_CLUSTERS_IN_ELBOW = 10
 
 def apply_elbow_method(fields_data, vectors, distance_function):
     wcss=[]
     tries = 0
     i=1
-    while i < MAX_CLUSTERS_IN_ELBOW:
+    while i <= MAX_CLUSTERS_IN_ELBOW:
         flag = False
         try:
             model = KMeansClusterer(hyper_params=dict(), distance=hm, num_means=int(i), type_of_fields=fields_data, repeats=2)
@@ -41,13 +41,8 @@ def apply_elbow_method(fields_data, vectors, distance_function):
             tries = 0
         i+=1
     print("wcss list is: ", wcss)
-    kneedle = KneeLocator(range(1, i), wcss, curve='convex', direction='decreasing')
-    elbow_point = kneedle.elbow
-    if not isinstance(elbow_point,int):
-        elbow_point=DEFAULT_ELBOW
-        print("could not generate elbow point, use default value", elbow_point)
-    else:
-        print('elbow point is:', elbow_point)
+    elbow_point = elbowLocator(wcss)
+    print('elbow point is:', elbow_point)
     return elbow_point
 
 def create_array(i, len, v):
