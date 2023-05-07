@@ -205,6 +205,7 @@ class KMeansClusterer:
             self._average_distance_list[index] /= len(clusters[index])
             for i in range (numberOfFeatures):
                 self._averageOfDistances[index][i] = sumOfDistances[i] / len(clusters[index])
+                
         # calculate variance
         for index in range(numberOfClusters):
             self._variance_list[index] = 0

@@ -7,6 +7,8 @@ from model import modular_distance_utils
 from model.Storage.StorageFactory import StorageFactory
 #from controller.DistanceFunctionController import DistanceFunctionController
 
+OFF_SCALE = 5
+
 
 class Model:
     _id = 0
@@ -149,11 +151,9 @@ class Model:
         print ('means: ',means)
         types=self._fieldTypes
         distanceFunc = self._distanceFunctionRefrence
-        best_distance = best_index = None
-        distances = []
+        clustersDistances = []
         distancesVectors = []
         standarizeDistancesVectors=[]
-
         hyperParmas = self._hyperParams
         for index in range(len(means)):
             mean = means[index]
@@ -171,16 +171,28 @@ class Model:
                 if (delta <= 0):
                     standarizeDistances.append(0)
                 elif (stdDevs[i]==0):
-                    standarizeDistances.append(5)
+                    standarizeDistances.append(OFF_SCALE)
                 else:
                     standarizeDistances.append(delta/(stdDevs[i]))
             print ('standarizeDistances: ', standarizeDistances)
             standarizeDistancesVectors.append(standarizeDistances)
+            delta = distance-clustersInfo[index]['average_cluster_distance']
+            standarizeDistance = 0
+            if (delta <= 0):
+                standarizeDistance=0
+            elif (clustersInfo[index]['variance']==0):
+                standarizeDistance=OFF_SCALE
+            else:
+                standarizeDistance=delta/clustersInfo[index]['variance']
             cluster_info = {
-                "cluster": index,
-                "distance": distance
+                "distance": distance,
+                "standarizeDistance": standarizeDistance
             }
-            distances.append(cluster_info)
-            if best_distance is None or distance < best_distance:
-                best_index, best_distance = index, distance
-        return best_index, distances, distancesVectors, standarizeDistancesVectors
+            clustersDistances.append(cluster_info)
+        returnObject = {
+            "overall": clustersDistances,
+            "distancesVectors": distancesVectors,
+            "standarizeDistancesVectors": standarizeDistancesVectors,
+            "means": means
+        }
+        return returnObject

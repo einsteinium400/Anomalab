@@ -172,23 +172,39 @@ class Results(Screen):
         self.ids.modelName.text=f'Model: {app.modelsList[0]["name"]}'
         model = app.modelController.GetModel(app.modelsList[0]['name'])
         answer=checkSampleForAnomaly(model, app.query)
-        anomalies=answer['anomaly']
-        clusterNumber=answer['clusterNumber']
-        distances=answer['detailedDistances']
-        fullData=answer['predictionFullData']
         table_width = dp(Window.size[0]*9/50)
         self.data=[]
-        print ("attribute list: ", app.attributesList)
-        print ("anomalies: ", anomalies)
-        print ("classified cluster: ", clusterNumber)
-        print ("distances: ", distances)
-        print ("fullData: ", fullData)
-        for i in range(len(distances[clusterNumber])):
+        '''{
+            'anomaly': True,
+            'closestCluster': 2,
+            'overallDistance': 4,
+            'overallStandarizeDistance': 2.6613418530351445,
+            'distances': [1, 1, 1, 1, 0],
+            'standarizeDistances': [1.5013410820738637, 1.5013410820738637, 1.6856564395318838, 1.3502799020771536, 0],
+            'clusterCenter': [6.669767441860466, 3.0186046511627898, 5.602325581395347, 2.051162790697674, 2.0]
+        }'''
+        row = []
+        row.append('[size=24]overall[/size]')
+        row.append('[size=24]'+str(answer['overallStandarizeDistance'])+'[/size]')
+        row.append('[size=24]'+str(answer['anomaly'])+'[/size]')
+        string='[size=24]'+str(answer['overallDistance'])+'[/size]'
+        if answer['overallStandarizeDistance']>2:
+            string='[color=ff3333]'+string+'[/color]'
+        elif answer['overallStandarizeDistance']>1:
+            string='[color=ffff00]'+string+'[/color]'
+        row.append(string)
+        self.data.append(row)
+        for i in range(len(answer['distances'])):
             row = []
-            row.append('[size=40]'+app.attributesList[i]['name']+'[/size]')
-            row.append(fullData[clusterNumber]['mean'][i])
-            row.append(app.query[i])
-            row.append(distances[clusterNumber][i])
+            row.append('[size=20]'+app.attributesList[i]['name']+'[/size]')
+            row.append('[size=20]'+str(answer['clusterCenter'][i])+'[/size]')
+            row.append('[size=20]'+str(app.query[i])+'[/size]')
+            string='[size=20]'+str(answer['distances'][i])+'[/size]'
+            if answer['standarizeDistances'][i]>2:
+                string='[color=ff3333]'+string+'[/color]'
+            elif answer['standarizeDistances'][i]>1:
+                string='[color=ffff00]'+string+'[/color]'
+            row.append(string)
             self.data.append(row)
         dataRows = len(self.data)
         pagination = False
@@ -198,10 +214,10 @@ class Results(Screen):
             use_pagination = pagination,
             rows_num = dataRows,
             column_data = [
-                ("Attribute", dp (table_width*0.25)),
-                ("Cluster mean", dp (table_width*0.25)),
-                ("Sample", dp (table_width*0.25)),
-                ("Distance", dp (table_width*0.25)),
+                ("[size=32]Attribute[/size]", dp (table_width*0.25)),
+                ("[size=32]Cluster mean[/size]", dp (table_width*0.25)),
+                ("[size=32]Sample[/size]", dp (table_width*0.25)),
+                ("[size=32]Distance[/size]", dp (table_width*0.25)),
             ],
             row_data = self.data
         )

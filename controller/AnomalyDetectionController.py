@@ -1,37 +1,25 @@
-numberOfStdDev = 2
+ANOMALY_DEFINITION_STD_DEV = 2
 
 def checkSampleForAnomaly(model,sample):
-    
-    def checkAnomaly(clusterJson):
-        return (clusterJson['distance_from_centroid'] >= (numberOfStdDev*clusterJson['variance'] + clusterJson['average_cluster_distance']))
-
-    def mergeClassifcationData(model,classifedClusterIndex,classifedClusterDistancesInfo):
-        classicationData = {
-            "classifiedCluster": classifedClusterIndex,
-        }
-        modelData = model.JsonData
-        #print ('modelData: ',modelData)
-        classicationData['fullClusteringInfo'] = modelData
-        for cluster in classicationData['fullClusteringInfo']['clusters_info']:
-            for singleClassficationData in classifedClusterDistancesInfo:
-                if(cluster['cluster'] == singleClassficationData['cluster']):
-                    cluster['distance_from_centroid'] = singleClassficationData['distance']
-        return classicationData
-    
-    fakeSample = sample
-    cluster,distances,detailedDistances, standardizeDistances = model.check_sample(fakeSample)
-    #print("detailed distances: ", detailedDistances)
-    #print("Classifed Cluster: ", cluster)
-    predictionFullData = mergeClassifcationData(model,cluster,distances)
-    answer = {}
-    answer['anomaly'] = []
-    answer['clusterNumber'] = cluster
-    answer['detailedDistances'] = detailedDistances
-    answer['predictionFullData'] = predictionFullData['fullClusteringInfo']['clusters_info']
-    for clusterJson in answer['predictionFullData']:
-        #print ("clusterJson: ", clusterJson)
-        if(checkAnomaly(clusterJson)):
-            answer['anomaly'].append(True)
-        else:
-            answer['anomaly'].append(False)
+    anomalyData = model.check_sample(sample)
+    print("anomalyData:", anomalyData)
+    overall = anomalyData['overall']
+    clustersNumber = len(overall)
+    closestCluster = 0
+    anomaly=False
+    for i in range(clustersNumber):
+        if overall[i]['standarizeDistance']<overall[closestCluster]['standarizeDistance']:
+            closestCluster=i
+    if overall[closestCluster]['standarizeDistance']>ANOMALY_DEFINITION_STD_DEV:
+        anomaly = True
+    answer = {
+        'anomaly' : anomaly,
+        'closestCluster' : closestCluster,
+        'overallDistance' : overall[closestCluster]['distance'],
+        'overallStandarizeDistance' : overall[closestCluster]['standarizeDistance'],
+        'distances' : anomalyData['distancesVectors'][closestCluster],
+        'standarizeDistances' : anomalyData['standarizeDistancesVectors'][closestCluster],
+        'clusterCenter': anomalyData['means'][closestCluster]
+    }
+    print ('answer:',answer)
     return answer

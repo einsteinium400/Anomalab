@@ -1,5 +1,3 @@
-FIRST_POINT = 1
-
 def elbowLocator(wcssArr):
     size = len(wcssArr)
     ##arr in size 1 or 2 dealing
