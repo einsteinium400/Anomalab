@@ -2,21 +2,25 @@ ANOMALY_DEFINITION_STD_DEV = 2
 
 def checkSampleForAnomaly(model,sample):
     anomalyData = model.check_sample(sample)
-    print("anomalyData:", anomalyData)
-    overall = anomalyData['overall']
-    clustersNumber = len(overall)
+    ##print("anomalyData:", anomalyData)
+    clustersInfo = anomalyData['clustersInfo']
+    clustersNumber = len(clustersInfo)
     closestCluster = 0
     anomaly=False
     for i in range(clustersNumber):
-        if overall[i]['standarizeDistance']<overall[closestCluster]['standarizeDistance']:
+        print (f"clusterDistance {i} : {clustersInfo[i]['distance']}")
+        print (f"maxDistance {i} : {clustersInfo[i]['maxDistance']}")
+        print (f"stdDistance {i} : {clustersInfo[i]['standarizeDistance']}")
+        if clustersInfo[i]['standarizeDistance']<clustersInfo[closestCluster]['standarizeDistance']:
             closestCluster=i
-    if overall[closestCluster]['standarizeDistance']>ANOMALY_DEFINITION_STD_DEV:
+    if clustersInfo[closestCluster]['standarizeDistance']>ANOMALY_DEFINITION_STD_DEV:
         anomaly = True
     answer = {
         'anomaly' : anomaly,
         'closestCluster' : closestCluster,
-        'overallDistance' : overall[closestCluster]['distance'],
-        'overallStandarizeDistance' : overall[closestCluster]['standarizeDistance'],
+        'clusterDistance' : clustersInfo[closestCluster]['distance'],
+        'maxDistance' : clustersInfo[closestCluster]['maxDistance'],
+        'clusterStandarizeDistance' : clustersInfo[closestCluster]['standarizeDistance'],
         'distances' : anomalyData['distancesVectors'][closestCluster],
         'standarizeDistances' : anomalyData['standarizeDistancesVectors'][closestCluster],
         'clusterCenter': anomalyData['means'][closestCluster]

@@ -158,13 +158,14 @@ class Model:
         for index in range(len(means)):
             mean = means[index]
             averageDistances = clustersInfo[index]['averageDistances']
-            stdDevs = clustersInfo[index]['meansStdDev']
+            stdDevs = clustersInfo[index]['clusterStdDevs']
+            maxDistance = clustersInfo[index]['clusterMaxDistance']
+            averageDistances = clustersInfo[index]['averageDistances']
             print ('$$$$cluster number ',index,' $$$$$$$$$$$$$$$$')
-            print ('averageDistances: ',averageDistances)
-            print ('stdDevs: ',stdDevs)
+            print ('maxDistances: ',maxDistance)
             distance, results = distanceFunc(vector, mean, types, hyperParmas)
             distancesVectors.append(results)
-            print ('results: ', results)
+            print ('sample distance: ', distance)
             standarizeDistances = []
             for i in range(len(results)):
                 delta = results[i]-averageDistances[i]
@@ -186,11 +187,15 @@ class Model:
                 standarizeDistance=delta/clustersInfo[index]['variance']
             cluster_info = {
                 "distance": distance,
-                "standarizeDistance": standarizeDistance
+                "standarizeDistance": standarizeDistance,
+                "maxDistance": maxDistance,
+                "averageDistance": clustersInfo[index]['average_cluster_distance'],
+                "delta" : delta,
+                "stdDev" : clustersInfo[index]['variance'],
             }
             clustersDistances.append(cluster_info)
         returnObject = {
-            "overall": clustersDistances,
+            "clustersInfo": clustersDistances,
             "distancesVectors": distancesVectors,
             "standarizeDistancesVectors": standarizeDistancesVectors,
             "means": means

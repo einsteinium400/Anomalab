@@ -174,23 +174,22 @@ class Results(Screen):
         answer=checkSampleForAnomaly(model, app.query)
         table_width = dp(Window.size[0]*9/50)
         self.data=[]
-        '''{
-            'anomaly': True,
-            'closestCluster': 2,
-            'overallDistance': 4,
-            'overallStandarizeDistance': 2.6613418530351445,
-            'distances': [1, 1, 1, 1, 0],
-            'standarizeDistances': [1.5013410820738637, 1.5013410820738637, 1.6856564395318838, 1.3502799020771536, 0],
-            'clusterCenter': [6.669767441860466, 3.0186046511627898, 5.602325581395347, 2.051162790697674, 2.0]
-        }'''
+        '''
+            {'anomaly': False,
+            'closestCluster': 3,
+            'clusterDistance': 5,
+            'clusterStandarizeDistance': 0.5465968586387431,
+            'distances': [1, 0, 0, 1, 0, 0, 1, 1, 1],
+            'standarizeDistances': [0.29862068234903855, 0, 0, 1.4174534602330349, 0, 0, 0, 0.6702046791291495, 1.0615184269479903], 'clusterCenter': [37.46788990825688, 1.0, 1.688073394495413, 1.0, 0.0, 0.0, 3437.577981651376, 18.73394495412844, 1.0]}
+        '''
         row = []
         row.append('[size=24]overall[/size]')
-        row.append('[size=24]'+str(answer['overallStandarizeDistance'])+'[/size]')
+        row.append('[size=24]'+str(answer['clusterStandarizeDistance'])+'[/size]')
         row.append('[size=24]'+str(answer['anomaly'])+'[/size]')
-        string='[size=24]'+str(answer['overallDistance'])+'[/size]'
-        if answer['overallStandarizeDistance']>2:
+        string='[size=24]'+str(answer['clusterDistance'])+'[/size]'
+        if answer['clusterStandarizeDistance']>2:
             string='[color=ff3333]'+string+'[/color]'
-        elif answer['overallStandarizeDistance']>1:
+        elif answer['clusterStandarizeDistance']>1:
             string='[color=ffff00]'+string+'[/color]'
         row.append(string)
         self.data.append(row)

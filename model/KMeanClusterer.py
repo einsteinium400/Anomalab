@@ -22,7 +22,10 @@ class KMeansClusterer:
         self._mean_values = mean_values
         self._type_of_fields = type_of_fields
         self._means = None
-        self._meansStdDev = []
+        ##NOAM LINES FOR ANOMALIES
+        self._clustersStdDev = []
+        self._clustersMaxDistances = []
+        ##
         self._max_difference = conv_test
         self._wcss = None
         self._normalized_wcss=None
@@ -47,7 +50,8 @@ class KMeansClusterer:
                     "variance": self._variance_list[i],
                     "mean": self._means[i].tolist(),
                     "averageDistances": self._averageOfDistances[i],
-                    "meansStdDev": self._meansStdDev[i],
+                    "clusterStdDevs": self._clustersStdDevs[i],
+                    "clusterMaxDistance": self._clustersMaxDistances[i]
                 }
             )
         jsonData['clusters_info'] = listObj
@@ -125,8 +129,11 @@ class KMeansClusterer:
     def get_means(self):
         return self._means
     
-    def get_meansStdDev(self):
-        return self._meansStdDev
+    def get_clusterStdDevs(self):
+        return self._clusterStdDevs
+    
+    def get_clustersMaxDistances(self):
+        return self._clustersMaxDistances
     
     def get_averageOfDistances(self):
         return self._averageOfDistances
@@ -187,25 +194,37 @@ class KMeansClusterer:
     def _variance_average_calculate(self, clusters):
         numberOfFeatures = len(self._means[0])
         numberOfClusters = len(self._means)
+        
         self._average_distance_list = [[0] for _ in range(numberOfClusters)]
         self._variance_list = [[0] for _ in range(numberOfClusters)]
-        self._meansStdDev = [[] for _ in range(numberOfClusters)]
+        self._clustersStdDevs = [[] for _ in range(numberOfClusters)]
         self._averageOfDistances = [[] for _ in range(numberOfClusters)]
-
+        
+        ##init variable of max distances in each cluster
+        self._clustersMaxDistances = []
+        
         # calculate average mean
         for index in range(numberOfClusters):
+            maxDistance = 0
             self._average_distance_list[index] = 0
             sumOfDistances = [0 for _ in range(numberOfFeatures)]
             self._averageOfDistances[index] = [0 for _ in range(numberOfFeatures)]
             for vec in clusters[index]:
+                ##check distance between vec in cluster with the cluster mean
                 distance , results = self._distance(vec, self._means[index], self._type_of_fields,self._hyper_parameters)
+                ##check for max distance
+                if distance > maxDistance:
+                    maxDistance=distance
+                ##sum total distance for average calculate
                 self._average_distance_list[index] += distance
+                ##sum each distances for average calculate
                 for i in range(numberOfFeatures):
                     sumOfDistances[i]+=results[i]
+            self._clustersMaxDistances.append(maxDistance)
             self._average_distance_list[index] /= len(clusters[index])
             for i in range (numberOfFeatures):
                 self._averageOfDistances[index][i] = sumOfDistances[i] / len(clusters[index])
-                
+            
         # calculate variance
         for index in range(numberOfClusters):
             self._variance_list[index] = 0
@@ -219,11 +238,11 @@ class KMeansClusterer:
             if len(clusters[index])<2:
                 self._variance_list[index]=0
                 for i in range(numberOfFeatures):
-                    self._meansStdDev[index].append(0)
+                    self._clustersStdDevs[index].append(0)
             else:
                 self._variance_list[index] /= (len(clusters[index])-1)
                 for i in range(numberOfFeatures):
-                    self._meansStdDev[index].append(math.sqrt(squareDeltaDistances[i]/(len(clusters[index])-1)))
+                    self._clustersStdDevs[index].append(math.sqrt(squareDeltaDistances[i]/(len(clusters[index])-1)))
 
     def _sum_distances(self, vectors1, vectors2):
         difference = 0.0
