@@ -33,11 +33,11 @@ def Statistic(u, v, type_values, parameters):
                 fr_v = f_freq(parameters["frequencies"][str(i)][str(int(v[int(i)]))], theta1, betha, theta2, gamma)
                 m_fk = parameters["minimum_freq_of_each_attribute"][str(i)]
                 d_fr = (abs(fr_u - fr_v) + m_fk) / max(fr_u, fr_v)
-                results.append(max(d_fr, theta, f_v_ak))
+                results.append(abs(max(d_fr, theta, f_v_ak)))
                 distance+=pow(max(d_fr, theta, f_v_ak), 2)
         # numberic handle
         else:
-            results.append(np.int64(u[i]) - np.int64(v[i]))
+            results.append(abs(np.int64(u[i]) - np.int64(v[i])))
             distance+=pow(np.int64(u[i]) - np.int64(v[i]), 2)
     
     distance = math.sqrt(distance)

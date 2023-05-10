@@ -1,5 +1,7 @@
+REPEATS_NUM = 5
+
 import json
-import traceback
+#import traceback
 import numpy as np
 import math
 import model.utils as utils
@@ -10,7 +12,7 @@ class KMeansClusterer:
             self,
             num_means,  # k value
             distance,  # distance function
-            repeats=1,
+            repeats = REPEATS_NUM,
             mean_values=None,
             conv_test=1e-6,  # threshold for converging
             type_of_fields=None,
@@ -23,14 +25,15 @@ class KMeansClusterer:
         self._type_of_fields = type_of_fields
         self._means = None
         ##NOAM LINES FOR ANOMALIES
-        self._clustersStdDev = []
-        self._clustersMaxDistances = []
+        self.clustersAverageDistance = None
+        self.clustersStdDev = None
+        self.clustersMaxDistances = None
+        self.attributesAverageDistances = None
+        self.attributesStdDevs = None
         ##
         self._max_difference = conv_test
         self._wcss = None
         self._normalized_wcss=None
-        self._variance_list = []
-        self._average_distance_list = []
         self._clusters_info = []
         self._model_json_info = 0
         self._hyper_parameters = hyper_params
@@ -46,12 +49,12 @@ class KMeansClusterer:
             listObj.append(
                 {
                     "cluster": i,
-                    "average_cluster_distance": self._average_distance_list[i],
-                    "variance": self._variance_list[i],
                     "mean": self._means[i].tolist(),
-                    "averageDistances": self._averageOfDistances[i],
-                    "clusterStdDevs": self._clustersStdDevs[i],
-                    "clusterMaxDistance": self._clustersMaxDistances[i]
+                    "averageDistance": self.clustersAverageDistance[i],
+                    "maxDistance": self.clustersMaxDistances[i],
+                    "stdDev": self.clustersStdDev[i],
+                    "attributesAverageDistances": self.attributesAverageDistances[i],
+                    "attributesStdDevs": self.attributesStdDevs[i],
                 }
             )
         jsonData['clusters_info'] = listObj
@@ -120,24 +123,9 @@ class KMeansClusterer:
     def get_wcss(self):
         return self._wcss
 
-    def get_variance(self):
-        return self._variance_list
-
-    def get_average_distance_list(self):
-        return self._average_distance_list
-
     def get_means(self):
         return self._means
     
-    def get_clusterStdDevs(self):
-        return self._clusterStdDevs
-    
-    def get_clustersMaxDistances(self):
-        return self._clustersMaxDistances
-    
-    def get_averageOfDistances(self):
-        return self._averageOfDistances
-
     def calculate_normalized_wcss(self, clusters):
 
         normalized_clusters = []
@@ -191,24 +179,23 @@ class KMeansClusterer:
 
         self._wcss = wcss
         #DO NOT DELETE THIS
-    def _variance_average_calculate(self, clusters):
+
+    def _stdVar_average_calculate(self, clusters):
         numberOfFeatures = len(self._means[0])
         numberOfClusters = len(self._means)
         
-        self._average_distance_list = [[0] for _ in range(numberOfClusters)]
-        self._variance_list = [[0] for _ in range(numberOfClusters)]
-        self._clustersStdDevs = [[] for _ in range(numberOfClusters)]
-        self._averageOfDistances = [[] for _ in range(numberOfClusters)]
+        self.clustersAverageDistance = []
+        self.clustersStdDev = []
+        self.attributesStdDevs = [[] for _ in range(numberOfClusters)]
+        self.attributesAverageDistances = [[] for _ in range(numberOfClusters)]
+        self.clustersMaxDistances = []
         
-        ##init variable of max distances in each cluster
-        self._clustersMaxDistances = []
-        
-        # calculate average mean
+        # calculate average
         for index in range(numberOfClusters):
             maxDistance = 0
-            self._average_distance_list[index] = 0
-            sumOfDistances = [0 for _ in range(numberOfFeatures)]
-            self._averageOfDistances[index] = [0 for _ in range(numberOfFeatures)]
+            sumOfTotalDistance = 0
+            sumOfAttributesDistances = [0 for _ in range(numberOfFeatures)]
+            self.attributesAverageDistances[index] = [0 for _ in range(numberOfFeatures)]
             for vec in clusters[index]:
                 ##check distance between vec in cluster with the cluster mean
                 distance , results = self._distance(vec, self._means[index], self._type_of_fields,self._hyper_parameters)
@@ -216,33 +203,33 @@ class KMeansClusterer:
                 if distance > maxDistance:
                     maxDistance=distance
                 ##sum total distance for average calculate
-                self._average_distance_list[index] += distance
+                sumOfTotalDistance += distance
                 ##sum each distances for average calculate
                 for i in range(numberOfFeatures):
-                    sumOfDistances[i]+=results[i]
-            self._clustersMaxDistances.append(maxDistance)
-            self._average_distance_list[index] /= len(clusters[index])
+                    sumOfAttributesDistances[i]+=abs(results[i])
+            self.clustersMaxDistances.append(maxDistance)
+            self.clustersAverageDistance.append(sumOfTotalDistance/len(clusters[index]))
             for i in range (numberOfFeatures):
-                self._averageOfDistances[index][i] = sumOfDistances[i] / len(clusters[index])
+                self.attributesAverageDistances[index][i] = sumOfAttributesDistances[i] / len(clusters[index])
             
-        # calculate variance
+        # calculate standard deviation
         for index in range(numberOfClusters):
-            self._variance_list[index] = 0
+            sumOfSquareDistances = 0
             squareDeltaDistances = [0 for _ in range(numberOfFeatures)]
             for vec in clusters[index]:
                 distance , results = self._distance(vec, self._means[index], self._type_of_fields,self._hyper_parameters)
                 for i in range(numberOfFeatures):
-                    squareDeltaDistances[i] += (results[i]-self._averageOfDistances[index][i])**2
-                self._variance_list[index] += (distance - self._average_distance_list[index]) ** 2
+                    squareDeltaDistances[i] += (results[i]-self.attributesAverageDistances[index][i])**2
+                sumOfSquareDistances += (distance - self.clustersAverageDistance[index]) ** 2
             ##deal with clusters with only one data sample
             if len(clusters[index])<2:
-                self._variance_list[index]=0
+                self.clustersStdDev.append(0)
                 for i in range(numberOfFeatures):
-                    self._clustersStdDevs[index].append(0)
+                    self.attributesStdDevs[index].append(0)
             else:
-                self._variance_list[index] /= (len(clusters[index])-1)
+                self.clustersStdDev.append(math.sqrt(sumOfSquareDistances/(len(clusters[index])-1)))
                 for i in range(numberOfFeatures):
-                    self._clustersStdDevs[index].append(math.sqrt(squareDeltaDistances[i]/(len(clusters[index])-1)))
+                    self.attributesStdDevs[index].append(math.sqrt(squareDeltaDistances[i]/(len(clusters[index])-1)))
 
     def _sum_distances(self, vectors1, vectors2):
         difference = 0.0
@@ -316,7 +303,7 @@ class KMeansClusterer:
                     self._wcss_calculate(clusters)
                     #self.calculate_normalized_wcss(clusters)
                     # calculate variance and average distance
-                    self._variance_average_calculate(clusters)
+                    self._stdVar_average_calculate(clusters)
             self._clusters_info = clusters
             self.createClusterJson()
             #print ('cluster means: ', self._means)

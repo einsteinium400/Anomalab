@@ -169,40 +169,33 @@ class Query(Screen):
 class Results(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
-        self.ids.modelName.text=f'Model: {app.modelsList[0]["name"]}'
         model = app.modelController.GetModel(app.modelsList[0]['name'])
         answer=checkSampleForAnomaly(model, app.query)
+        self.ids.result.text=f'Model: {app.modelsList[0]["name"]}'
+        self.ids.result.text=f'Model: {app.modelsList[0]["name"]}'
         table_width = dp(Window.size[0]*9/50)
         self.data=[]
-        '''
-            {'anomaly': False,
-            'closestCluster': 3,
-            'clusterDistance': 5,
-            'clusterStandarizeDistance': 0.5465968586387431,
-            'distances': [1, 0, 0, 1, 0, 0, 1, 1, 1],
-            'standarizeDistances': [0.29862068234903855, 0, 0, 1.4174534602330349, 0, 0, 0, 0.6702046791291495, 1.0615184269479903], 'clusterCenter': [37.46788990825688, 1.0, 1.688073394495413, 1.0, 0.0, 0.0, 3437.577981651376, 18.73394495412844, 1.0]}
-        '''
         row = []
         row.append('[size=24]overall[/size]')
-        row.append('[size=24]'+str(answer['clusterStandarizeDistance'])+'[/size]')
-        row.append('[size=24]'+str(answer['anomaly'])+'[/size]')
-        string='[size=24]'+str(answer['clusterDistance'])+'[/size]'
-        if answer['clusterStandarizeDistance']>2:
+        row.append('[size=24]'+str(answer['maxDistance'])+'[/size]')
+        row.append('[size=24]'+str(answer['distance'])+'[/size]')
+        string='[size=24]'+str(answer['anomaly'])+'[/size]'
+        if answer['anomaly']==True:
             string='[color=ff3333]'+string+'[/color]'
-        elif answer['clusterStandarizeDistance']>1:
+        else:
             string='[color=ffff00]'+string+'[/color]'
         row.append(string)
         self.data.append(row)
-        for i in range(len(answer['distances'])):
+        for i in range(len(answer['results'])):
             row = []
             row.append('[size=20]'+app.attributesList[i]['name']+'[/size]')
-            row.append('[size=20]'+str(answer['clusterCenter'][i])+'[/size]')
+            row.append('[size=20]'+str(answer['mean'][i])+'[/size]')
             row.append('[size=20]'+str(app.query[i])+'[/size]')
-            string='[size=20]'+str(answer['distances'][i])+'[/size]'
-            if answer['standarizeDistances'][i]>2:
-                string='[color=ff3333]'+string+'[/color]'
-            elif answer['standarizeDistances'][i]>1:
-                string='[color=ffff00]'+string+'[/color]'
+            string='[size=20]'+str(answer['results'][i])+'[/size]'
+            #if answer['standarizeDistances'][i]>2:
+                #string='[color=ff3333]'+string+'[/color]'
+            #elif answer['standarizeDistances'][i]>1:
+                #string='[color=ffff00]'+string+'[/color]'
             row.append(string)
             self.data.append(row)
         dataRows = len(self.data)

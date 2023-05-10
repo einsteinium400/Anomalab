@@ -1,14 +1,9 @@
-
 import uuid
 import time
-import copy
 
 from model import modular_distance_utils
 from model.Storage.StorageFactory import StorageFactory
 #from controller.DistanceFunctionController import DistanceFunctionController
-
-OFF_SCALE = 5
-
 
 class Model:
     _id = 0
@@ -147,57 +142,37 @@ class Model:
     def check_sample(self, vector):
         means = self._meanValues
         clustersInfo = self._clusters
-        print ('cluster info is: ', self._clusters)
-        print ('means: ',means)
-        types=self._fieldTypes
-        distanceFunc = self._distanceFunctionRefrence
-        clustersDistances = []
-        distancesVectors = []
-        standarizeDistancesVectors=[]
-        hyperParmas = self._hyperParams
+        returnObject = []
+        
         for index in range(len(means)):
+            print ('$$$$$$$$$$$$$$$$$$$$$   cluster number ',index,' $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
             mean = means[index]
-            averageDistances = clustersInfo[index]['averageDistances']
-            stdDevs = clustersInfo[index]['clusterStdDevs']
-            maxDistance = clustersInfo[index]['clusterMaxDistance']
-            averageDistances = clustersInfo[index]['averageDistances']
-            print ('$$$$cluster number ',index,' $$$$$$$$$$$$$$$$')
-            print ('maxDistances: ',maxDistance)
-            distance, results = distanceFunc(vector, mean, types, hyperParmas)
-            distancesVectors.append(results)
-            print ('sample distance: ', distance)
-            standarizeDistances = []
+            print ('mean',mean)
+            distance, results = self._distanceFunctionRefrence(vector, mean, self._fieldTypes, self._hyperParams)
             for i in range(len(results)):
-                delta = results[i]-averageDistances[i]
-                if (delta <= 0):
-                    standarizeDistances.append(0)
-                elif (stdDevs[i]==0):
-                    standarizeDistances.append(OFF_SCALE)
-                else:
-                    standarizeDistances.append(delta/(stdDevs[i]))
-            print ('standarizeDistances: ', standarizeDistances)
-            standarizeDistancesVectors.append(standarizeDistances)
-            delta = distance-clustersInfo[index]['average_cluster_distance']
-            standarizeDistance = 0
-            if (delta <= 0):
-                standarizeDistance=0
-            elif (clustersInfo[index]['variance']==0):
-                standarizeDistance=OFF_SCALE
-            else:
-                standarizeDistance=delta/clustersInfo[index]['variance']
-            cluster_info = {
+                results[i]=abs(results[i])
+            print ('distance',distance)
+            print ('results',results)
+            averageDistance = clustersInfo[index]['averageDistance']
+            maxDistance = clustersInfo[index]['maxDistance']
+            stdDev = clustersInfo[index]['stdDev']
+            attributesAverageDistances = clustersInfo[index]['attributesAverageDistances']
+            attributesStdDevs = clustersInfo[index]['attributesStdDevs']
+            print ("averageDistance",averageDistance)
+            print ("maxDistance",maxDistance)
+            print ("stdDev",stdDev)
+            print ("attributesAverageDistances",attributesAverageDistances)
+            print ("attributesStdDevs",attributesStdDevs)
+            clusterReturnObject = {
+                "num": index,
+                "mean": mean,
                 "distance": distance,
-                "standarizeDistance": standarizeDistance,
+                "results": results,
+                "averageDistance": averageDistance,
                 "maxDistance": maxDistance,
-                "averageDistance": clustersInfo[index]['average_cluster_distance'],
-                "delta" : delta,
-                "stdDev" : clustersInfo[index]['variance'],
+                "stdDev" : stdDev,
+                "attributesAverageDistances": attributesAverageDistances,
+                "attributesStdDevs": attributesStdDevs,
             }
-            clustersDistances.append(cluster_info)
-        returnObject = {
-            "clustersInfo": clustersDistances,
-            "distancesVectors": distancesVectors,
-            "standarizeDistancesVectors": standarizeDistancesVectors,
-            "means": means
-        }
+            returnObject.append(clusterReturnObject)
         return returnObject
