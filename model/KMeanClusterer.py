@@ -30,9 +30,12 @@ class KMeansClusterer:
         self.clustersMaxDistances = None
         self.attributesAverageDistances = None
         self.attributesStdDevs = None
+        
+        self.silhouette = None
         ##
         self._max_difference = conv_test
         self._wcss = None
+        
         self._normalized_wcss=None
         self._clusters_info = []
         self._model_json_info = 0
@@ -168,19 +171,51 @@ class KMeansClusterer:
         # self._normalized_wcss = wcss
         # print("calculated normalize wcss!!!", wcss)
 
-    def _wcss_calculate(self, clusters):
-      #  self.calculate_normalized_wcss()
+    def wcssSilhouetteCalculate(self, clusters):
         wcss = 0
-
+        
         for index in range(len(clusters)):
             for vec in clusters[index]:
                 distance, results = self._distance(vec, self._means[index], self._type_of_fields,self._hyper_parameters)
                 wcss += distance ** 2
 
         self._wcss = wcss
+        
+        if (len(clusters)<2):
+            silhouette=0
+            return
+        
+        totalSilhouette = 0
+        
+        totalVectors = 0
+        for cluster in clusters:
+            totalVectors+=len(cluster)
+
+        clustersRange = [*range(len(clusters))]
+        for index in range(len(clusters)):
+            for thisVector in clusters[index]:
+                sumInCluster = 0
+                sumOutCluster = 0
+                numOutCluster = 0
+                for otherVector in clusters[index]:
+                    distance, results = self._distance(vec, otherVector, self._type_of_fields,self._hyper_parameters)
+                    sumInCluster+=distance
+                clustersRange.remove(index)
+                for otherClusters in clustersRange:
+                    for otherVector in clusters[otherClusters]:
+                        distance, results = self._distance(vec, otherVector, self._type_of_fields,self._hyper_parameters)
+                        sumOutCluster+=distance
+                        numOutCluster+=1
+                clustersRange.append(index)
+                ai = sumInCluster/len(clusters[index])
+                bi = sumOutCluster/numOutCluster
+                si = (bi-ai)/max(ai,bi)
+                totalSilhouette+=si
+        silhouette = totalSilhouette/totalVectors
+        print ('silouette is:',totalSilhouette)
         #DO NOT DELETE THIS
 
-    def _stdVar_average_calculate(self, clusters):
+    def metaDataCalculation(self, clusters):
         numberOfFeatures = len(self._means[0])
         numberOfClusters = len(self._means)
         
@@ -299,11 +334,12 @@ class KMeansClusterer:
 
                 if difference < self._max_difference:
                     converged = True
-                    # calculate wcss score
-                    self._wcss_calculate(clusters)
-                    #self.calculate_normalized_wcss(clusters)
                     # calculate variance and average distance
-                    self._stdVar_average_calculate(clusters)
+                    self.metaDataCalculation(clusters)
+                    # calculate wcss score
+                    self.wcssSilhouetteCalculate(clusters)
+                    #self.calculate_normalized_wcss(clusters)
+
             self._clusters_info = clusters
             self.createClusterJson()
             #print ('cluster means: ', self._means)
