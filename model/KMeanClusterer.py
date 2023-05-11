@@ -46,6 +46,7 @@ class KMeansClusterer:
     def createClusterJson(self):
         jsonData = {
             "wcss_score_of_model": self._wcss,
+            "silhouette": self.silhouette,
         }
         listObj = []
         for i in range(len(self._means)):
@@ -125,81 +126,50 @@ class KMeansClusterer:
 
     def get_wcss(self):
         return self._wcss
+    
+    def get_silhouette(self):
+        return self.silhouette
 
     def get_means(self):
         return self._means
     
-    def calculate_normalized_wcss(self, clusters):
-
-        normalized_clusters = []
-        cluster_std = self._overall_std
-        
-        for index in range(len(clusters)):
-            # Compute the mean and standard deviation of the current cluster
-            cluster_mean = self._means[index]
-            # Normalize each element in the current cluster and append the results to the normalized_clusters list
-            normalized_cluster = [(item - cluster_mean) / cluster_std for item in clusters[index]]
-            normalized_clusters.append(normalized_cluster)
-
-        wcss = 0
-
-        for index in range(len(normalized_clusters)):
-            for vec in clusters[index]:
-                distance , results = self._distance(vec, self._means[index], self._type_of_fields,self._hyper_parameters)
-                wcss +=  distance** 2
-
-        self._wcss = wcss
-        print("calculated normalize wcss!!!", wcss)
-
-        # normalized_clusters = []
-
-        # for cluster in clusters:
-        #     # Compute the mean and standard deviation of the current cluster
-        #     cluster_mean = np.mean(cluster, axis=0)
-        #     cluster_std = np.std(cluster, axis=0)
-            
-        #     # Normalize each element in the current cluster and append the results to the normalized_clusters list
-        #     normalized_cluster = [(item - cluster_mean) / cluster_std for item in cluster]
-        #     normalized_clusters.append(normalized_cluster)
-
-        # wcss = 0
-
-        # for index in range(len(normalized_clusters)):
-        #     for vec in clusters[index]:
-        #         wcss += self._distance(vec, self._means[index], self._type_of_fields,self._hyper_parameters) ** 2
-
-        # self._normalized_wcss = wcss
-        # print("calculated normalize wcss!!!", wcss)
-
     def wcssSilhouetteCalculate(self, clusters):
+               
         wcss = 0
-        
-        for index in range(len(clusters)):
-            for vec in clusters[index]:
-                distance, results = self._distance(vec, self._means[index], self._type_of_fields,self._hyper_parameters)
-                wcss += distance ** 2
-
-        self._wcss = wcss
-        
+                
+        ##handling one cluster only
         if (len(clusters)<2):
-            silhouette=0
+            self.silhouette=0
+            for vec in clusters[0]:
+                distance, results = self._distance(vec, self._means[0], self._type_of_fields,self._hyper_parameters)
+                wcss += distance ** 2
+            self._wcss = wcss
             return
         
-        totalSilhouette = 0
+        
+        
         
         totalVectors = 0
+        totalSilhouette = 0
+        clustersRange = [*range(len(clusters))]            
+        ##count vectors
         for cluster in clusters:
             totalVectors+=len(cluster)
 
-        clustersRange = [*range(len(clusters))]
         for index in range(len(clusters)):
-            for thisVector in clusters[index]:
+            for vec in clusters[index]:
+                ##wcss
+                distance, results = self._distance(vec, self._means[index], self._type_of_fields,self._hyper_parameters)
+                wcss += distance ** 2
+                ##silhouette
                 sumInCluster = 0
                 sumOutCluster = 0
                 numOutCluster = 0
+                ##calculate inner cluster distances (ai)
                 for otherVector in clusters[index]:
                     distance, results = self._distance(vec, otherVector, self._type_of_fields,self._hyper_parameters)
                     sumInCluster+=distance
+                ##calculate outer clusters distances (bi)
                 clustersRange.remove(index)
                 for otherClusters in clustersRange:
                     for otherVector in clusters[otherClusters]:
@@ -207,13 +177,14 @@ class KMeansClusterer:
                         sumOutCluster+=distance
                         numOutCluster+=1
                 clustersRange.append(index)
+                ##summarize silhouette
                 ai = sumInCluster/len(clusters[index])
                 bi = sumOutCluster/numOutCluster
                 si = (bi-ai)/max(ai,bi)
                 totalSilhouette+=si
-        silhouette = totalSilhouette/totalVectors
-        print ('silouette is:',totalSilhouette)
-        #DO NOT DELETE THIS
+                
+        self.silhouette = totalSilhouette/totalVectors
+        self._wcss = wcss
 
     def metaDataCalculation(self, clusters):
         numberOfFeatures = len(self._means[0])

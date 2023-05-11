@@ -9,8 +9,6 @@ from model.Storage.StorageFactory import StorageFactory
 from model.Model import Model
 from model.KMeanClusterer import KMeansClusterer
 from model import modular_distance_utils
-from model.utils import csv_to_nested_list
-
 
 class ModelController:
     operationFactory = StorageFactory()
@@ -51,7 +49,6 @@ class ModelController:
         distanceFunction = modular_distance_utils.get_function_by_name(distanceName)
         #mean = dataSet.MeanValues
         fieldsData = dataSet.getAttributesTypesAndValuesList()
-        print ('fieldsData: ',fieldsData)
         types = [True if d['type'] == 'categorical' else False for d in fieldsData]
         data = np.array(dataSet.Data)
         hp, k = preProcess(data, fieldsData, distanceFunction)

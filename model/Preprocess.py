@@ -37,7 +37,7 @@ def apply_elbow_method(fields_data, vectors, distance_function):
                 raise e
         if flag==False:
             wcss.append(model.get_wcss())
-            print (f'elbow for {i} clusters wcss is : {model.get_wcss()}')
+            print (f'elbow for {i} wcss is : {model.get_wcss()} Silhouette is : {model.get_silhouette()}')
             tries = 0
         i+=1
     print("wcss list is: ", wcss)
