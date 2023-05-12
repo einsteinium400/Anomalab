@@ -89,12 +89,15 @@ class ModelController:
         for item in modelJson['clusters_info']:
             meanValues.append(item['mean'])
         modelJson['meanValues'] = meanValues
+        print ("#### DEBUG #####")
+        print (modelJson['meanValues'])
 
         self.storage.Save(name, modelJson, "MODEL")
+        print ("#### DEBUG #####")
         dataset.addNewModel({
             'name':modelJson['name'],
             # 'wcss_score':modelJson['wcss_score_of_model'],
-            'silohette':modelJson['silhouette']
+            'silhouette':modelJson['silhouette']
         })
 
         print("########################## MODEL FINISHED#############################")

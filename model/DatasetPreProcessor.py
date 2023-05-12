@@ -28,6 +28,20 @@ class DatasetPreProcessor:
                 "stdDev":float(df[col].std())
             })
         categorical_cols = list(set(cols) - set(num_cols))
+
+        # # Add unique string to dataframe in NA for Data imputation
+        # fake = faker.Faker()
+        # # Loop over each column and fill missing values with unique strings
+        # for col in categorical_cols:
+        #     # Get the locations of missing values in the column
+        #     missing_mask = df[col].isnull()
+        #     missing_locs = missing_mask[missing_mask].index.tolist()
+
+        #     # Generate unique strings with prefix and fill missing values
+        #     unique_strings = ["fillna-" + fake.text() for _ in range(len(missing_locs))]
+        #     df.loc[missing_locs, col] = unique_strings
+        
+
         for col in categorical_cols:
             le = preprocessing.LabelEncoder()
             # Normalizes categorical values
@@ -45,18 +59,6 @@ class DatasetPreProcessor:
                 "values":inv_map,
                 "frequencies": value_counts
             })
-            # Add unique string to dataframe in NA for Data imputation
-            fake = faker.Faker()
-            # Loop over each column and fill missing values with unique strings
-            for col in categorical_cols:
-                # Generate unique strings that are not already present in the column
-                unique_strings = set(df[col].unique().astype(str))  # Start with existing unique values
-                while len(unique_strings) < df[col].isnull().sum():
-                    # Add a prefix to identify filled items
-                    unique_strings.add("fillna-" + fake.text())
-
-                # Fill missing values with the unique strings
-                missing_mask = df[col].isnull()
-                df.loc[missing_mask, col] = ["fillna-" + x for x in list(unique_strings)]
+        print(df)
         print (featuresInfo)
         return df,featuresInfo

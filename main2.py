@@ -12,4 +12,9 @@ modelController = ModelController()
 # distanceController.delete_function('MixedDistance')
 
 #  Add dataset flow 
+try:
+    datasetController.DeleteDataset("test")
+except:
+    pass
+datasetController.CreateDataset("test","./datasets/german_credit_data_michael_test.csv")
 print("end")
