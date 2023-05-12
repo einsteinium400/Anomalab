@@ -1,5 +1,6 @@
 from sklearn import preprocessing
 import pandas as pd
+import faker
 COMMON_MISSING_VALUES=['NA']
 
 class DatasetPreProcessor:
@@ -44,5 +45,18 @@ class DatasetPreProcessor:
                 "values":inv_map,
                 "frequencies": value_counts
             })
+            # Add unique string to dataframe in NA for Data imputation
+            fake = faker.Faker()
+            # Loop over each column and fill missing values with unique strings
+            for col in categorical_cols:
+                # Generate unique strings that are not already present in the column
+                unique_strings = set(df[col].unique().astype(str))  # Start with existing unique values
+                while len(unique_strings) < df[col].isnull().sum():
+                    # Add a prefix to identify filled items
+                    unique_strings.add("fillna-" + fake.text())
+
+                # Fill missing values with the unique strings
+                missing_mask = df[col].isnull()
+                df.loc[missing_mask, col] = ["fillna-" + x for x in list(unique_strings)]
         print (featuresInfo)
         return df,featuresInfo
