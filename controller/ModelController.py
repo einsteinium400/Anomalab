@@ -93,7 +93,8 @@ class ModelController:
         self.storage.Save(name, modelJson, "MODEL")
         dataset.addNewModel({
             'name':modelJson['name'],
-            'wcss_score':modelJson['wcss_score_of_model']
+            # 'wcss_score':modelJson['wcss_score_of_model'],
+            'silohette':modelJson['silhouette']
         })
 
         print("########################## MODEL FINISHED#############################")

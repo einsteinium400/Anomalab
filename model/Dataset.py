@@ -205,9 +205,10 @@ class Dataset:
     def addNewModel(self,model):
         self._bestModel.append({
             'name':model['name'],
-            'wcss_score':model['wcss_score']
+            # 'wcss_score':model['wcss_score'],
+            'silhouette':model['silhouette']
         })
-        self._bestModel = sorted(self._bestModel, key=lambda x: x['wcss_score'])
+        self._bestModel = sorted(self._bestModel, key=lambda x: x['silhouette'],reverse=False)
         self.SaveDataset()
 
     def removeModel(self,modelName):
