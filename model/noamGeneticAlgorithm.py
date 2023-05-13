@@ -34,8 +34,7 @@ def genetic_algorithm(params, distance_function, k, vectors, type_values, maxDom
                                                 type_of_fields=type_values)
         # activate model
         model_for_population.cluster(vectors)
-        print ('iteration:',i,'wcss:',model_for_population.get_wcss())
-        i+=1
+        print ('wcss:',model_for_population.get_wcss())
         return (-(model_for_population.get_wcss()))
     
     
@@ -46,12 +45,7 @@ def genetic_algorithm(params, distance_function, k, vectors, type_values, maxDom
 
     
     print("inside genetic_algoritm")
-    #_paramsDict = params
-    #_distanceFunc = distance_function
-    #_clustersNum = k
-    #_typeOfFields = type_values
-    #_vectors = vectors
-
+    
     parentMating = 2
     generationType = [int,int,float,float]
     generationSize = 4
