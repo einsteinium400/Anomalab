@@ -93,7 +93,7 @@ def apply_genetic_operators(selected_parents, beta_space, gamma_space, z):
 
 
 def genetic_algorithm(params, distance_function, k, vectors, type_values, z):
-    if distance_function.__name__ != "statisticdist":
+    if distance_function.__name__ != "Statistic":
         print("genetic_algorithm no matter")
 
         return (0, 0, 0, 0)

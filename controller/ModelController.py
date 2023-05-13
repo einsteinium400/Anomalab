@@ -60,6 +60,7 @@ class ModelController:
                 #mean_values=mean,
                 type_of_fields=types,
                 hyper_params=hp)
+
         except Exception as e:
             print(f"Error {e}")
             traceback.print_exc()
@@ -78,6 +79,9 @@ class ModelController:
                 traceback.print_exc()
                 trained = 0
         print ('done training')
+        clusterer.get_wcss()
+        clusterer.get_Silhouette()
+        clusterer.createClusterJson()
         modelJson = clusterer.getModelData()
         modelJson['datasetName']=dataset.Name
         modelJson['function'] = distanceName
