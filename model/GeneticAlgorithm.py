@@ -4,7 +4,7 @@ from model.KMeanClusterer import KMeansClusterer
 # Define the search space for each parameter
 
 # Define the size of the population
-population_size = 4
+population_size = 10
 
 # Define the maximum number of generations
 max_generations = 10
@@ -49,6 +49,7 @@ def evaluate_population(params, vectors, population, distance_function, type_val
         # activate model
         model_for_population.cluster(vectors)
         fitness_scores.append(model_for_population.get_wcss())
+    print ('wcss: ',min(fitness_scores))
     return fitness_scores
 
 
@@ -112,7 +113,7 @@ def genetic_algorithm(params, distance_function, k, vectors, type_values, z):
     # Repeat the genetic algorithm for a maximum of max_generations
 
     for generation in range(max_generations):
-        print(generation, "###############out of", max_generations)
+        #print(generation, "###############out of", max_generations)
 
         # Evaluate the fitness of the current population
         fitness_scores = evaluate_population(params, vectors, population, distance_function, type_values, k)

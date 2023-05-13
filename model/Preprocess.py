@@ -1,13 +1,12 @@
 import pandas as pd
 from model.GeneticAlgorithm import genetic_algorithm
 #from model.noamGeneticAlgorithm import genetic_algorithm
-import numpy as np
 from itertools import permutations
-from kneed import KneeLocator
 from model.elbow import elbowLocator
 import matplotlib.pyplot as plt
 from distanceFunctions.Hamming import Hamming as hm
 from model.KMeanClusterer import KMeansClusterer
+from datetime import datetime
 
 MAX_CLUSTERS_IN_ELBOW = 10
 
@@ -111,8 +110,12 @@ def preProcess(vectors, fieldsData, distance_function):
     k = apply_elbow_method(fieldsData, vectors, distance_function )
     # activate the genetic algorithm
     #z = df.nunique().max()  # max domain size
-
+    time = datetime.now()
+    print("START GENETIC!!! Current Time =", time.strftime("%H:%M:%S"))
     theta1, theta2, betha, gamma = genetic_algorithm(params_dict, distance_function, k, vectors, type_of_fields, z)
+    print("FINISH GENETIC!!! Current Time =", datetime.now().strftime("%H:%M:%S"))
+    print("IT TOOK:", (datetime.now()-time).seconds,"seconds")
+
     params_dict["theta1"] = theta1  # 3
     params_dict["theta2"] = theta2  # 10
     params_dict["betha"] = betha  # 0.05
@@ -125,8 +128,6 @@ def preProcess(vectors, fieldsData, distance_function):
         print(normalize_values)
         exit()
     params_dict["normalize_values"] = normalize_values
-
-    print("dict is:", params_dict, k)
 
     # exit()
     print("params_dict", params_dict)

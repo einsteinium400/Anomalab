@@ -2,9 +2,7 @@ import random
 from model.KMeanClusterer import KMeansClusterer
 import pygad as pygad
 
-# Define the search space for each parameter
-
-POPULATION_SIZE = 4
+POPULATION_SIZE = 10
 GENERATIONS = 10
 
 # Generate an initial population of solutions
@@ -32,15 +30,12 @@ def genetic_algorithm(params, distance_function, k, vectors, type_values, maxDom
         params["theta2"] = solution[1]  # 10
         params["betha"] = solution[2]  # 0.05
         params["gamma"] = solution[3]  # 0.01
-        #model_for_population = KMeansClusterer(    hyper_params=_paramsDict,
-        #                                           distance=_distanceFunc,
-        #                                           num_means=_clustersNum,
-        #                                           type_of_fields=_typeOfFields)
         model_for_population = KMeansClusterer(hyper_params=params, distance=distance_function, num_means=k,
                                                 type_of_fields=type_values)
         # activate model
         model_for_population.cluster(vectors)
-        print ('wcss:',model_for_population.get_wcss())
+        print ('iteration:',i,'wcss:',model_for_population.get_wcss())
+        i+=1
         return (-(model_for_population.get_wcss()))
     
     
@@ -75,6 +70,7 @@ def genetic_algorithm(params, distance_function, k, vectors, type_values, maxDom
     population = generate_population(maxDomainSize)
 
     print ('@@@@@@@@@@@@start the genetic alg@@@@@@')
+    iteration = 0
     geneticAlgorithm = pygad.GA(num_generations= GENERATIONS,
                         num_parents_mating= parentMating,
                         sol_per_pop= POPULATION_SIZE,
