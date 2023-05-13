@@ -1,5 +1,6 @@
 import pandas as pd
 from model.GeneticAlgorithm import genetic_algorithm
+#from model.noamGeneticAlgorithm import genetic_algorithm
 import numpy as np
 from itertools import permutations
 from kneed import KneeLocator
@@ -88,23 +89,28 @@ def preProcess(vectors, fieldsData, distance_function):
     df = pd.DataFrame(vectors)
     domain_sizes = df.nunique()
     params_dict["domain sizes"] = domain_sizes.tolist()
-    # params_dict["max_domain_size"] = df.applymap(get_max_domain_size).max().max()
     frequencies_dict = dict()
     minimal_frequencies_dict = dict()
+    max_frequencies_dict = dict()
+    z = 0
     for i in range(len(fieldsData)):
         if fieldsData[i]['type'] == 'categorical':
-            frequencies_dict[str(i)] = fieldsData[i]['frequencies'] ##NOAM DELETE FIX DANA~~~~~~@~@##$#$!!@##$!~@~!@!#$$
+            frequencies_dict[str(i)] = fieldsData[i]['frequencies']
             minimal_frequencies_dict[str(i)] = min(frequencies_dict[str(i)].values())
+            max_frequencies_dict[str(i)] = max(frequencies_dict[str(i)].values())
+            if max(frequencies_dict[str(i)].values())>z:
+                z=max(frequencies_dict[str(i)].values())
         else:
             frequencies_dict[str(i)] = dict()
             minimal_frequencies_dict[str(i)] = dict()
+            max_frequencies_dict[str(i)] = dict()
 
     params_dict["frequencies"] = frequencies_dict
     params_dict["minimum_freq_of_each_attribute"] = minimal_frequencies_dict
     params_dict["theta"] = 0.1
     k = apply_elbow_method(fieldsData, vectors, distance_function )
     # activate the genetic algorithm
-    z = df.nunique().max()  # max domain size
+    #z = df.nunique().max()  # max domain size
 
     theta1, theta2, betha, gamma = genetic_algorithm(params_dict, distance_function, k, vectors, type_of_fields, z)
     params_dict["theta1"] = theta1  # 3

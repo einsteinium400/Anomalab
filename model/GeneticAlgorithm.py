@@ -4,7 +4,7 @@ from model.KMeanClusterer import KMeansClusterer
 # Define the search space for each parameter
 
 # Define the size of the population
-population_size = 10
+population_size = 4
 
 # Define the maximum number of generations
 max_generations = 10
