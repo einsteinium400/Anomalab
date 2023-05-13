@@ -93,7 +93,7 @@ def apply_genetic_operators(selected_parents, beta_space, gamma_space, z):
 
 
 def genetic_algorithm(params, distance_function, k, vectors, type_values, z):
-    if distance_function.__name__ == "Hamming":
+    if distance_function.__name__ != "statisticdist":
         print("genetic_algorithm no matter")
 
         return (0, 0, 0, 0)
@@ -136,7 +136,7 @@ def genetic_algorithm(params, distance_function, k, vectors, type_values, z):
 
     # activate model
     model_for_population.cluster(vectors)
-
+   # best_fitness_score = model_for_population.wcss_calculate()  # hello(*best_solution)
     best_fitness_score = model_for_population.get_wcss()  # hello(*best_solution)
 
     for solution in population[1:]:

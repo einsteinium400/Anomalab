@@ -125,6 +125,8 @@ class KMeansClusterer:
             raise Exception("bad seed")
 
     def get_wcss(self):
+        if self._wcss is None:
+            self.wcss_calculate()
         return self._wcss
     
     def get_silhouette(self):
@@ -132,8 +134,18 @@ class KMeansClusterer:
 
     def get_means(self):
         return self._means
-    
-    def wcssSilhouetteCalculate(self, clusters):
+
+    def wcss_calculate(self):
+        wcss = 0
+        for vec in self._clusters_info: #clusters[0]:
+            distance, results = self._distance(vec, self._means[0], self._type_of_fields, self._hyper_parameters)
+            wcss += distance ** 2
+        self._wcss = wcss
+
+    def get_Silhouette(self, clusters):
+        if self.self.silhouette
+
+    def SilhouetteCalculate(self, clusters):
                
         wcss = 0
                 
@@ -145,9 +157,7 @@ class KMeansClusterer:
                 wcss += distance ** 2
             self._wcss = wcss
             return
-        
-        
-        
+
         
         totalVectors = 0
         totalSilhouette = 0
@@ -309,6 +319,7 @@ class KMeansClusterer:
                     self.metaDataCalculation(clusters)
                     # calculate wcss score
                     self.wcssSilhouetteCalculate(clusters)
+
                     #self.calculate_normalized_wcss(clusters)
 
             self._clusters_info = clusters
