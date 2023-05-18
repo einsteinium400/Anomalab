@@ -9,53 +9,57 @@ from model.KMeanClusterer import KMeansClusterer
 from datetime import datetime
 
 MAX_CLUSTERS_IN_ELBOW = 10
-MIN_CLUSTERS_IN_ELBOW = 2
+MIN_CLUSTERS_IN_ELBOW = 1
+AVERAGE_CALCULATION_TIMES = 5
+KMEANS_ELBOW_REPEATS = 20
 
 
 def apply_elbow_method(fields_data, vectors, distance_function):
     wcss = []
     tries = 0
     i = MIN_CLUSTERS_IN_ELBOW
-    repeater = 10
+    wcssCalc = []
+    model = None
     while i <= MAX_CLUSTERS_IN_ELBOW:
-        flag = False
-        try:
-            if distance_function.__name__ != "Statistic":
-                model = KMeansClusterer(hyper_params=dict(), distance=distance_function, num_means=int(i),
-                                        type_of_fields=fields_data, repeats=30)
-            else:
-                model = KMeansClusterer(hyper_params=dict(), distance=hm, num_means=int(i),
-                                        type_of_fields=fields_data, repeats=30)
-            model.cluster(vectors)
-        except Exception as e:
-            print('exception is:', e, 'i:', i, 'tries:', tries)
-            if str(e) == "bad seed":
-                if tries == 3:
-                    if i == 1:
-                        raise e
-                    else:
-                        print('three tries with', i)
-                        break
+        wcssCalc = []
+        j = 0
+        while j < AVERAGE_CALCULATION_TIMES:
+            flag = False
+            try:
+                if distance_function.__name__ != "Statistic":
+                    model = KMeansClusterer(hyper_params=dict(), distance=distance_function, num_means=int(i),
+                                            type_of_fields=fields_data, repeats=KMEANS_ELBOW_REPEATS)
                 else:
-                    tries += 1
-                    i -= 1
-                    print('another try')
-                    flag = True
-            else:
-                raise e
-        if not flag:
-            #wcss.append(model.get_wcss())
-            print(f'elbow for {i} wcss is : {model.get_wcss()}')
-            #print(f'Silhouette is : {model.get_Silhouette()}')
-            tries = 0
-            if (repeater > 0):
-                i -= 1
-                repeater -= 1
-            else:
-                repeater = 10
+                    model = KMeansClusterer(hyper_params=dict(), distance=hm, num_means=int(i),
+                                            type_of_fields=fields_data, repeats=KMEANS_ELBOW_REPEATS)
+                model.cluster(vectors)
+            except Exception as e:
+                print('exception is:', e, 'i:', i, 'tries:', tries)
+                if str(e) == "bad seed":
+                    if tries == 3:
+                        if i < 3:
+                            raise e+"three tries"
+                        else:
+                            print('three tries with', i)
+                            i = MAX_CLUSTERS_IN_ELBOW+1
+                            break
+                    else:
+                        tries += 1
+                        j -= 1
+                        print('another try')
+                        flag = True
+                else:
+                    raise e
+            if not flag:
+                wcssCalc.append(model.get_wcss())
+                print('wcss for',i,'is',wcssCalc[-1])
+                tries = 0
+            j += 1
+        print ("wcssCalc for",i,"clusters:",wcssCalc)
+        if (len(wcssCalc)>0):
+            wcss.append(sum(wcssCalc)/len(wcssCalc))        
         i += 1
     print("wcss list is: ", wcss)
-    raise "BLAH BLAH"
     elbow_point = elbowLocator(wcss)
     print('elbow point is:', elbow_point)
     return elbow_point
@@ -98,7 +102,6 @@ def max_combination(func, params_dict, type_of_fields, fieldsData):
             # max_vals_array[i] = fieldsData[i]['max']
     print("max_vals_array: ", max_vals_array)
     return max_vals_array
-
 
 def preProcess(vectors, fieldsData, distance_function):
     type_of_fields = [True if d['type'] == 'categorical' else False for d in fieldsData]

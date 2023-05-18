@@ -268,7 +268,7 @@ class KMeansClusterer:
                 # add the new means each time
                 meanss.append(self._means)
             except Exception as e:
-                print(e, ": ", trial)
+                #print(e, ": ", trial)
                 raise e
         ##NOAM WHY WE NEED THIS PART
         # at this point meanss holds an array of arrays, each array has k means in it.
