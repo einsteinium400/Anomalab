@@ -45,4 +45,5 @@ class JobController:
     def stop_all_running_jobs(self):
         running_jobs = self.get_running_jobs()
         for job_id in running_jobs:
+            print("Stopping job ", job_id)
             self.job_queue.stop_job(job_id)
