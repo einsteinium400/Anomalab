@@ -56,13 +56,22 @@ def Statistic(u, v, type_values, parameters):
     return distance,results
 
 
-from math import sqrt
+from scipy.spatial.distance import euclidean
 
-def EuclideanDistance(u, v, type_values, parameters):
+def scikit_euclidian(u, v, type_values, parameters):
+
     distance = 0.0
     results = []
     for i in range(len(u)):
         results.append((u[i] - v[i]) ** 2)
         distance += results[i]
-    return sqrt(distance), results
+    return euclidean(u,v), results
+
+from sklearn.metrics.pairwise import euclidean_distances
+
+
+def pairwise_eucledean(vector1, vector2, j, k):
+    distance = euclidean_distances([vector1], [vector2])[0][0]
+    return distance, [0, 0]
+
 

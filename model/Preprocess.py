@@ -9,24 +9,23 @@ from model.KMeanClusterer import KMeansClusterer
 from datetime import datetime
 
 MAX_CLUSTERS_IN_ELBOW = 10
+MIN_CLUSTERS_IN_ELBOW = 2
 
 
 def apply_elbow_method(fields_data, vectors, distance_function):
     wcss = []
     tries = 0
-    i = 1
+    i = MIN_CLUSTERS_IN_ELBOW
+    repeater = 10
     while i <= MAX_CLUSTERS_IN_ELBOW:
         flag = False
         try:
-
             if distance_function.__name__ != "Statistic":
-                print("elbow with ",distance_function.__name__)
                 model = KMeansClusterer(hyper_params=dict(), distance=distance_function, num_means=int(i),
-                                        type_of_fields=fields_data, repeats=10)
+                                        type_of_fields=fields_data, repeats=30)
             else:
-                print("elbow builds with hamming")
                 model = KMeansClusterer(hyper_params=dict(), distance=hm, num_means=int(i),
-                                        type_of_fields=fields_data, repeats=10)
+                                        type_of_fields=fields_data, repeats=30)
             model.cluster(vectors)
         except Exception as e:
             print('exception is:', e, 'i:', i, 'tries:', tries)
@@ -45,12 +44,18 @@ def apply_elbow_method(fields_data, vectors, distance_function):
             else:
                 raise e
         if not flag:
-            wcss.append(model.get_wcss())
-            #print(f'elbow for {i} wcss is : {model.get_wcss()}')
+            #wcss.append(model.get_wcss())
+            print(f'elbow for {i} wcss is : {model.get_wcss()}')
             #print(f'Silhouette is : {model.get_Silhouette()}')
             tries = 0
+            if (repeater > 0):
+                i -= 1
+                repeater -= 1
+            else:
+                repeater = 10
         i += 1
     print("wcss list is: ", wcss)
+    raise "BLAH BLAH"
     elbow_point = elbowLocator(wcss)
     print('elbow point is:', elbow_point)
     return elbow_point

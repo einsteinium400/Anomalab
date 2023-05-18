@@ -94,9 +94,9 @@ class KMeansClusterer:
                                                self._hyper_parameters)
             std += distance ** 2
 
-        std = math.sqrt(std / len(vectors) - 1)
+        #std = math.sqrt(std / len(vectors) - 1)
 
-        self._overall_std = std
+        #self._overall_std = std
         # dana
         # self._hyper_parameters = preProcess(vectors, self._type_of_fields)
         # call abstract method to cluster the vectors
@@ -131,10 +131,10 @@ class KMeansClusterer:
 
     def get_wcss(self):
         if self._wcss is None:
-            self.wcss_calculate()
+            self.wcssCalculate()
         return self._wcss
 
-    def wcss_calculate(self):
+    def wcssCalculate(self):
         wcss = 0
         # print(self._clusters_info)
         # print(type(self._clusters_info))
@@ -194,7 +194,7 @@ class KMeansClusterer:
 
         self.silhouette = totalSilhouette / totalVectors
 
-    def metaDataCalculation(self, clusters):
+    def metaDataCalculation(self):
         numberOfFeatures = len(self._means[0])
         numberOfClusters = len(self._means)
 
@@ -210,7 +210,7 @@ class KMeansClusterer:
             sumOfTotalDistance = 0
             sumOfAttributesDistances = [0 for _ in range(numberOfFeatures)]
             self.attributesAverageDistances[index] = [0 for _ in range(numberOfFeatures)]
-            for vec in clusters[index]:
+            for vec in self._clusters_info[index]:
                 ##check distance between vec in cluster with the cluster mean
                 distance, results = self._distance(vec, self._means[index], self._type_of_fields,
                                                    self._hyper_parameters)
@@ -223,30 +223,30 @@ class KMeansClusterer:
                 for i in range(numberOfFeatures):
                     sumOfAttributesDistances[i] += abs(results[i])
             self.clustersMaxDistances.append(maxDistance)
-            self.clustersAverageDistance.append(sumOfTotalDistance / len(clusters[index]))
+            self.clustersAverageDistance.append(sumOfTotalDistance / len(self._clusters_info[index]))
             for i in range(numberOfFeatures):
-                self.attributesAverageDistances[index][i] = sumOfAttributesDistances[i] / len(clusters[index])
+                self.attributesAverageDistances[index][i] = sumOfAttributesDistances[i] / len(self._clusters_info[index])
 
         # calculate standard deviation
         for index in range(numberOfClusters):
             sumOfSquareDistances = 0
             squareDeltaDistances = [0 for _ in range(numberOfFeatures)]
-            for vec in clusters[index]:
+            for vec in self._clusters_info[index]:
                 distance, results = self._distance(vec, self._means[index], self._type_of_fields,
                                                    self._hyper_parameters)
                 for i in range(numberOfFeatures):
                     squareDeltaDistances[i] += (results[i] - self.attributesAverageDistances[index][i]) ** 2
                 sumOfSquareDistances += (distance - self.clustersAverageDistance[index]) ** 2
             ##deal with clusters with only one data sample
-            if len(clusters[index]) < 2:
+            if len(self._clusters_info[index]) < 2:
                 self.clustersStdDev.append(0)
                 for i in range(numberOfFeatures):
                     self.attributesStdDevs[index].append(0)
             else:
-                self.clustersStdDev.append(math.sqrt(sumOfSquareDistances / (len(clusters[index]) - 1)))
+                self.clustersStdDev.append(math.sqrt(sumOfSquareDistances / (len(self._clusters_info[index]) - 1)))
                 for i in range(numberOfFeatures):
                     self.attributesStdDevs[index].append(
-                        math.sqrt(squareDeltaDistances[i] / (len(clusters[index]) - 1)))
+                        math.sqrt(squareDeltaDistances[i] / (len(self._clusters_info[index]) - 1)))
 
     def _sum_distances(self, vectors1, vectors2):
         difference = 0.0
@@ -315,12 +315,6 @@ class KMeansClusterer:
 
                 if difference < self._max_difference:
                     converged = True
-                    # calculate variance and average distance
-                    self.metaDataCalculation(clusters)
-                    # calculate wcss score
-                    # self.wcssSilhouetteCalculate(clusters)
-
-                    # self.calculate_normalized_wcss(clusters)
 
             self._clusters_info = clusters
             # self.createClusterJson()

@@ -47,7 +47,6 @@ class ModelController:
             raise Exception(f"Model named {name} exist")
         dataSet = dataset
         distanceFunction = modular_distance_utils.get_function_by_name(distanceName)
-        #mean = dataSet.MeanValues
         fieldsData = dataSet.getAttributesTypesAndValuesList()
         types = [True if d['type'] == 'categorical' else False for d in fieldsData]
         data = np.array(dataSet.Data)
@@ -56,8 +55,7 @@ class ModelController:
         try:
             clusterer = KMeansClusterer(num_means=k,
                 distance=distanceFunction,
-                repeats=1,
-                #mean_values=mean,
+                repeats=10,
                 type_of_fields=types,
                 hyper_params=hp)
 
@@ -79,8 +77,9 @@ class ModelController:
                 traceback.print_exc()
                 trained = 0
         print ('done training')
-        clusterer.get_wcss()
-        clusterer.get_Silhouette()
+        print ('wcss is:',clusterer.get_wcss())
+        print ('silhouette is:',clusterer.get_Silhouette())
+        clusterer.metaDataCalculation()
         clusterer.createClusterJson()
         modelJson = clusterer.getModelData()
         modelJson['datasetName']=dataset.Name
