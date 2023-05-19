@@ -11,6 +11,10 @@ from kivy.core.window import Window
 #table imports
 from kivymd.uix.datatables import MDDataTable
 from kivy.metrics import dp
+# plots imports
+from matplotlib import pyplot as plt
+import numpy as np
+from kivy.garden.matplotlib import FigureCanvasKivyAgg
 #forms imports
 from kivymd.uix.label import MDLabel
 from kivymd.uix.textfield import MDTextFieldRect
@@ -109,7 +113,7 @@ class Query(Screen):
         try:
             app.attributesList=app.datasetController.GetAttributesList(app.dataSetName)
             for i in range(len(app.attributesList)):
-                self.ids.attributes_box.add_widget(MDLabel(text=f'{app.attributesList[i]["name"]}:', halign="center"))
+                self.ids.attributes_box.add_widget(MDLabel(text='[size=20]'+str(app.attributesList[i]["name"])+':[/size]', halign="center", markup= True))
                 if (app.attributesList[i]["type"] == 'numeric'):
                     ##NUMERIC ADD
                     self.attributesTypes.append(False)
@@ -171,21 +175,41 @@ class Results(Screen):
         app = MDApp.get_running_app()
         model = app.modelController.GetModel(app.modelsList[0]['name'])
         answer=checkSampleForAnomaly(model, app.query)
-        self.ids.result.text=f'Model: {app.modelsList[0]["name"]}'
-        self.ids.result.text=f'Model: {app.modelsList[0]["name"]}'
+        string = ""
+        if answer['anomaly']==True:
+            string = '[color=ff3333][b]Anomaly[/b][/color]'
+        else:
+            string = '[color=00FF00][b]Not anomaly[/b][/color]'
+        self.ids.result.text='Query is: '+string+ ' (Model: '+app.modelsList[0]["name"]+')'
+        print (answer['stadarizedResults'])
+        graphData = answer['stadarizedResults']
+        graphLabels = []
+        for i in range(len(app.attributesList)):
+            graphLabels.append(app.attributesList[i]["name"])
+        plot=plt.bar(graphLabels, graphData, color ='maroon', width = 0.4)
+        for i in range(len(graphData)):
+            if (graphData[i]>2):
+                plot[i].set_color('r')
+            elif (graphData[i]>1):
+                plot[i].set_color('y')
+            else:
+                plot[i].set_color('g')
+        plt.xlabel("attributes")
+        plt.ylabel("standarize distances")
+        # function to add value labels
+        def addlabels(x,y,text):
+            for i in range(len(x)):
+                plt.text(i, y[i], round(text[i],2), ha = 'center')
+        addlabels(graphLabels, graphData, answer['results'])
+        plt.legend(loc='best', fontsize=25)
+        plt.ylim(0, 3)
+        plt.title("detailed results")
+        # adding plot to kivy boxlayout
+        self.ids['table_place'].clear_widgets()
+        self.ids['table_place'].add_widget(FigureCanvasKivyAgg(plt.gcf()))
+        '''#TABLE!!!!!!!!
         table_width = dp(Window.size[0]*9/50)
         self.data=[]
-        row = []
-        row.append('[size=24]overall[/size]')
-        row.append('[size=24]'+str(answer['maxDistance'])+'[/size]')
-        row.append('[size=24]'+str(answer['distance'])+'[/size]')
-        string='[size=24]'+str(answer['anomaly'])+'[/size]'
-        if answer['anomaly']==True:
-            string='[color=ff3333]'+string+'[/color]'
-        else:
-            string='[color=ffff00]'+string+'[/color]'
-        row.append(string)
-        self.data.append(row)
         for i in range(len(answer['results'])):
             row = []
             row.append('[size=20]'+app.attributesList[i]['name']+'[/size]')
@@ -219,6 +243,7 @@ class Results(Screen):
             self.table.bind(on_row_press=self.row_press)
         except Exception as e:
             print(str(e))
+        '''
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'query'

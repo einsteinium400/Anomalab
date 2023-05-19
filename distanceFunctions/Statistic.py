@@ -21,7 +21,7 @@ def Statistic(u, v, type_values, parameters):
 
     for i in range(len(v)):
         # catrgorical handle
-        if type_values[i]:
+        if type_values[i]==True:
             # if attributes are same
             if u[i] == v[i]:
                 results.append(0)

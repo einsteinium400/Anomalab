@@ -10,6 +10,16 @@ def Hamming(u,v,type_values, hyperparams):
     return distance,results
 
 
+def Euclidean(u, v, type_values, parameters):
+    distance = 0.0
+    results = []
+    for i in range(len(type_values)):
+        if type_values[i]==True:
+            raise "EUCLIDEAN DON'T KNOW TO HANDLE CATEGORIC DATA"
+        results.append(u[i] - v[i])
+        distance += (u[i] - v[i])**2
+    return distance**0.5, results
+
 import numpy as np
 import math
 
@@ -33,7 +43,7 @@ def Statistic(u, v, type_values, parameters):
 
     for i in range(len(v)):
         # catrgorical handle
-        if type_values[i]:
+        if type_values[i]==True:
             # if attributes are same
             if u[i] == v[i]:
                 results.append(0)
@@ -54,27 +64,5 @@ def Statistic(u, v, type_values, parameters):
     
     distance = math.sqrt(distance)
     return distance,results
-
-
-from scipy.spatial.distance import euclidean
-
-def scikit_euclidian(u, v, type_values, parameters):
-
-    distance = 0.0
-    results = []
-    for i in range(len(u)):
-        results.append((u[i] - v[i]) ** 2)
-        distance += results[i]
-    return euclidean(u,v), results
-
-from sklearn.metrics.pairwise import euclidean_distances
-
-
-def pairwise_eucledean(vector1, vector2, j, k):
-    distance = euclidean_distances([vector1], [vector2])[0][0]
-    results = []
-    for i in range(len(vector1)):
-        results.append(0)
-    return distance, results
 
 

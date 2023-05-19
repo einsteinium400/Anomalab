@@ -11,8 +11,8 @@ from model.Model import Model
 from model.KMeanClusterer import KMeansClusterer
 from model import modular_distance_utils
 
-CLUSTERING_TRIES = 5
-REPEATS = 30
+CLUSTERING_TRIES = 3
+REPEATS = 100
 
 class ModelController:
     operationFactory = StorageFactory()
@@ -87,7 +87,7 @@ class ModelController:
         for i in range(1,CLUSTERING_TRIES):
             if (modelsTries[best].get_wcss()>modelsTries[i].get_wcss()):
                 best = i
-        print ('choose the best wcss model',i)
+        print ('choose the best wcss model',best)
         print ('done training')
         print("IT TOOK:", (datetime.now()-_time).seconds,"seconds")
         print ('wcss is:',modelsTries[best].get_wcss())

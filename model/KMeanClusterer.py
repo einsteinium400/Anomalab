@@ -77,31 +77,6 @@ class KMeansClusterer:
                       indent=4,
                       separators=(',', ': '))
 
-    def cluster(self, vectors):
-        mean = []
-        for i in range(len(self._type_of_fields)):
-            if self._type_of_fields[i]:
-                avg = np.mean([x[i] for x in vectors], axis=0)
-                mean.append(avg)
-            else:
-                max_val = np.max([x[i] for x in vectors], axis=0)
-                mean.append(max_val)
-        self._overall_mean = mean
-
-        std = 0
-        for i in range(len(vectors)):
-            distance, results = self._distance(vectors[i], self._overall_mean, self._type_of_fields,
-                                               self._hyper_parameters)
-            std += distance ** 2
-
-        #std = math.sqrt(std / len(vectors) - 1)
-
-        #self._overall_std = std
-        # dana
-        # self._hyper_parameters = preProcess(vectors, self._type_of_fields)
-        # call abstract method to cluster the vectors
-        self.cluster_vectorspace(vectors)
-
     # calculates the mean of a cluster
     def _centroid(self, cluster, mean):
         # initialize an empty list, with size of number of features
@@ -136,14 +111,10 @@ class KMeansClusterer:
 
     def wcssCalculate(self):
         wcss = 0
-        # print(self._clusters_info)
-        # print(type(self._clusters_info))
-        # print(type(self._clusters_info[0]))
-        # exit()
-        for vec in self._clusters_info[0]:  # clusters[0]:
-
-            distance, results = self._distance(list(vec), self._means[0], self._type_of_fields, self._hyper_parameters)
-            wcss += distance ** 2
+        for i in range(len(self._clusters_info)):
+            for vec in self._clusters_info[i]:
+                distance, results = self._distance(list(vec), self._means[i], self._type_of_fields, self._hyper_parameters)
+                wcss += distance ** 2
         self._wcss = wcss
 
     def get_Silhouette(self):

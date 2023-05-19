@@ -4,6 +4,7 @@ import pygad as pygad
 
 POPULATION_SIZE = 4
 GENERATIONS = 10
+EVALUATE_TIMES = 3
 
 # Generate an initial population of solutions
 def generate_population(maxDomainSize):
@@ -30,12 +31,15 @@ def genetic_algorithm(params, distance_function, k, vectors, type_values, maxDom
         params["theta2"] = solution[1]  # 10
         params["betha"] = solution[2]  # 0.05
         params["gamma"] = solution[3]  # 0.01
-        model_for_population = KMeansClusterer(hyper_params=params, distance=distance_function, num_means=k,
-                                                type_of_fields=type_values)
-        # activate model
-        model_for_population.cluster(vectors)
-        print ('wcss:',model_for_population.get_wcss())
-        return (-(model_for_population.get_wcss()))
+        grades = []
+        for i in range(EVALUATE_TIMES):
+            model_for_population = KMeansClusterer(hyper_params=params, distance=distance_function, num_means=k,
+                                                    type_of_fields=type_values)
+            # activate model
+            model_for_population.cluster(vectors)
+            grades.append(model_for_population.get_wcss())
+        print ('wcss:',grades,"avg",sum(grades)/len(grades))
+        return (-(sum(grades)/len(grades)))
     
     
     if distance_function.__name__ != "Statistic":
