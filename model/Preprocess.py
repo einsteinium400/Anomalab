@@ -10,11 +10,8 @@ from datetime import datetime
 
 MAX_CLUSTERS_IN_ELBOW = 10
 MIN_CLUSTERS_IN_ELBOW = 1
-AVERAGE_CALCULATION_TIMES = 5
-KMEANS_ELBOW_REPEATS = 20
 
-
-def apply_elbow_method(fields_data, vectors, distance_function):
+def apply_elbow_method(fields_data, vectors, distance_function,triesNumber, _repeats):
     wcss = []
     tries = 0
     i = MIN_CLUSTERS_IN_ELBOW
@@ -23,15 +20,15 @@ def apply_elbow_method(fields_data, vectors, distance_function):
     while i <= MAX_CLUSTERS_IN_ELBOW:
         wcssCalc = []
         j = 0
-        while j < AVERAGE_CALCULATION_TIMES:
+        while j < triesNumber:
             flag = False
             try:
                 if distance_function.__name__ != "Statistic":
                     model = KMeansClusterer(hyper_params=dict(), distance=distance_function, num_means=int(i),
-                                            type_of_fields=fields_data, repeats=KMEANS_ELBOW_REPEATS)
+                                            type_of_fields=fields_data, repeats=_repeats)
                 else:
                     model = KMeansClusterer(hyper_params=dict(), distance=hm, num_means=int(i),
-                                            type_of_fields=fields_data, repeats=KMEANS_ELBOW_REPEATS)
+                                            type_of_fields=fields_data, repeats=_repeats)
                 model.cluster(vectors)
             except Exception as e:
                 print('exception is:', e, 'i:', i, 'tries:', tries)
@@ -52,12 +49,13 @@ def apply_elbow_method(fields_data, vectors, distance_function):
                     raise e
             if not flag:
                 wcssCalc.append(model.get_wcss())
-                print('wcss for',i,'is',wcssCalc[-1])
+                if i==1:
+                    j = triesNumber
                 tries = 0
             j += 1
-        print ("wcssCalc for",i,"clusters:",wcssCalc)
         if (len(wcssCalc)>0):
-            wcss.append(sum(wcssCalc)/len(wcssCalc))        
+            print ("wcssCalc for",i,"clusters:",wcssCalc,"average:",sum(wcssCalc)/len(wcssCalc))
+            wcss.append(sum(wcssCalc)/len(wcssCalc))
         i += 1
     print("wcss list is: ", wcss)
     elbow_point = elbowLocator(wcss)
@@ -71,7 +69,6 @@ def create_array(i, len, v):
     # Set the value at index `i` to `v`
     arr[i] = v
     return arr
-
 
 def max_combination(func, params_dict, type_of_fields, fieldsData):
     max_vals_array = [float('-inf')] * len(type_of_fields)
@@ -103,7 +100,7 @@ def max_combination(func, params_dict, type_of_fields, fieldsData):
     print("max_vals_array: ", max_vals_array)
     return max_vals_array
 
-def preProcess(vectors, fieldsData, distance_function):
+def preProcess(vectors, fieldsData, distance_function, triesNumber, repeats):
     type_of_fields = [True if d['type'] == 'categorical' else False for d in fieldsData]
     params_dict = dict()
     df = pd.DataFrame(vectors)
@@ -130,7 +127,7 @@ def preProcess(vectors, fieldsData, distance_function):
     params_dict["frequencies"] = frequencies_dict
     params_dict["minimum_freq_of_each_attribute"] = minimal_frequencies_dict
     params_dict["theta"] = 0.1
-    k = apply_elbow_method(fieldsData, vectors, distance_function)
+    k = apply_elbow_method(fieldsData, vectors, distance_function,triesNumber, repeats)
     # activate the genetic algorithm
     #z = df.nunique().max()  # max domain size
     time = datetime.now()

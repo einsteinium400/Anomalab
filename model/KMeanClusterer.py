@@ -270,7 +270,6 @@ class KMeansClusterer:
             except Exception as e:
                 #print(e, ": ", trial)
                 raise e
-        ##NOAM WHY WE NEED THIS PART
         # at this point meanss holds an array of arrays, each array has k means in it.
         if len(meanss) > 1:
             # find the set of means that's minimally different from the others

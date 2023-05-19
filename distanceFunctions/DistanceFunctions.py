@@ -76,3 +76,5 @@ def pairwise_eucledean(vector1, vector2, j, k):
     for i in range(len(vector1)):
         results.append(0)
     return distance, results
+
+

@@ -3,12 +3,16 @@ import numpy as np
 import traceback
 import uuid
 import time
+from datetime import datetime
 
 from model.Preprocess import preProcess
 from model.Storage.StorageFactory import StorageFactory
 from model.Model import Model
 from model.KMeanClusterer import KMeansClusterer
 from model import modular_distance_utils
+
+CLUSTERING_TRIES = 5
+REPEATS = 30
 
 class ModelController:
     operationFactory = StorageFactory()
@@ -41,6 +45,8 @@ class ModelController:
         return self.storage.GetListWithSpecificAttributes("MODEL",attributesList)
 
     def CreateModel(self, dataset, distanceName):
+        _time = datetime.now()
+        print("Start Create Model! Current Time =", _time.strftime("%H:%M:%S"))
         name = f'{dataset.Name}-{distanceName}'
         modelsList = self.__GetAllModelsNamesList()
         if name in modelsList:
@@ -50,38 +56,45 @@ class ModelController:
         fieldsData = dataSet.getAttributesTypesAndValuesList()
         types = [True if d['type'] == 'categorical' else False for d in fieldsData]
         data = np.array(dataSet.Data)
-        hp, k = preProcess(data, fieldsData, distanceFunction)
-        print("done preprocess - start k means")
-        try:
-            clusterer = KMeansClusterer(num_means=k,
-                distance=distanceFunction,
-                repeats=10,
-                type_of_fields=types,
-                hyper_params=hp)
-
-        except Exception as e:
-            print(f"Error {e}")
-            traceback.print_exc()
-            raise e
-
-
-        print ('done k means start training')
-        
-        trained = 0
-        while trained == 0:
+        hp, k = preProcess(data, fieldsData, distanceFunction, CLUSTERING_TRIES, REPEATS)
+        print("done preprocess - start k means models")
+        print("IT TOOK:", (datetime.now()-_time).seconds,"seconds")
+        modelsTries = []
+        for i in range(CLUSTERING_TRIES):
             try:
-                clusterer.cluster(data)
-                trained =1
+                modelsTries.append(KMeansClusterer(num_means=k,
+                    distance=distanceFunction,
+                    repeats=REPEATS,
+                    type_of_fields=types,
+                    hyper_params=hp))
             except Exception as e:
                 print(f"Error {e}")
                 traceback.print_exc()
-                trained = 0
+                raise e
+        print ('create k means models and start training')
+        for i in range(CLUSTERING_TRIES):
+            trained = 0
+            while trained == 0:
+                try:
+                    modelsTries[i].cluster(data)
+                    print ("create model num",i,"wcss is:",modelsTries[i].get_wcss())
+                    trained =1
+                except Exception as e:
+                    print(f"Error {e}")
+                    traceback.print_exc()
+                    trained = 0
+        best = 0
+        for i in range(1,CLUSTERING_TRIES):
+            if (modelsTries[best].get_wcss()>modelsTries[i].get_wcss()):
+                best = i
+        print ('choose the best wcss model',i)
         print ('done training')
-        print ('wcss is:',clusterer.get_wcss())
-        print ('silhouette is:',clusterer.get_Silhouette())
-        clusterer.metaDataCalculation()
-        clusterer.createClusterJson()
-        modelJson = clusterer.getModelData()
+        print("IT TOOK:", (datetime.now()-_time).seconds,"seconds")
+        print ('wcss is:',modelsTries[best].get_wcss())
+        print ('silhouette is:',modelsTries[best].get_Silhouette())
+        modelsTries[best].metaDataCalculation()
+        modelsTries[best].createClusterJson()
+        modelJson = modelsTries[best].getModelData()
         modelJson['datasetName']=dataset.Name
         modelJson['function'] = distanceName
         modelJson['name'] = name
@@ -92,11 +105,10 @@ class ModelController:
         for item in modelJson['clusters_info']:
             meanValues.append(item['mean'])
         modelJson['meanValues'] = meanValues
-        print ("#### DEBUG #####")
+        #print ("#### DEBUG #####")
         print (modelJson['meanValues'])
-
         self.storage.Save(name, modelJson, "MODEL")
-        print ("#### DEBUG #####")
+        #print ("#### DEBUG #####")
         dataset.addNewModel({
             'name':modelJson['name'],
             # 'wcss_score':modelJson['wcss_score_of_model'],
@@ -104,6 +116,7 @@ class ModelController:
         })
 
         print("########################## MODEL FINISHED#############################")
+        print("IT TOOK:", (datetime.now()-_time).seconds,"seconds")
 
     def GetModel(self, modelName):
         modelsList = self.__GetAllModelsNamesList()

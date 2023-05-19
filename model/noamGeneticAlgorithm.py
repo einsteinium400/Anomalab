@@ -2,7 +2,7 @@ import random
 from model.KMeanClusterer import KMeansClusterer
 import pygad as pygad
 
-POPULATION_SIZE = 10
+POPULATION_SIZE = 4
 GENERATIONS = 10
 
 # Generate an initial population of solutions
@@ -42,10 +42,6 @@ def genetic_algorithm(params, distance_function, k, vectors, type_values, maxDom
         print("distance function is:",distance_function.__name__,"genetic_algorithm no matter")
         return (0, 0, 0, 0)
     
-
-    
-    print("inside genetic_algoritm")
-    
     parentMating = 2
     generationType = [int,int,float,float]
     generationSize = 4
@@ -62,9 +58,6 @@ def genetic_algorithm(params, distance_function, k, vectors, type_values, maxDom
 
     # Generate an initial population
     population = generate_population(maxDomainSize)
-
-    print ('@@@@@@@@@@@@start the genetic alg@@@@@@')
-    iteration = 0
     geneticAlgorithm = pygad.GA(num_generations= GENERATIONS,
                         num_parents_mating= parentMating,
                         sol_per_pop= POPULATION_SIZE,
