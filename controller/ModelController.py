@@ -12,7 +12,7 @@ from model.KMeanClusterer import KMeansClusterer
 from model import modular_distance_utils
 
 CLUSTERING_TRIES = 3
-REPEATS = 100
+REPEATS = 8
 
 class ModelController:
     operationFactory = StorageFactory()
@@ -76,7 +76,7 @@ class ModelController:
             trained = 0
             while trained == 0:
                 try:
-                    modelsTries[i].cluster(data)
+                    modelsTries[i].cluster_vectorspace(data)
                     print ("create model num",i,"wcss is:",modelsTries[i].get_wcss())
                     trained =1
                 except Exception as e:
