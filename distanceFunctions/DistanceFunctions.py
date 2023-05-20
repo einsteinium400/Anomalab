@@ -7,6 +7,8 @@ def Euclidean(u, v, type_values, parameters):
         results.append(u[i] - v[i])
         distance += (u[i] - v[i])**2
     return distance**0.5, results
+
+
 def Hamming(u,v,type_values, hyperparams):
     distance = 0
     results = []
@@ -17,6 +19,8 @@ def Hamming(u,v,type_values, hyperparams):
         else:
             results.append(0)
     return distance,results
+
+
 import numpy as np
 import math
 
@@ -62,6 +66,8 @@ def Statistic(u, v, type_values, parameters):
 
     distance = math.sqrt(distance)
     return distance, results
+
+
 '''
 
 dict=
@@ -152,3 +158,5 @@ def statisticdistdebug(u, v, type_values, parameters):
 
     categoric_dist = pow(categoric_dist, 2)
     return math.sqrt(categoric_dist + numeric_dist)
+
+

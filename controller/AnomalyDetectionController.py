@@ -24,11 +24,13 @@ def checkSampleForAnomaly(model,sample):
         else:
             delta=closestClusterData['results'][i]-closestClusterData['attributesAverageDistances'][i]
             stdResults.append(delta/closestClusterData['attributesStdDevs'][i])
+    
     answer = {
         'anomaly' : anomaly,
         'closestCluster' : closestCluster,
         'mean' : closestClusterData['mean'],
         'distance' : closestClusterData['distance'],
+        'stdDev' : closestClusterData['stdDev'],
         'results' : closestClusterData['results'],
         'maxDistance' : closestClusterData['maxDistance'],
         'stadarizedResults': stdResults

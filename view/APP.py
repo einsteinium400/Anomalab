@@ -695,7 +695,7 @@ class ChooseModels(Screen):
         for model in app.modelsList:
             row = []
             row.append(model['name'])   #Name
-            row.append(round(model['silhouette'],2))   #Silhouette
+            row.append(round(model['silhouette'],5))   #Silhouette
             row.append(round(model['wcss'],2))   #wcss
             self.data.append(row)
         dataRows = len(self.data)
@@ -736,13 +736,16 @@ class ChooseModels(Screen):
         app.modelsApplyList.append(current_row[0])
 
     def on_choose(self):
-        app = MDApp.get_running_app()
-        print (app.modelsApplyList)
-        if app.modelsApplyList == []:
-            show_popup('Must choose at least one model')
-            return
-        self.manager.transition = SlideTransition(direction="left")
-        self.manager.current = 'analystresults'
+        try:
+            app = MDApp.get_running_app()
+            print (app.modelsApplyList)
+            if app.modelsApplyList == []:
+                show_popup('Must choose at least one model')
+                return
+            self.manager.transition = SlideTransition(direction="left")
+            self.manager.current = 'analystresults'
+        except Exception as e:
+            show_popup(str(e))
     
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
@@ -756,110 +759,45 @@ class AnalystResults(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
         results = []
+        modelsNum = len(app.modelsApplyList)
         try:
             for modelname in app.modelsApplyList:
                 results.append(checkSampleForAnomaly(app.modelController.GetModel(modelname), app.query))
         except Exception as e:
             show_popup(str(e))
             return
-        self.ids.modelName.text=f'Model: {app.modelsList[0]["name"]}'
-        model = app.modelController.GetModel(app.modelsList[0]['name'])
-        answer=checkSampleForAnomaly(model, app.query)
-        anomalies=answer['anomaly']
-        clusterNumber=answer['clusterNumber']
-        distances=answer['detailedDistances']
-        fullData=answer['predictionFullData']
         table_width = dp(Window.size[0]*9/50)
         self.data=[]
-        print ("attribute list: ", app.attributesList)
-        print ("anomalies: ", anomalies)
-        print ("classified cluster: ", clusterNumber)
-        print ("distances: ", distances)
-        print ("fullData: ", fullData)
-        for i in range(len(distances[clusterNumber])):
+        row = []
+        row.append('[size=20]Is anomaly[/size]')
+        row.append('[size=20]-[/size]')
+        for result in results:
+            if result['anomaly']==True:
+                row.append('[size=20][color=ff3333][b]'+str(result['anomaly'])+'[/b][/color][/size]')
+            else:
+                row.append('[size=20][color=00FF00][b]'+str(result['anomaly'])+'[/b][/color][/size]')
+        self.data.append(row)
+        for i in range(len(app.attributesList)):
             row = []
-            row.append('[size=40]'+app.attributesList[i]['name']+'[/size]')
-            row.append(fullData[clusterNumber]['mean'][i])
-            row.append(app.query[i])
-            row.append(distances[clusterNumber][i])
+            row.append('[size=20]'+app.attributesList[i]['name']+'[/size]')
+            row.append('[size=20]'+str(app.query[i])+'[/size]')
+            for result in results:
+                row.append('[size=20]'+str(result['stadarizedResults'][i])+'[/size]')
             self.data.append(row)
         dataRows = len(self.data)
         pagination = False
-        self.table = MDDataTable(
-            pos_hint = {'x': 0.05, 'top': 0.95},
-            size_hint= (0.9, 0.9),
-            use_pagination = pagination,
-            rows_num = dataRows,
-            column_data = [
-                ("Attribute", dp (table_width*0.25)),
-                ("Cluster mean", dp (table_width*0.25)),
-                ("Sample", dp (table_width*0.25)),
-                ("Distance", dp (table_width*0.25)),
-            ],
-            row_data = self.data
-        )
-        try: 
-            self.ids['table_place'].clear_widgets()
-            self.ids['table_place'].add_widget(self.table)
-            self.table.bind(on_row_press=self.row_press)
-        except Exception as e:
-            print(str(e))
-    def on_back(self):
-        self.manager.transition = SlideTransition(direction="right")
-        self.manager.current = 'query'
-    
-    def logout(self):
-        self.manager.transition = SlideTransition(direction="right")
-        self.manager.current = 'login'
-    
-    
-    
-    
-    def on_enter(self):
-        app = MDApp.get_running_app()
-        self.accord = Accordion(orientation ='vertical')
+        columnSize = table_width*(1/(modelsNum+2))
+        columnNames = []
+        columnNames.append(("[size=32]Attribute[/size]", dp (columnSize)))
+        columnNames.append(("[size=32]Sample[/size]", dp (columnSize)))
         for modelname in app.modelsApplyList:
-            item=AccordionItem(title=modelname)
-            x,y=checkSampleForAnomaly(app.modelController.GetModel(modelname), app.query)
-            item.add_widget(MDLabel(text=f'Is anomaly: {x}\n\n{y}', halign="center"))
-            self.accord.add_widget(item)
-        self.ids['accordion_place'].clear_widgets()
-        self.ids['accordion_place'].add_widget(self.accord)
-        app = MDApp.get_running_app()
-        self.ids.modelName.text=f'Model: {app.modelsList[0]["name"]}'
-        model = app.modelController.GetModel(app.modelsList[0]['name'])
-        answer=checkSampleForAnomaly(model, app.query)
-        anomalies=answer['anomaly']
-        clusterNumber=answer['clusterNumber']
-        distances=answer['detailedDistances']
-        fullData=answer['predictionFullData']
-        table_width = dp(Window.size[0]*9/50)
-        self.data=[]
-        print ("attribute list: ", app.attributesList)
-        print ("anomalies: ", anomalies)
-        print ("classified cluster: ", clusterNumber)
-        print ("distances: ", distances)
-        print ("fullData: ", fullData)
-        for i in range(len(distances[clusterNumber])):
-            row = []
-            row.append(app.attributesList[i]['name'])
-            row.append(fullData[clusterNumber]['mean'][i])
-            row.append(app.query[i])
-            row.append(distances[clusterNumber][i])
-            self.data.append(row)
-        dataRows = len(self.data)
-        pagination = False
+            columnNames.append(("[size=32]"+modelname+"[/size]", dp (columnSize)),)
         self.table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
             size_hint= (0.9, 0.9),
             use_pagination = pagination,
             rows_num = dataRows,
-            column_data = [
-                ("model", dp (table_width*0.25)),
-                ("anomaly", dp (table_width*0.25)),
-                ("distance", dp (table_width*0.25)),
-                ("wcss", dp (table_width*0.25)),
-            ],
+            column_data = columnNames,
             row_data = self.data
         )
         try: 
@@ -868,11 +806,11 @@ class AnalystResults(Screen):
             self.table.bind(on_row_press=self.row_press)
         except Exception as e:
             print(str(e))
-    
+
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'choosemodels'
-    
+
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
