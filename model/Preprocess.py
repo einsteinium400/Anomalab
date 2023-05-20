@@ -1,6 +1,6 @@
 import pandas as pd
-# from model.GeneticAlgorithm import genetic_algorithm
-from model.noamGeneticAlgorithm import genetic_algorithm
+from model.GeneticAlgorithm import genetic_algorithm
+#from model.noamGeneticAlgorithm import genetic_algorithm
 from itertools import permutations
 from model.elbow import elbowLocator
 import matplotlib.pyplot as plt
@@ -13,6 +13,7 @@ MIN_CLUSTERS_IN_ELBOW = 1
 
 
 def apply_elbow_method(fields_data, vectors, distance_function, triesNumber, _repeats):
+    print("in elbow")
     wcss = []
     tries = 0
     triesNumber=1 ###
@@ -25,10 +26,13 @@ def apply_elbow_method(fields_data, vectors, distance_function, triesNumber, _re
         while j < triesNumber:
             flag = False
             try:
-                if distance_function.__name__ != "Statistic":
+                if distance_function.__name__ != "Statistic" and distance_function.__name__ != "statisticdistdebug":
+                    print("building using bad ", distance_function)
+                    #exit()
                     model = KMeansClusterer(hyper_params=dict(), distance=distance_function, num_means=int(i),
                                             type_of_fields=fields_data, repeats=_repeats)
                 else:
+                   # print("build using hamming!")
                     model = KMeansClusterer(hyper_params=dict(), distance=hm, num_means=int(i),
                                             type_of_fields=fields_data, repeats=_repeats)
                 model.cluster_vectorspace(vectors)
