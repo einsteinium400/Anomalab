@@ -2,8 +2,8 @@ import random
 from model.KMeanClusterer import KMeansClusterer
 import pygad as pygad
 
-POPULATION_SIZE = 10
-GENERATIONS = 10
+POPULATION_SIZE = 4
+GENERATIONS = 4
 EVALUATE_TIMES = 1
 
 # Generate an initial population of solutions

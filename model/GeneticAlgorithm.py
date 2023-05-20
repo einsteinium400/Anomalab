@@ -4,7 +4,7 @@ from model.KMeanClusterer import KMeansClusterer
 # Define the search space for each parameter
 
 # Define the size of the population
-population_size = 10
+population_size = 4
 
 # Define the maximum number of generations
 max_generations = 10
@@ -47,7 +47,7 @@ def evaluate_population(params, vectors, population, distance_function, type_val
         model_for_population = KMeansClusterer(hyper_params=params, distance=distance_function, num_means=k,
                                                type_of_fields=type_values)
         # activate model
-        model_for_population.cluster(vectors)
+        model_for_population.cluster_vectorspace(vectors)
         fitness_scores.append(model_for_population.get_wcss())
     print ('wcss: ',min(fitness_scores))
     return fitness_scores
@@ -136,7 +136,7 @@ def genetic_algorithm(params, distance_function, k, vectors, type_values, z):
                                            type_of_fields=type_values)
 
     # activate model
-    model_for_population.cluster(vectors)
+    model_for_population.cluster_vectorspace(vectors)
    # best_fitness_score = model_for_population.wcss_calculate()  # hello(*best_solution)
     best_fitness_score = model_for_population.get_wcss()  # hello(*best_solution)
 
@@ -150,7 +150,7 @@ def genetic_algorithm(params, distance_function, k, vectors, type_values, z):
         model_for_population = KMeansClusterer(hyper_params=params, distance=distance_function,
                                                num_means=k, type_of_fields=type_values)
         # activate model
-        model_for_population.cluster(vectors)
+        model_for_population.cluster_vectorspace(vectors)
 
         fitness_score = model_for_population.get_wcss()  # hello(*solution)
         # if we want to find the biggest score

@@ -1,10 +1,11 @@
 import numpy as np
 import math
 
+
 def Statistic(u, v, type_values, parameters):
     distance = 0
     results = []
-    
+
     def f_freq(z, theta1, betha, theta2, gamma):
         if z <= theta1:
             return 1
@@ -21,7 +22,7 @@ def Statistic(u, v, type_values, parameters):
 
     for i in range(len(v)):
         # catrgorical handle
-        if type_values[i]==True:
+        if type_values[i] == True:
             # if attributes are same
             if u[i] == v[i]:
                 results.append(0)
@@ -34,11 +35,11 @@ def Statistic(u, v, type_values, parameters):
                 m_fk = parameters["minimum_freq_of_each_attribute"][str(i)]
                 d_fr = (abs(fr_u - fr_v) + m_fk) / max(fr_u, fr_v)
                 results.append(abs(max(d_fr, theta, f_v_ak)))
-                distance+=pow(max(d_fr, theta, f_v_ak), 2)
+                distance += pow(max(d_fr, theta, f_v_ak), 2)
         # numberic handle
         else:
             results.append(abs(np.int64(u[i]) - np.int64(v[i])))
-            distance+=pow(np.int64(u[i]) - np.int64(v[i]), 2)
-    
+            distance += pow(np.int64(u[i]) - np.int64(v[i]), 2)
+
     distance = math.sqrt(distance)
-    return distance,results
+    return distance, results

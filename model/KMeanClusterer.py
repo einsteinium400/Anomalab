@@ -108,6 +108,7 @@ class KMeansClusterer:
             #            print("new centroid is:", centroid)
             return centroid
         else:
+           # print(cluster)
             raise Exception("bad seed")
 
     def get_means(self):
