@@ -4,7 +4,7 @@ import pygad as pygad
 
 POPULATION_SIZE = 10
 GENERATIONS = 10
-EVALUATE_TIMES = 3
+EVALUATE_TIMES = 1
 
 # Generate an initial population of solutions
 def generate_population(maxDomainSize):
@@ -36,7 +36,7 @@ def genetic_algorithm(params, distance_function, k, vectors, type_values, maxDom
             model_for_population = KMeansClusterer(hyper_params=params, distance=distance_function, num_means=k,
                                                     type_of_fields=type_values)
             # activate model
-            model_for_population.cluster(vectors)
+            model_for_population.cluster_vectorspace(vectors)
             grades.append(model_for_population.get_wcss())
         print ('wcss:',grades,"avg",sum(grades)/len(grades))
         return (-(sum(grades)/len(grades)))

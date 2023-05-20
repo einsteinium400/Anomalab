@@ -5,6 +5,9 @@ import json
 import numpy as np
 import math
 import model.utils as utils
+from collections import Counter
+
+MAX_ITERATION = 30
 
 
 class KMeansClusterer:
@@ -17,8 +20,9 @@ class KMeansClusterer:
             mean_values=None,
             conv_test=1e-6,  # threshold for converging
             type_of_fields=None,
+            repeats_method="best_wcss",
             hyper_params=dict()):
-
+        self.repeats_method = repeats_method
         self._num_means = num_means
         self._distance = distance
         self._repeats = repeats
@@ -33,10 +37,8 @@ class KMeansClusterer:
         self.attributesStdDevs = None
 
         self.silhouette = None
-        ##
         self._max_difference = conv_test
         self._wcss = None
-
         self._normalized_wcss = None
         self._clusters_info = []
         self._model_json_info = 0
@@ -81,22 +83,29 @@ class KMeansClusterer:
     def _centroid(self, cluster, mean):
         # initialize an empty list, with size of number of features
         if len(cluster):
-            temp_centroid = [[] for columns in range(cluster[0].shape[0])]
-            for sample in cluster:
-                for j in range(len(temp_centroid)):
-                    temp_centroid[j].append(sample[j])
+            # temp_centroid = [[] for columns in range(cluster[0].shape[0])]
+            # for sample in cluster:
+            #     for j in range(len(temp_centroid)):
+            #         temp_centroid[j].append(sample[j])
             # temp_centroid.append(mean)
             # extract the most frequenct value in each index
             frequent_value_list = []
-            for x in range(len(temp_centroid)):
+            for ind in range(len(cluster[0])):
+                # print("cluster is:", cluster)
                 # if type if categorical, take the most frequent value.
                 # if type is numerical, make avg
-                if self._type_of_fields[x]:
-                    frequent_value_list.append(int(max(set(temp_centroid[x]), key=temp_centroid[x].count)))
+                if self._type_of_fields[ind]:
+                    counter = Counter(arr[ind] for arr in cluster if len(arr) > ind)
+                    frequent_value_list.append(counter.most_common(1)[0][0])
+
+                    #l = max(Counter(cluster[ind]), key=lambda x: Counter(cluster[ind])[x])
+                    #frequent_value_list.append(max(Counter(cluster[ind]), key=lambda x: Counter(cluster[ind])[x]))
+                    # frequent_value_list.append(int(max(set(cluster[x]), key=cluster[x].count)))
                 else:
-                    frequent_value_list.append(sum(temp_centroid[x]) / len(temp_centroid[x]))
+                    frequent_value_list.append(np.mean([arr[ind] for arr in cluster], axis=0))
 
             centroid = np.array(frequent_value_list)
+            #            print("new centroid is:", centroid)
             return centroid
         else:
             raise Exception("bad seed")
@@ -113,7 +122,8 @@ class KMeansClusterer:
         wcss = 0
         for i in range(len(self._clusters_info)):
             for vec in self._clusters_info[i]:
-                distance, results = self._distance(list(vec), self._means[i], self._type_of_fields, self._hyper_parameters)
+                distance, results = self._distance(list(vec), self._means[i], self._type_of_fields,
+                                                   self._hyper_parameters)
                 wcss += distance ** 2
         self._wcss = wcss
 
@@ -125,7 +135,7 @@ class KMeansClusterer:
     def SilhouetteCalculate(self):
 
         ##handling one cluster only
-        if (len(self._clusters_info) < 2):
+        if len(self._clusters_info) < 2:
             self.silhouette = 0
             return
 
@@ -196,7 +206,8 @@ class KMeansClusterer:
             self.clustersMaxDistances.append(maxDistance)
             self.clustersAverageDistance.append(sumOfTotalDistance / len(self._clusters_info[index]))
             for i in range(numberOfFeatures):
-                self.attributesAverageDistances[index][i] = sumOfAttributesDistances[i] / len(self._clusters_info[index])
+                self.attributesAverageDistances[index][i] = sumOfAttributesDistances[i] / len(
+                    self._clusters_info[index])
 
         # calculate standard deviation
         for index in range(numberOfClusters):
@@ -229,40 +240,57 @@ class KMeansClusterer:
     # cluster the data given to kmeans
     def cluster_vectorspace(self, vectors):
         meanss = []
+        wcsss = []
         # make _repeats repeats to get the best means
         for trial in range(self._repeats):
+         #   print("kmeans cluster_vectorspace, doing repeats", trial)
             # generate new means
             try:
                 self._means = utils.mean_generator(self._num_means, vectors)
                 # cluster the vectors to the given means
-                self._cluster_vectorspace(vectors)
+                try:
+                    self._cluster_vectorspace(vectors)
+                except Exception as e:
+                    raise e
                 # add the new means each time
                 meanss.append(self._means)
+                self.wcssCalculate()
+                wcsss.append(self._wcss)
             except Exception as e:
-                #print(e, ": ", trial)
+                # print(e, ": ", trial)
                 raise e
         # at this point meanss holds an array of arrays, each array has k means in it.
         if len(meanss) > 1:
-            # find the set of means that's minimally different from the others
-            min_difference = min_means = None
-            for i in range(len(meanss)):
-                d = 0
-                for j in range(len(meanss)):
-                    if i != j:
-                        d += self._sum_distances(meanss[i], meanss[j])
-                if min_difference is None or d < min_difference:
-                    min_difference, min_means = d, meanss[i]
+            if self.repeats_method == "best_wcss":
+                #print(wcsss)
+                lowest_wcss = wcsss.index(min(wcsss, key=lambda x: x))
+                self._wcss = wcsss[lowest_wcss]
+                self._means = meanss[lowest_wcss]
 
-                # use the best means
-                self._means = min_means
+            elif self.repeats_method == "minimal_difference":
+                # find the set of means that's minimally different from the others
+                min_difference = min_means = None
+                for i in range(len(meanss)):
+                    d = 0
+                    for j in range(len(meanss)):
+                        if i != j:
+                            d += self._sum_distances(meanss[i], meanss[j])
+                    if min_difference is None or d < min_difference:
+                        min_difference, min_means = d, meanss[i]
+
+                    # use the best means
+                    self._means = min_means
 
     # cluster for specific mean values
     def _cluster_vectorspace(self, vectors):
-
+        print("in cluster vectorspace")
         if self._num_means < len(vectors):
+            # max iteration if there is no conversion
+            current_iteration = 0
             # perform k-means clustering
             converged = False
             while not converged:
+                current_iteration += 1
                 # assign the tokens to clusters based on minimum distance to
                 # the cluster means
 
@@ -271,9 +299,15 @@ class KMeansClusterer:
                 for vector in vectors:
                     index, distances = self.classify_vectorspace(vector)
                     clusters[index].append(vector)
-
-                new_means = list(map(self._centroid, clusters, self._means))
-
+                # for i in range(len(clusters)):
+                # print("cluster is",len(clusters[i]))
+                # print("generating new means")
+                try:
+                    new_means = list(map(self._centroid, clusters, self._means))
+                except Exception as e:
+                    # Propagate the exception from function c to function a
+                    raise e
+                # print("new means are:", new_means)
                 # recalculate cluster means by computing the centroid of each cluster
                 ###### new_means = list(map(self._centroid, clusters, self._means))
 
@@ -283,13 +317,14 @@ class KMeansClusterer:
 
                 self._means = new_means
 
-                if difference < self._max_difference:
+                if difference < self._max_difference or current_iteration == MAX_ITERATION:
                     converged = True
 
             self._clusters_info = clusters
             # self.createClusterJson()
             # print ('cluster means: ', self._means)
         else:
+            print("erorr!!!!")
             pass  # todo: return error here
 
     def classify_vectorspace(self, vector):

@@ -1,5 +1,5 @@
 import pandas as pd
-#from model.GeneticAlgorithm import genetic_algorithm
+# from model.GeneticAlgorithm import genetic_algorithm
 from model.noamGeneticAlgorithm import genetic_algorithm
 from itertools import permutations
 from model.elbow import elbowLocator
@@ -11,9 +11,11 @@ from datetime import datetime
 MAX_CLUSTERS_IN_ELBOW = 10
 MIN_CLUSTERS_IN_ELBOW = 1
 
-def apply_elbow_method(fields_data, vectors, distance_function,triesNumber, _repeats):
+
+def apply_elbow_method(fields_data, vectors, distance_function, triesNumber, _repeats):
     wcss = []
     tries = 0
+    triesNumber=1 ###
     i = MIN_CLUSTERS_IN_ELBOW
     wcssCalc = []
     model = None
@@ -35,10 +37,12 @@ def apply_elbow_method(fields_data, vectors, distance_function,triesNumber, _rep
                 if str(e) == "bad seed":
                     if tries == 3:
                         if i < 3:
-                            raise e+"three tries"
+                            print("three tries")
+                            raise e
+
                         else:
                             print('three tries with', i)
-                            i = MAX_CLUSTERS_IN_ELBOW+1
+                            i = MAX_CLUSTERS_IN_ELBOW + 1
                             break
                     else:
                         tries += 1
@@ -49,18 +53,19 @@ def apply_elbow_method(fields_data, vectors, distance_function,triesNumber, _rep
                     raise e
             if not flag:
                 wcssCalc.append(model.get_wcss())
-                if i==1:
+                if i == 1:
                     j = triesNumber
                 tries = 0
             j += 1
-        if (len(wcssCalc)>0):
-            print ("wcssCalc for",i,"clusters:",wcssCalc,"average:",sum(wcssCalc)/len(wcssCalc))
-            wcss.append(sum(wcssCalc)/len(wcssCalc))
+        if (len(wcssCalc) > 0):
+            print("wcssCalc for", i, "clusters:", wcssCalc, "average:", sum(wcssCalc) / len(wcssCalc))
+            wcss.append(sum(wcssCalc) / len(wcssCalc))
         i += 1
     print("wcss list is: ", wcss)
     elbow_point = elbowLocator(wcss)
     print('elbow point is:', elbow_point)
     return elbow_point
+
 
 def preProcess(vectors, fieldsData, distance_function, triesNumber, repeats):
     type_of_fields = [True if d['type'] == 'categorical' else False for d in fieldsData]
@@ -79,8 +84,8 @@ def preProcess(vectors, fieldsData, distance_function, triesNumber, repeats):
 
             minimal_frequencies_dict[str(i)] = min(frequencies_dict[str(i)].values())
             max_frequencies_dict[str(i)] = max(frequencies_dict[str(i)].values())
-            if max(frequencies_dict[str(i)].values())>z:
-                z=max(frequencies_dict[str(i)].values())
+            if max(frequencies_dict[str(i)].values()) > z:
+                z = max(frequencies_dict[str(i)].values())
         else:
             frequencies_dict[str(i)] = dict()
             minimal_frequencies_dict[str(i)] = dict()
@@ -89,14 +94,15 @@ def preProcess(vectors, fieldsData, distance_function, triesNumber, repeats):
     params_dict["frequencies"] = frequencies_dict
     params_dict["minimum_freq_of_each_attribute"] = minimal_frequencies_dict
     params_dict["theta"] = 0.1
-    k = apply_elbow_method(fieldsData, vectors, distance_function,triesNumber, repeats)
+    print("starting elbow")
+    k = apply_elbow_method(type_of_fields, vectors, distance_function, triesNumber, repeats)
     # activate the genetic algorithm
-    #z = df.nunique().max()  # max domain size
+    # z = df.nunique().max()  # max domain size
     time = datetime.now()
     print("START GENETIC!!! Current Time =", time.strftime("%H:%M:%S"))
     theta1, theta2, betha, gamma = genetic_algorithm(params_dict, distance_function, k, vectors, type_of_fields, z)
     print("FINISH GENETIC!!! Current Time =", datetime.now().strftime("%H:%M:%S"))
-    print("IT TOOK:", (datetime.now()-time).seconds,"seconds")
+    print("IT TOOK:", (datetime.now() - time).seconds, "seconds")
 
     params_dict["theta1"] = theta1  # 3
     params_dict["theta2"] = theta2  # 10

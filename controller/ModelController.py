@@ -12,7 +12,7 @@ from model.KMeanClusterer import KMeansClusterer
 from model import modular_distance_utils
 
 CLUSTERING_TRIES = 3
-REPEATS = 100
+REPEATS = 8
 
 class ModelController:
     operationFactory = StorageFactory()
