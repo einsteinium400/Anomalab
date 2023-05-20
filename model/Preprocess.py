@@ -27,12 +27,10 @@ def apply_elbow_method(fields_data, vectors, distance_function, triesNumber, _re
             flag = False
             try:
                 if distance_function.__name__ != "Statistic" and distance_function.__name__ != "statisticdistdebug":
-                    print("building using bad ", distance_function)
                     #exit()
                     model = KMeansClusterer(hyper_params=dict(), distance=distance_function, num_means=int(i),
                                             type_of_fields=fields_data, repeats=_repeats)
                 else:
-                   # print("build using hamming!")
                     model = KMeansClusterer(hyper_params=dict(), distance=hm, num_means=int(i),
                                             type_of_fields=fields_data, repeats=_repeats)
                 model.cluster_vectorspace(vectors)
