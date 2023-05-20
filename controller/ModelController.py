@@ -111,7 +111,7 @@ class ModelController:
         # print ("#### DEBUG #####")
         dataset.addNewModel({
             'name': modelJson['name'],
-            # 'wcss_score':modelJson['wcss_score_of_model'],
+            'wcss':modelJson['wcss'],
             'silhouette': modelJson['silhouette']
         })
 
@@ -157,7 +157,7 @@ class ModelController:
 
     def GetListForManager(self):
         return self.storage.GetListWithSpecificAttributes("MODEL",
-                                                          ['name', 'timestamp', 'wcss_score_of_model', 'datasetName',
+                                                          ['name', 'timestamp', 'wcss', 'datasetName',
                                                            'function'])
 
     def GetListOfModelsWithDistanceFunction(self, distanceFunctionName):

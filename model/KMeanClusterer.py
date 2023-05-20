@@ -48,7 +48,7 @@ class KMeansClusterer:
 
     def createClusterJson(self):
         jsonData = {
-            "wcss_score_of_model": self._wcss,
+            "wcss": self._wcss,
             "silhouette": self.silhouette,
         }
         listObj = []
@@ -284,7 +284,7 @@ class KMeansClusterer:
 
     # cluster for specific mean values
     def _cluster_vectorspace(self, vectors):
-        print("in cluster vectorspace")
+        #print("in cluster vectorspace")
         if self._num_means < len(vectors):
             # max iteration if there is no conversion
             current_iteration = 0

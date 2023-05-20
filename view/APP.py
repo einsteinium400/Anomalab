@@ -282,13 +282,11 @@ class ManageDatasets(Screen):
             row.append(dataset['instancesNumber'])
             row.append(datetime.fromtimestamp(dataset['timestamp']))
             self.data.append(row)
-        dataRows = len(self.data)
-        pagination = False
         self.table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
             size_hint= (0.9, 0.9),
-            use_pagination = pagination,
-            rows_num = dataRows,
+            use_pagination = False,
+            rows_num = len(self.data),
             column_data = [
                 ("Attribute", dp (table_width*0.25)),
                 ("Attributes", dp (table_width*0.25)),
@@ -394,19 +392,12 @@ class ManageDistanceFunctions(Screen):
             row = []
             row.append(distanceFunction)
             self.data.append(row)
-        
-        dataRows = len(self.data)
-        pagination = False
-        print (f'row of data = {dataRows}')
-        if (dataRows > 5):
-            pagination = True
-            dataRows = 5
         table_width = dp(Window.size[0]*9/50)
         self.table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
             size_hint= (0.9, 0.9),
-            use_pagination = pagination,
-            rows_num = dataRows,
+            use_pagination = False,
+            rows_num = len(self.data),
             column_data = [
                 ("Name", dp (table_width)),
             ],

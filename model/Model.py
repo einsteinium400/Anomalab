@@ -32,7 +32,7 @@ class Model:
             self._jsonData = modelJson
             self._jsonData['id'] = self._id
             self._jsonData['timeStamp'] = self._timeStamp
-            self._wcss = modelJson['wcss_score_of_model']
+            self._wcss = modelJson['wcss']
             self._silhouette=modelJson['silhouette']
             self._numberOfClusters = len(modelJson['clusters_info'])
             self._clusters = modelJson['clusters_info']
@@ -48,7 +48,7 @@ class Model:
             # self._distanceFunctionId = self._jsonData['functionId']
             self._distanceFunction = self._jsonData['function']
             self._silhouette=self._jsonData['silhouette']
-            self._wcss = self._jsonData['wcss_score_of_model']
+            self._wcss = self._jsonData['wcss']
             self._silhouette=self._jsonData['silhouette']
             self._numberOfClusters = len(self._jsonData['clusters_info'])
             self._clusters = self._jsonData['clusters_info']
