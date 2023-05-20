@@ -76,7 +76,7 @@ class ModelController:
             trained = 0
             while trained == 0:
                 try:
-                    modelsTries[i].cluster(data)
+                    modelsTries[i].cluster_vectorspace(data)
                     print ("create model num",i,"wcss is:",modelsTries[i].get_wcss())
                     trained =1
                 except Exception as e:
@@ -95,6 +95,7 @@ class ModelController:
         modelsTries[best].metaDataCalculation()
         modelsTries[best].createClusterJson()
         modelJson = modelsTries[best].getModelData()
+        modelJson['wcss']=modelsTries[best].get_wcss()
         modelJson['datasetName']=dataset.Name
         modelJson['function'] = distanceName
         modelJson['name'] = name
@@ -111,7 +112,7 @@ class ModelController:
         #print ("#### DEBUG #####")
         dataset.addNewModel({
             'name':modelJson['name'],
-            # 'wcss_score':modelJson['wcss_score_of_model'],
+            'wcss':modelJson['wcss'],
             'silhouette':modelJson['silhouette']
         })
 

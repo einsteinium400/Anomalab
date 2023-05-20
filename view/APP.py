@@ -199,7 +199,7 @@ class Results(Screen):
         # function to add value labels
         def addlabels(x,y,text):
             for i in range(len(x)):
-                plt.text(i, y[i], round(text[i],2), ha = 'center')
+                plt.text(i, y[i], "d="+str(round(text[i],2)), ha = 'center')
         addlabels(graphLabels, graphData, answer['results'])
         plt.legend(loc='best', fontsize=25)
         plt.ylim(0, 3)
@@ -704,7 +704,8 @@ class ChooseModels(Screen):
         for model in app.modelsList:
             row = []
             row.append(model['name'])   #Name
-            row.append(model['wcss_score'])   #wcss
+            row.append(round(model['silhouette'],2))   #Silhouette
+            row.append(round(model['wcss'],2))   #wcss
             self.data.append(row)
         dataRows = len(self.data)
         pagination = False
@@ -722,8 +723,9 @@ class ChooseModels(Screen):
                 rows_num = dataRows,
                 column_data = [
                     #HERE COME CHECK MARK width
-                    ("Model Name", dp (table_width*0.47)),
-                    ("Wcss", dp (table_width*0.47)),
+                    ("Model Name", dp (table_width*0.32)),
+                    ("Silhouette", dp (table_width*0.32)),
+                    ("Wcss", dp (table_width*0.32)),
                 ],
                 row_data = self.data
             )
