@@ -1,10 +1,41 @@
+import uuid
 from sklearn import preprocessing
 import pandas as pd
 import faker
 COMMON_MISSING_VALUES=['NA']
 
+
+
+def fill_with_most_frequent(dataframe, columns):
+    for column in columns:
+        most_frequent = dataframe[column].mode()[0]
+        dataframe[column].fillna(most_frequent, inplace=True)
+    return dataframe
+
+def create_unique_string(dataframe, columns):
+    # Loop over each column and fill missing values with unique strings
+    for col in columns:
+        # Get the locations of missing values in the column
+        missing_mask = dataframe[col].isnull()
+        missing_locs = missing_mask[missing_mask].index.tolist()
+
+        # Generate unique strings with prefix and fill missing values
+        unique_strings = [f"filledNa-{str(uuid.uuid4())}" for _ in range(len(missing_locs))]
+        dataframe.loc[missing_locs, col] = unique_strings
+    # for column in columns:
+    #     dataframe[column] = dataframe[column].fillna('filledNa-' + dataframe[column].astype(str))
+
+def apply_swap_function(dataframe, columns, function_name):
+    switch_case = {
+        'most_frequent': fill_with_most_frequent,
+        'unique_string': create_unique_string
+    }
+
+    function = switch_case.get(function_name)
+    dataframe = function(dataframe, columns)
+
 class DatasetPreProcessor:
-    def dataSetPreProcess(self,name,df):
+    def dataSetPreProcess(self,name,df, method = 'unique_string'):
         # Replace common missing values conventions with NaN
         for item in COMMON_MISSING_VALUES:
             df = df.replace(item, pd.NaT)
@@ -29,18 +60,8 @@ class DatasetPreProcessor:
             })
         categorical_cols = list(set(cols) - set(num_cols))
 
-        # # Add unique string to dataframe in NA for Data imputation
-        # fake = faker.Faker()
-        # # Loop over each column and fill missing values with unique strings
-        # for col in categorical_cols:
-        #     # Get the locations of missing values in the column
-        #     missing_mask = df[col].isnull()
-        #     missing_locs = missing_mask[missing_mask].index.tolist()
-
-        #     # Generate unique strings with prefix and fill missing values
-        #     unique_strings = ["fillna-" + fake.text() for _ in range(len(missing_locs))]
-        #     df.loc[missing_locs, col] = unique_strings
-        
+        apply_swap_function(dataframe=df,columns=categorical_cols,function_name=method)
+        print(df)
 
         for col in categorical_cols:
             le = preprocessing.LabelEncoder()
@@ -59,6 +80,6 @@ class DatasetPreProcessor:
                 "values":inv_map,
                 "frequencies": value_counts
             })
-        print(df)
+        
         print (featuresInfo)
         return df,featuresInfo
