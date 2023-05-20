@@ -14,7 +14,7 @@ from kivy.metrics import dp
 # plots imports
 from matplotlib import pyplot as plt
 import numpy as np
-from kivy.garden.matplotlib import FigureCanvasKivyAgg
+# from kivy.garden.matplotlib import FigureCanvasKivyAgg
 #forms imports
 from kivymd.uix.label import MDLabel
 from kivymd.uix.textfield import MDTextFieldRect
