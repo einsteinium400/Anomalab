@@ -6,6 +6,7 @@ import numpy as np
 import math
 import model.utils as utils
 from collections import Counter
+from sklearn.metrics import silhouette_score
 
 MAX_ITERATION = 30
 
@@ -98,8 +99,8 @@ class KMeansClusterer:
                     counter = Counter(arr[ind] for arr in cluster if len(arr) > ind)
                     frequent_value_list.append(counter.most_common(1)[0][0])
 
-                    #l = max(Counter(cluster[ind]), key=lambda x: Counter(cluster[ind])[x])
-                    #frequent_value_list.append(max(Counter(cluster[ind]), key=lambda x: Counter(cluster[ind])[x]))
+                    # l = max(Counter(cluster[ind]), key=lambda x: Counter(cluster[ind])[x])
+                    # frequent_value_list.append(max(Counter(cluster[ind]), key=lambda x: Counter(cluster[ind])[x]))
                     # frequent_value_list.append(int(max(set(cluster[x]), key=cluster[x].count)))
                 else:
                     frequent_value_list.append(np.mean([arr[ind] for arr in cluster], axis=0))
@@ -108,7 +109,7 @@ class KMeansClusterer:
             #            print("new centroid is:", centroid)
             return centroid
         else:
-           # print(cluster)
+            # print(cluster)
             raise Exception("bad seed")
 
     def get_means(self):
@@ -134,47 +135,58 @@ class KMeansClusterer:
         return self.silhouette
 
     def SilhouetteCalculate(self):
-
-        ##handling one cluster only
-        if len(self._clusters_info) < 2:
-            self.silhouette = 0
-            return
-
-        totalVectors = 0
-        totalSilhouette = 0
-        clustersRange = [*range(len(self._clusters_info))]
-        ##count vectors
-        for cluster in self._clusters_info:
-            totalVectors += len(cluster)
-
+        # list to hold all vectors
+        concatenated_list = []
+        cluster_labels = []
+        # build the cluster labels
         for index in range(len(self._clusters_info)):
-            for vec in self._clusters_info[index]:
-                ##silhouette
-                sumInCluster = 0
-                sumOutCluster = 0
-                numOutCluster = 0
+            concatenated_list.extend(self._clusters_info[index])
+            cluster_labels.extend([index] * len(self._clusters_info[index]))
 
-                ##calculate inner cluster distances (ai)
-                for otherVector in self._clusters_info[index]:
-                    distance, results = self._distance(vec, otherVector, self._type_of_fields, self._hyper_parameters)
-                    sumInCluster += distance
-
-                ##calculate outer clusters distances (bi)
-                clustersRange.remove(index)
-                for otherClusters in clustersRange:
-                    for otherVector in self._clusters_info[otherClusters]:
-                        distance, results = self._distance(vec, otherVector, self._type_of_fields,
-                                                           self._hyper_parameters)
-                        sumOutCluster += distance
-                        numOutCluster += 1
-                clustersRange.append(index)
-                ##summarize silhouette
-                ai = sumInCluster / len(self._clusters_info[index])
-                bi = sumOutCluster / numOutCluster
-                si = (bi - ai) / max(ai, bi)
-                totalSilhouette += si
-
-        self.silhouette = totalSilhouette / totalVectors
+        score = silhouette_score(concatenated_list, cluster_labels,
+                                 metric=lambda x, y: self._distance(x, y, self._type_of_fields, self._hyper_parameters)[
+                                     0])
+        self.silhouette = score
+        # ##handling one cluster only
+        # if len(self._clusters_info) < 2:
+        #     self.silhouette = 0
+        #     return
+        #
+        # totalVectors = 0
+        # totalSilhouette = 0
+        # clustersRange = [*range(len(self._clusters_info))]
+        # ##count vectors
+        # for cluster in self._clusters_info:
+        #     totalVectors += len(cluster)
+        #
+        # for index in range(len(self._clusters_info)):
+        #     for vec in self._clusters_info[index]:
+        #         ##silhouette
+        #         sumInCluster = 0
+        #         sumOutCluster = 0
+        #         numOutCluster = 0
+        #
+        #         ##calculate inner cluster distances (ai)
+        #         for otherVector in self._clusters_info[index]:
+        #             distance, results = self._distance(vec, otherVector, self._type_of_fields, self._hyper_parameters)
+        #             sumInCluster += distance
+        #
+        #         ##calculate outer clusters distances (bi)
+        #         clustersRange.remove(index)
+        #         for otherClusters in clustersRange:
+        #             for otherVector in self._clusters_info[otherClusters]:
+        #                 distance, results = self._distance(vec, otherVector, self._type_of_fields,
+        #                                                    self._hyper_parameters)
+        #                 sumOutCluster += distance
+        #                 numOutCluster += 1
+        #         clustersRange.append(index)
+        #         ##summarize silhouette
+        #         ai = sumInCluster / len(self._clusters_info[index])
+        #         bi = sumOutCluster / numOutCluster
+        #         si = (bi - ai) / max(ai, bi)
+        #         totalSilhouette += si
+        #
+        # self.silhouette = totalSilhouette / totalVectors
 
     def metaDataCalculation(self):
         numberOfFeatures = len(self._means[0])
@@ -244,7 +256,7 @@ class KMeansClusterer:
         wcsss = []
         # make _repeats repeats to get the best means
         for trial in range(self._repeats):
-         #   print("kmeans cluster_vectorspace, doing repeats", trial)
+            #   print("kmeans cluster_vectorspace, doing repeats", trial)
             # generate new means
             try:
                 self._means = utils.mean_generator(self._num_means, vectors)
@@ -263,7 +275,7 @@ class KMeansClusterer:
         # at this point meanss holds an array of arrays, each array has k means in it.
         if len(meanss) > 1:
             if self.repeats_method == "best_wcss":
-                #print(wcsss)
+                # print(wcsss)
                 lowest_wcss = wcsss.index(min(wcsss, key=lambda x: x))
                 self._wcss = wcsss[lowest_wcss]
                 self._means = meanss[lowest_wcss]
@@ -284,7 +296,7 @@ class KMeansClusterer:
 
     # cluster for specific mean values
     def _cluster_vectorspace(self, vectors):
-        #print("in cluster vectorspace")
+        # print("in cluster vectorspace")
         if self._num_means < len(vectors):
             # max iteration if there is no conversion
             current_iteration = 0
