@@ -57,8 +57,7 @@ class ModelController:
         types = [True if d['type'] == 'categorical' else False for d in fieldsData]
         data = np.array(dataSet.Data)
         hp, k = preProcess(data, fieldsData, distanceFunction, CLUSTERING_TRIES, REPEATS)
-        print("done preprocess - start k means models")
-        print("IT TOOK:", (datetime.now() - _time).seconds, "seconds")
+        print("done preprocess")
         modelsTries = []
         for i in range(CLUSTERING_TRIES):
             try:
@@ -87,9 +86,7 @@ class ModelController:
         for i in range(1, CLUSTERING_TRIES):
             if (modelsTries[best].get_wcss() > modelsTries[i].get_wcss()):
                 best = i
-        print('choose the best wcss model', best)
-        print('done training')
-        print("IT TOOK:", (datetime.now() - _time).seconds, "seconds")
+        print("FINISH TRAINING- IT TOOK:", (datetime.now() - _time).seconds, "seconds")
         print('wcss is:', modelsTries[best].get_wcss())
         print('silhouette is:', modelsTries[best].get_Silhouette())
         modelsTries[best].metaDataCalculation()
@@ -116,7 +113,7 @@ class ModelController:
         })
 
         print("########################## MODEL FINISHED#############################")
-        print("IT TOOK:", (datetime.now() - _time).seconds, "seconds")
+        print("OVERALL IT TOOK:", (datetime.now() - _time).seconds, "seconds")
 
     def GetModel(self, modelName):
         modelsList = self.__GetAllModelsNamesList()

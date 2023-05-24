@@ -98,15 +98,14 @@ def preProcess(vectors, fieldsData, distance_function, triesNumber, repeats):
     params_dict["frequencies"] = frequencies_dict
     params_dict["minimum_freq_of_each_attribute"] = minimal_frequencies_dict
     params_dict["theta"] = 0.1
-    print("starting elbow")
+    time = datetime.now()
     k = apply_elbow_method(type_of_fields, vectors, distance_function, triesNumber, repeats)
+    print("ELBOW COMPLETED AND TOOK:", (datetime.now() - time).seconds, "seconds")
     # activate the genetic algorithm
     # z = df.nunique().max()  # max domain size
     time = datetime.now()
-    print("START GENETIC!!! Current Time =", time.strftime("%H:%M:%S"))
     theta1, theta2, betha, gamma = genetic_algorithm(params_dict, distance_function, k, vectors, type_of_fields, z)
-    print("FINISH GENETIC!!! Current Time =", datetime.now().strftime("%H:%M:%S"))
-    print("IT TOOK:", (datetime.now() - time).seconds, "seconds")
+    print("GENETIC COMPLETED AND TOOK:", (datetime.now() - time).seconds, "seconds")
 
     params_dict["theta1"] = theta1  # 3
     params_dict["theta2"] = theta2  # 10
