@@ -16,6 +16,7 @@ class Model:
     _numberOfClusters = 0
     _clusters = 0
     _hyperParams = 0
+    _clustersValues=0
 
     def __init__(
             self,
@@ -36,6 +37,7 @@ class Model:
             self._silhouette=modelJson['silhouette']
             self._numberOfClusters = len(modelJson['clusters_info'])
             self._clusters = modelJson['clusters_info']
+            self._clustersValues = modelJson['cluster_values']
             self._fieldTypes = modelJson['fieldTypes']
             self._meanValues = modelJson['meanValues']
             self._hyperParams = modelJson['hyperParams']
@@ -52,6 +54,7 @@ class Model:
             self._silhouette=self._jsonData['silhouette']
             self._numberOfClusters = len(self._jsonData['clusters_info'])
             self._clusters = self._jsonData['clusters_info']
+            self._clustersValues = self._jsonData['cluster_values']
             self._datasetName = self._jsonData['datasetName']
             self._fieldTypes = self._jsonData['fieldTypes']
             self._meanValues = self._jsonData['meanValues']
@@ -133,6 +136,11 @@ class Model:
     def ImportFeatures(self, value):
         self._jsonData = value
         self.SaveModel()
+    
+    @property
+    def ClusterValues(self):
+        return self._clustersValues
+
 
     def SaveModel(self):
         operationFactory = StorageFactory()

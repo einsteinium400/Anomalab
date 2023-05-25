@@ -9,20 +9,22 @@ datasetController = DatasetController()
 modelController = ModelController()
 # add function flow
 # distanceController.add_function('./distanceFunctions/MixedDistance.py')
-# datasetController.CreateDataset("german_20",'./datasets/german_credit_data_michael_test.csv')
-# data = datasetController.GetDataset('german_20')
-# modelController.CreateModel(data,'Statistic')
+datasetController.CreateDataset("german_20",'./datasets/german_credit_data_michael_test.csv')
+data = datasetController.GetDataset('german_20')
+modelController.CreateModel(data,'Statistic')
+model = modelController.GetModel('german_20-Statistic')
+print(model.ClusterValues)
 # distanceController.delete_function('MixedDistance')
 # data= datasetController.GetDataset('german_20')
 # print(data.BestModel)
 
 #  Add dataset flow 
-try:
-    datasetController.DeleteDataset("test")
-except:
-    pass
-datasetController.CreateDataset("test","./datasets/german_credit_data_michael_test.csv")
-print("end")
+# try:
+#     datasetController.DeleteDataset("test")
+# except:
+#     pass
+# datasetController.CreateDataset("test","./datasets/german_credit_data_michael_test.csv")
+# print("end")
 
 
 # Job queue tester
