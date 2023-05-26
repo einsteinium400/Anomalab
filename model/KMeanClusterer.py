@@ -66,6 +66,7 @@ class KMeansClusterer:
                 }
             )
         jsonData['clusters_info'] = listObj
+        jsonData['cluster_values'] = self._clusters_info
         jsonData['hyperParams'] = self._hyper_parameters
         self._model_json_info = jsonData
 
@@ -311,7 +312,7 @@ class KMeansClusterer:
 
                 for vector in vectors:
                     index, distances = self.classify_vectorspace(vector)
-                    clusters[index].append(vector)
+                    clusters[index].append(vector.tolist())
                 # for i in range(len(clusters)):
                 # print("cluster is",len(clusters[i]))
                 # print("generating new means")

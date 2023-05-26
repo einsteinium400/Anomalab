@@ -208,7 +208,7 @@ class Dataset:
             'wcss':model['wcss'],
             'silhouette':model['silhouette']
         })
-        self._bestModel = sorted(self._bestModel, key=lambda x: x['silhouette'],reverse=False)
+        self._bestModel = sorted(self._bestModel, key=lambda x: x['silhouette'],reverse=True)
         self.SaveDataset()
 
     def removeModel(self,modelName):
