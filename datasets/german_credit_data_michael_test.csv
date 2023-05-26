@@ -1,4 +1,4 @@
-Age,Sex,Job,Housing,Saving accounts,Checking account,Credit amount,Duration,Purpose
+Age,Gender,Job,Housing,Saving accounts,Checking account,Credit amount,Duration,Purpose
 67,male,2,NA,NA,little,1169,6,NA
 22,female,2,own,little,moderate,5951,48,radio/TV
 49,,1,own,little,NA,2096,12,education

@@ -68,7 +68,7 @@ class DistanceFunctionController:
         modular_distance_utils.refresh_functions_list()
 
     @staticmethod
-    def view_all_functions():
+    def getListForManager():
         function_names = [t[0] for t in modular_distance_utils.function_list]
         return function_names
 

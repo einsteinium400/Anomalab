@@ -13,13 +13,13 @@ from kivymd.uix.datatables import MDDataTable
 from kivy.metrics import dp
 # plots imports
 from matplotlib import pyplot as plt
-import numpy as np
-# from kivy.garden.matplotlib import FigureCanvasKivyAgg
+#import numpy as np
+from kivy.garden.matplotlib import FigureCanvasKivyAgg
 #forms imports
 from kivymd.uix.label import MDLabel
 from kivymd.uix.textfield import MDTextFieldRect
 from kivy.uix.spinner import Spinner
-from kivy.uix.accordion import Accordion, AccordionItem
+##from kivy.uix.accordion import Accordion, AccordionItem
 
 # Controllers import
 from controller.DistanceFunctionController import DistanceFunctionController
@@ -75,6 +75,7 @@ class ChooseDataset(Screen):
             self.ids['spinner_id'].values = nameList
         except Exception as e:
             show_popup(str(e))
+            self.on_back()
            
     def on_choose(self, datasetName):
         app = MDApp.get_running_app()
@@ -112,6 +113,7 @@ class Query(Screen):
         app = MDApp.get_running_app()
         try:
             app.attributesList=app.datasetController.GetAttributesList(app.dataSetName)
+            print("attributes list:", app.attributesList)
             for i in range(len(app.attributesList)):
                 self.ids.attributes_box.add_widget(MDLabel(text='[size=20]'+str(app.attributesList[i]["name"])+':[/size]', halign="center", markup= True))
                 if (app.attributesList[i]["type"] == 'numeric'):
@@ -141,20 +143,24 @@ class Query(Screen):
     
     def on_apply(self):
         app = MDApp.get_running_app()
-        app.query = []
+        app.numericQuery = []
+        app.originalQuery = []
+
         for i in range(len(self.attributesRefs)):
             if (self.attributesRefs[i].text==""):
                 show_popup(f'MUST FILL ALL FIELDS check field number {i+1}')
                 return
+            # keep the original query
+            app.originalQuery.append(str(self.attributesRefs[i].text))
             if (self.attributesTypes.pop(0)):
-                ## get the numeric value for categorical attribute
+                # get the numeric value for categorical attribute
                 dict = app.attributesList[i]["values"]
                 value = [k for k, v in dict.items() if v == self.attributesRefs[i].text][0]
-                app.query.append(int(value))
+                app.numericQuery.append(int(value))
             else:
                 # numeric feature
-                app.query.append(float(self.attributesRefs[i].text))
-        print (f'query is {app.query}')
+                app.numericQuery.append(float(self.attributesRefs[i].text))
+        print (f'query is {app.numericQuery}')
         if app.userType == 'regular':
             self.manager.transition = SlideTransition(direction="left")
             self.manager.current = 'results'
@@ -174,7 +180,7 @@ class Results(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
         model = app.modelController.GetModel(app.modelsList[0]['name'])
-        answer=checkSampleForAnomaly(model, app.query)
+        answer=checkSampleForAnomaly(model, app.numericQuery)
         string = ""
         if answer['anomaly']==True:
             string = '[color=ff3333][b]Anomaly[/b][/color]'
@@ -214,7 +220,7 @@ class Results(Screen):
             row = []
             row.append('[size=20]'+app.attributesList[i]['name']+'[/size]')
             row.append('[size=20]'+str(answer['mean'][i])+'[/size]')
-            row.append('[size=20]'+str(app.query[i])+'[/size]')
+            row.append('[size=20]'+str(app.numericQuery[i])+'[/size]')
             string='[size=20]'+str(answer['results'][i])+'[/size]'
             #if answer['standarizeDistances'][i]>2:
                 #string='[color=ff3333]'+string+'[/color]'
@@ -280,7 +286,7 @@ class ManageDatasets(Screen):
             row.append(dataset['name'])
             row.append(dataset['featuresNumber'])
             row.append(dataset['instancesNumber'])
-            row.append(datetime.fromtimestamp(dataset['timestamp']))
+            row.append(str(datetime.fromtimestamp(dataset['timestamp']))[:16])
             self.data.append(row)
         self.table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
@@ -316,7 +322,7 @@ class ManageDatasets(Screen):
             "timestamp": self.table.row_data[row_num][3],
         }
         self.manager.transition = SlideTransition(direction="left")
-        self.manager.current = 'uddataset'
+        self.manager.current = 'deletedataset'
     def on_add(self):
         self.manager.transition = SlideTransition(direction="left")
         self.manager.current = 'adddataset'
@@ -358,7 +364,7 @@ class AddDataset(Screen):
         self.ids['name'].text = ""
         #self.ids['path'].text = ""
 #---8---
-class UDDataset(Screen):
+class DeleteDataset(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
         self.ids['name'].text= 'name: '+str(app.dictionary['name'])
@@ -386,7 +392,7 @@ class UDDataset(Screen):
 class ManageDistanceFunctions(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
-        distancesData = app.distanceController.view_all_functions()
+        distancesData = app.distanceController.getListForManager()
         self.data=[]
         for distanceFunction in distancesData:
             row = []
@@ -418,7 +424,7 @@ class ManageDistanceFunctions(Screen):
             "name": self.table.row_data[row_num][0],
         }
         self.manager.transition = SlideTransition(direction="left")
-        self.manager.current = 'uddistancefunction'
+        self.manager.current = 'deletedistancefunction'
         
     def on_add(self):
         self.manager.transition = SlideTransition(direction="left")
@@ -460,7 +466,7 @@ class AddDistanceFunction(Screen):
     def resetForm(self):
         self.ids['path'].text = ""
 #---11---
-class UDDistanceFunction(Screen):
+class DeleteDistanceFunction(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
         self.ids['name'].text= str(app.dictionary['name'])
@@ -762,7 +768,7 @@ class AnalystResults(Screen):
         modelsNum = len(app.modelsApplyList)
         try:
             for modelname in app.modelsApplyList:
-                results.append(checkSampleForAnomaly(app.modelController.GetModel(modelname), app.query))
+                results.append(checkSampleForAnomaly(app.modelController.GetModel(modelname), app.numericQuery))
         except Exception as e:
             show_popup(str(e))
             return
@@ -780,7 +786,7 @@ class AnalystResults(Screen):
         for i in range(len(app.attributesList)):
             row = []
             row.append('[size=20]'+app.attributesList[i]['name']+'[/size]')
-            row.append('[size=20]'+str(app.query[i])+'[/size]')
+            row.append('[size=20]'+str(app.originalQuery[i])+'[/size]')
             for result in results:
                 row.append('[size=20]'+str(result['stadarizedResults'][i])+'[/size]')
             self.data.append(row)
@@ -832,7 +838,8 @@ class AnomalabApp(MDApp):
     modelsApplyList = []                #USED FOR ANALYST QUERY
     userType = StringProperty(None)     #USED FOR SCREENS NAVIGATION
     attributesList = []
-    query = []
+    numericQuery = []
+    originalQuery = []
     dictionary = {}
     
     def build(self):
