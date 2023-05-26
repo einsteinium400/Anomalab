@@ -148,6 +148,7 @@ class KMeansClusterer:
                                  metric=lambda x, y: self._distance(x, y, self._type_of_fields, self._hyper_parameters)[
                                      0])
         self.silhouette = score
+        # todo: make sure its the best clusters and not the last
         # ##handling one cluster only
         # if len(self._clusters_info) < 2:
         #     self.silhouette = 0
@@ -255,6 +256,7 @@ class KMeansClusterer:
     def cluster_vectorspace(self, vectors):
         meanss = []
         wcsss = []
+        best_clusters = []
         # make _repeats repeats to get the best means
         for trial in range(self._repeats):
             #   print("kmeans cluster_vectorspace, doing repeats", trial)
@@ -269,17 +271,21 @@ class KMeansClusterer:
                 # add the new means each time
                 meanss.append(self._means)
                 self.wcssCalculate()
+                # if (min())
                 wcsss.append(self._wcss)
+                if min(wcsss) == self._wcss:
+                    best_clusters = self._clusters_info
+                # if ()
             except Exception as e:
                 # print(e, ": ", trial)
                 raise e
         # at this point meanss holds an array of arrays, each array has k means in it.
         if len(meanss) > 1:
             if self.repeats_method == "best_wcss":
-                # print(wcsss)
                 lowest_wcss = wcsss.index(min(wcsss, key=lambda x: x))
                 self._wcss = wcsss[lowest_wcss]
                 self._means = meanss[lowest_wcss]
+                self._clusters_info = best_clusters
 
             elif self.repeats_method == "minimal_difference":
                 # find the set of means that's minimally different from the others

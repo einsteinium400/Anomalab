@@ -1,5 +1,7 @@
-ANOMALY_DEFINITION_STD_DEV = 2
+
+ANOMALY_DEFINITION_STD_DEV = 1
 MAX_ANOMALY_STD_DEV = 3
+MIN_PTS = 3
 
 def checkSampleForAnomaly(model,sample):
     data = model.check_sample(sample)

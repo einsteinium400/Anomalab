@@ -152,12 +152,12 @@ class ModelController:
             finalList.append(Item)
         return finalList
 
-    def GetListForManager(self):
+    '''def GetListForManager(self):
         return self.storage.GetListWithSpecificAttributes("MODEL",
                                                           ['name', 'timestamp', 'wcss', 'datasetName',
-                                                           'function'])
+                                                           'function'])'''
 
-    def GetListOfModelsWithDistanceFunction(self, distanceFunctionName):
+    '''def GetListOfModelsWithDistanceFunction(self, distanceFunctionName):
         models = self.__GetAllModelsWithSpecificAttributes(['name', 'function'])
         names = [model["name"] for model in models if model["function"] == distanceFunctionName]
-        return names
+        return names'''
