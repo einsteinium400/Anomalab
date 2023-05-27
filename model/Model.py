@@ -1,5 +1,6 @@
 import uuid
 import time
+from datetime import datetime
 
 from model import modular_distance_utils
 from model.Storage.StorageFactory import StorageFactory
@@ -28,7 +29,6 @@ class Model:
             self._id = str(uuid.uuid1())
             self._timeStamp = time.time()
             self._distanceFunction = modelJson['function']
-            # self._distanceFunctionId = modelJson['functionId']
             self._datasetName = modelJson['datasetName']
             self._jsonData = modelJson
             self._jsonData['id'] = self._id
@@ -47,7 +47,6 @@ class Model:
             self._jsonData = self.LoadModel()
             self._id = self._jsonData['id']
             self._timeStamp = self._jsonData['timestamp']
-            # self._distanceFunctionId = self._jsonData['functionId']
             self._distanceFunction = self._jsonData['function']
             self._silhouette=self._jsonData['silhouette']
             self._wcss = self._jsonData['wcss']
@@ -154,11 +153,50 @@ class Model:
         return jsonData
 
     # Classify a new sample
-    def check_sample(self, vector):
+    def check_sample(self, vector, minPts):
+        ##CALCULATE DO AND DM FOR ANOMALY DETECTION METHOD
+        def calculateDOandDM(distanceFunc, fieldTypes, hyperParams, vector, clusterDataSamples, minPts):
+            _time = datetime.now()
+            print("Start Calculate DO AND DM! Current Time =", _time.strftime("%H:%M:%S"))
+            ##calculate DO return 3 closest point and 3 closest distances
+            def calculateDO(distanceFunc, fieldTypes, hyperParams, vector, clusterDataSamples, minPts=3, deleteMyself=False):            
+                closestDataSamples = []
+                for dataSample in clusterDataSamples:
+                    distance, results = distanceFunc(vector, dataSample, fieldTypes, hyperParams)
+                    #print ("distance is:", distance)
+                    if (distance==0 and deleteMyself==True):
+                        deleteMyself=False
+                    else:
+                        ## IF STILL DON'T HOLD ENOGH POINTS ADD POINT
+                        if len(closestDataSamples)<minPts:
+                            closestDataSamples.append((dataSample,distance))
+                            closestDataSamples = sorted(closestDataSamples,key=lambda x: x[1],reverse=True)
+                            #print ("SAVE DISTANCE - closestDataSamples",closestDataSamples)
+                        ## IF HOLD ENOUGH CHECK IF NEED TO CHANGE POINTS
+                        elif distance<closestDataSamples[0][1]:
+                            closestDataSamples[0]=(dataSample,distance)
+                            closestDataSamples = sorted(closestDataSamples,key=lambda x: x[1],reverse=True)
+                            #print ("SAVE DISTANCE - closestDataSamples",closestDataSamples)
+                print ("FINAL - closestDataSamples",closestDataSamples)                
+                return closestDataSamples
+            
+            ##DEAL WITH SMALL CLUSTER THAN MIN PTS
+            if (len(clusterDataSamples)<minPts):
+                return -1,-1
+            closestSamples=calculateDO(distanceFunc, fieldTypes, hyperParams, vector, clusterDataSamples, minPts)
+            dmArr=[]
+            for sample in closestSamples:
+                closestneighbors = calculateDO(distanceFunc, fieldTypes, hyperParams, sample[0], clusterDataSamples, minPts, deleteMyself=True)
+                dmArr.append(sum(tupleObj[1] for tupleObj in closestneighbors))
+            do = sum(tupleObj[1] for tupleObj in closestSamples)/minPts
+            dm = sum(dmArr)/(minPts**2)
+            print("FINISH Calculate DO AND DM- IT TOOK:", (datetime.now() - _time).seconds, "seconds")
+            return do,dm
+        
         means = self._meanValues
         clustersInfo = self._clusters
         returnObject = []
-        
+        print ("query is:",vector)
         for index in range(len(means)):
             print ('$$$$$$$$$$$$$$$$$$$$$   cluster number ',index,' $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
             mean = means[index]
@@ -166,18 +204,20 @@ class Model:
             distance, results = self._distanceFunctionRefrence(vector, mean, self._fieldTypes, self._hyperParams)
             for i in range(len(results)):
                 results[i]=abs(results[i])
-            print ('distance',distance)
-            print ('results',results)
+            print ('distance',distance,'results',results)
             averageDistance = clustersInfo[index]['averageDistance']
             maxDistance = clustersInfo[index]['maxDistance']
             stdDev = clustersInfo[index]['stdDev']
             attributesAverageDistances = clustersInfo[index]['attributesAverageDistances']
             attributesStdDevs = clustersInfo[index]['attributesStdDevs']
-            print ("averageDistance",averageDistance)
-            print ("maxDistance",maxDistance)
-            print ("stdDev",stdDev)
-            print ("attributesAverageDistances",attributesAverageDistances)
-            print ("attributesStdDevs",attributesStdDevs)
+            standarizeDistance = (distance-averageDistance)/stdDev
+            ##deal with the donut problem
+            if standarizeDistance < 0 :
+                standarizeDistance = 0
+            print ("averageDistance",averageDistance,"maxDistance",maxDistance,"stdDev",stdDev,"standarizeDistance",standarizeDistance)
+            print ("attributesAverageDistances",attributesAverageDistances,"attributesStdDevs",attributesStdDevs)
+            do,dm = calculateDOandDM(self._distanceFunctionRefrence, self._fieldTypes, self._hyperParams ,vector,self._clustersValues[index],minPts)
+            print ("do",do,",dm",dm)
             clusterReturnObject = {
                 "num": index,
                 "mean": mean,
@@ -185,9 +225,12 @@ class Model:
                 "results": results,
                 "averageDistance": averageDistance,
                 "maxDistance": maxDistance,
+                "standarizeDistance": standarizeDistance,
                 "stdDev" : stdDev,
                 "attributesAverageDistances": attributesAverageDistances,
                 "attributesStdDevs": attributesStdDevs,
+                "do": do,
+                "dm": dm,
             }
             returnObject.append(clusterReturnObject)
         return returnObject

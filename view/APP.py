@@ -187,9 +187,9 @@ class Results(Screen):
         else:
             string = '[color=00FF00][b]Not anomaly[/b][/color]'
         self.ids.result.text='Query is: '+string+ ' (Model: '+app.modelsList[0]["name"]+')'
-        print (answer['stadarizedResults'])
         graphData = answer['stadarizedResults']
         graphLabels = []
+        plt.clf()
         for i in range(len(app.attributesList)):
             graphLabels.append(app.attributesList[i]["name"])
         plot=plt.bar(graphLabels, graphData, color ='maroon', width = 0.4)
@@ -312,8 +312,6 @@ class ManageDatasets(Screen):
         index = instance_row.index
         cols_num = len(instance_table.column_data)
         row_num = int(index/cols_num)
-        print (f'press on row_num is: {row_num}')
-        print (f'name of pressed line is: {self.table.row_data[row_num][0]}')
         app = MDApp.get_running_app()
         app.dictionary =  {
             "name": self.table.row_data[row_num][0],
@@ -417,8 +415,6 @@ class ManageDistanceFunctions(Screen):
         index = instance_row.index
         cols_num = len(instance_table.column_data)
         row_num = int(index/cols_num)
-        print (f'press on row_num is: {row_num}')
-        print (f'name of pressed line is: {self.table.row_data[row_num][0]}')
         app = MDApp.get_running_app()
         app.dictionary =  {
             "name": self.table.row_data[row_num][0],
@@ -788,7 +784,7 @@ class AnalystResults(Screen):
             row.append('[size=20]'+app.attributesList[i]['name']+'[/size]')
             row.append('[size=20]'+str(app.originalQuery[i])+'[/size]')
             for result in results:
-                row.append('[size=20]'+str(result['stadarizedResults'][i])+'[/size]')
+                row.append('[size=20]'+str(round(result['stadarizedResults'][i],2))+'[/size]')
             self.data.append(row)
         dataRows = len(self.data)
         pagination = False
