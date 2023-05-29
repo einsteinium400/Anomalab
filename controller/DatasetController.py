@@ -30,11 +30,13 @@ class DatasetController:
     
     def CreateDataset(self, name, csvFilePath):
         dataSetsList = self.__GetAllDatasetsNamesList()
-        if name in dataSetsList:
+        if any(item.startswith(name) for item in dataSetsList):
             raise Exception(f'Dataset name {name} already taken')
         df = pd.read_csv(csvFilePath)
-        dataSet = Dataset(name, df)
-        self.storage.Save(dataSet.Name, dataSet.JsonData, "DATASET")
+        dataSet1 = Dataset(f'{name}-common-fillna',"COMMON", df)
+        self.storage.Save(dataSet1.Name, dataSet1.JsonData, "DATASET")
+        dataSet2 = Dataset(f'{name}-unique-fillna',"UNIQUE" ,df )
+        self.storage.Save(dataSet2.Name, dataSet2.JsonData, "DATASET")
 
     def GetDataset(self, DatasetName):
         dataSetsList = self.__GetAllDatasetsNamesList()
@@ -58,7 +60,15 @@ class DatasetController:
         return self.storage.GetListWithSpecificAttributes("DATASET",['name','timestamp','featuresNumber','instancesNumber'])
     
     def GetAttributesList(self,name):
-        return self.GetDataset(name).getAttributesTypesAndValuesList()
+        preFilteredAttributesList = self.GetDataset(name).getAttributesTypesAndValuesList()
+        # Iterate over each object in the array
+        for item in preFilteredAttributesList:
+            if item['type'] == 'categorical':
+                values = item['values']
+                updated_values = {key: value for key, value in values.items() if not value.startswith('filledNa-')}
+                item['values'] = updated_values
+        # filter na fill in unique values
+        return preFilteredAttributesList
     
     def CleanModelsFromDatasetsByFunction(self,name):
         allDataSets = self.__GetAllInstances()
