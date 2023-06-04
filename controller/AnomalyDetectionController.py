@@ -17,33 +17,34 @@ def checkSampleForAnomaly(model,sample):
     print ('closestCluster',closestCluster)
     print ('closestStandarizeCluster',closestStandarizeCluster)
     closestClusterData = data[closestCluster] ## FOR USE OF REAL DISTANCE
-    closestStandarizeClusterData = data[closestStandarizeCluster]
+    #closestStandarizeClusterData = data[closestStandarizeCluster]
     ##CHECK ANOMALY
-    print ('standarize distance is:',closestStandarizeClusterData['standarizeDistance'])
-    if closestStandarizeClusterData['standarizeDistance']>ANOMALY_DEFINITION_STD_DEV:
-        print ('SUSPECT OF ANOMALY','do is',closestStandarizeClusterData['do'],'dm is',closestStandarizeClusterData['dm'])
-        if (closestStandarizeClusterData['do']>closestStandarizeClusterData['dm']):
+    print ('standarize distance is:',closestClusterData['standarizeDistance'])
+    if closestClusterData['standarizeDistance']>ANOMALY_DEFINITION_STD_DEV:
+        print ('SUSPECT OF ANOMALY','do is',closestClusterData['do'],'dm is',closestClusterData['dm'])
+        if (closestClusterData['do']>closestClusterData['dm']):
             print ('SAMPLE IS ANOMALY')
             anomaly = True
     ##standarize results
     stdResults = []
     for i in range(len(data[closestCluster]['results'])):
-        if closestStandarizeClusterData['results'][i]<=closestStandarizeClusterData['attributesAverageDistances'][i]:
+        if closestClusterData['results'][i]<=closestClusterData['attributesAverageDistances'][i]:
             stdResults.append(0)
-        elif closestStandarizeClusterData['attributesStdDevs'][i]==0:
+        elif closestClusterData['attributesStdDevs'][i]==0:
             stdResults.append(MAX_ANOMALY_STD_DEV)
         else:
-            delta=closestStandarizeClusterData['results'][i]-closestStandarizeClusterData['attributesAverageDistances'][i]
-            stdResults.append(delta/closestStandarizeClusterData['attributesStdDevs'][i])
+            delta=closestClusterData['results'][i]-closestClusterData['attributesAverageDistances'][i]
+            stdResults.append(delta/closestClusterData['attributesStdDevs'][i])
     
     answer = {
         'anomaly' : anomaly,
-        'closestCluster' : closestStandarizeCluster,
-        'mean' : closestStandarizeClusterData['mean'],
-        'distance' : closestStandarizeClusterData['distance'],
-        'stdDev' : closestStandarizeClusterData['stdDev'],
-        'results' : closestStandarizeClusterData['results'],
-        'maxDistance' : closestStandarizeClusterData['maxDistance'],
+        'closestCluster' : closestCluster,
+        'mean' : closestClusterData['mean'],
+        'distance' : closestClusterData['distance'],
+        'standarizeDistance' : closestClusterData['standarizeDistance'],
+        'stdDev' : closestClusterData['stdDev'],
+        'results' : closestClusterData['results'],
+        'maxDistance' : closestClusterData['maxDistance'],
         'stadarizedResults': stdResults
     }
     return answer

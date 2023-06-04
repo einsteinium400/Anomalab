@@ -26,10 +26,15 @@ import math
 
 
 def Statistic(u, v, type_values, parameters):
+
+    print("parameters", parameters)
+    print("u", u)
+    print("v", v)
     distance = 0
     results = []
 
     def f_freq(z, theta1, betha, theta2, gamma):
+        print("Z", z)
         if z <= theta1:
             return 1
         if theta1 < z <= theta2:
@@ -53,18 +58,37 @@ def Statistic(u, v, type_values, parameters):
             else:
                 specific_domain_size = parameters["domain sizes"][i]
                 f_v_ak = f_freq(specific_domain_size, theta1, betha, theta2, gamma)
+                print("f_v_ak", f_v_ak)
                 fr_u = f_freq(parameters["frequencies"][str(i)][str(int(u[int(i)]))], theta1, betha, theta2, gamma)
+                print("fr_u", fr_u)
                 fr_v = f_freq(parameters["frequencies"][str(i)][str(int(v[int(i)]))], theta1, betha, theta2, gamma)
+                print("fr_v", fr_v)
                 m_fk = parameters["minimum_freq_of_each_attribute"][str(i)]
+                print("m_fk", m_fk)
                 d_fr = (abs(fr_u - fr_v) + m_fk) / max(fr_u, fr_v)
+                print("d_fr", d_fr)
                 results.append(abs(max(d_fr, theta, f_v_ak)))
                 distance += pow(max(d_fr, theta, f_v_ak), 2)
         # numberic handle
         else:
             results.append(abs(np.int64(u[i]) - np.int64(v[i])))
             distance += pow(np.int64(u[i]) - np.int64(v[i]), 2)
-
+    print("results", results)
     distance = math.sqrt(distance)
+    print("distance", distance)
+    print("----------------")
+    #exit()
+    return distance, results
+
+
+from sklearn.metrics.pairwise import euclidean_distances
+
+
+def pairwise_eucledean(vector1, vector2, j, k):
+    distance = euclidean_distances([vector1], [vector2])
+    results = []
+    for i in range(len(vector1)):
+        results.append(0)
     return distance, results
 
 
