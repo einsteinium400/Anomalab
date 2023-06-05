@@ -22,7 +22,7 @@ class Dataset:
     def __init__(
             self,
             name,
-            filling = "COMMON",
+            filling = "NONE",
             dataFrame=None
     ):
         if (dataFrame is not None):

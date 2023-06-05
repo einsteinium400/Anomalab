@@ -2,6 +2,8 @@ from model.Dataset import Dataset
 from model.Storage.StorageFactory import StorageFactory
 import pandas as pd
 
+COMMON_MISSING_VALUES=['NA']
+
 
 class DatasetController:
     operationFactory = StorageFactory()
@@ -33,10 +35,18 @@ class DatasetController:
         if any(item.startswith(name) for item in dataSetsList):
             raise Exception(f'Dataset name {name} already taken')
         df = pd.read_csv(csvFilePath)
-        dataSet1 = Dataset(f'{name}-common-fillna',"COMMON", df)
-        self.storage.Save(dataSet1.Name, dataSet1.JsonData, "DATASET")
-        dataSet2 = Dataset(f'{name}-unique-fillna',"UNIQUE" ,df )
-        self.storage.Save(dataSet2.Name, dataSet2.JsonData, "DATASET")
+        # Replace common missing values conventions with NaN
+        for item in COMMON_MISSING_VALUES:
+            df = df.replace(item, pd.NaT)
+        missing_values_count = df.isnull().sum().sum()
+        if(missing_values_count > 0):
+            dataSet1 = Dataset(f'{name}-common-fillna',"COMMON", df)
+            self.storage.Save(dataSet1.Name, dataSet1.JsonData, "DATASET")
+            dataSet2 = Dataset(f'{name}-unique-fillna',"UNIQUE" ,df )
+            self.storage.Save(dataSet2.Name, dataSet2.JsonData, "DATASET")
+        else:
+            dataSet1 = Dataset(f'{name}',"NONE", df)
+            self.storage.Save(dataSet1.Name, dataSet1.JsonData, "DATASET")
 
     def GetDataset(self, DatasetName):
         dataSetsList = self.__GetAllDatasetsNamesList()
@@ -50,6 +60,7 @@ class DatasetController:
             raise Exception(f"Dataset named {DatasetName} Does not exist")
         self.storage.Delete(DatasetName, "DATASET")
         self.storage.DeleteItemsByTypeAndFilter("MODEL",{"datasetName":DatasetName})
+        self.storage.DeleteItemsByTypeAndFilter("RAW_DATASET",{"name":DatasetName})
 
     def GetListForQuery(self):
         dataSetList = self.storage.GetListWithSpecificAttributes("DATASET",['name','bestmodel'])
