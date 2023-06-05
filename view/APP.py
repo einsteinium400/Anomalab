@@ -12,7 +12,9 @@ from kivy.core.window import Window
 from kivymd.uix.datatables import MDDataTable
 from kivy.metrics import dp
 # plots imports
-from kivymd_extensions.akivymd.uix.charts import AKBarChart
+from kivy.garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
+from matplotlib import pyplot as plt
+import pandas as pd
 #forms imports
 from kivymd.uix.label import MDLabel
 from kivymd.uix.textfield import MDTextFieldRect
@@ -110,7 +112,6 @@ class Query(Screen):
         app = MDApp.get_running_app()
         try:
             app.attributesList=app.datasetController.GetAttributesList(app.dataSetName)
-            print("attributes list:", app.attributesList)
             for i in range(len(app.attributesList)):
                 self.ids.attributes_box.add_widget(MDLabel(text='[size=20]'+str(app.attributesList[i]["name"])+':[/size]', halign="center", markup= True))
                 if (app.attributesList[i]["type"] == 'numeric'):
@@ -185,17 +186,12 @@ class Results(Screen):
             string = '[color=00FF00][b]Not anomaly[/b][/color]'
         self.ids.result.text='Query is: '+string+ ' (Model: '+app.modelsList[0]["name"]+')'
         
-        #data for graph
-        Xaxis = []
-        Y1axis = answer['results']
-        Y2axis = answer['stadarizedResults']
         #TABLE
         table_width = dp(Window.size[0]*9/50)
         self.data=[]
         for i in range(len(answer['results'])):
             row = []
             row.append('[size=20]'+app.attributesList[i]['name']+'[/size]')
-            Xaxis.append(app.attributesList[i]['name'])
             row.append('[size=20]'+str(app.originalQuery[i])+'[/size]')
             row.append('[size=20]'+str(answer['results'][i])+'[/size]')
             row.append('[size=20]'+str(answer['stadarizedResults'][i])+'[/size]')
@@ -222,22 +218,21 @@ class Results(Screen):
         except Exception as e:
             print(str(e))
         
+        #data for graph
+        print ('densities:',answer['densities'])
+        Xaxis = ['<AVG','AVG-1SD','1SD-2SD','2SD-3SD','3SD<']
+        Yaxis = list(answer['densities'].values())
+        colors = ['grey','grey','grey','grey','grey']
+        colors[answer['sampleColumn']] = 'blue'
+               
         #graph
-        barChart = AKBarChart(
-            labels = True,
-            x_values = range(len(Xaxis)),
-            y_values = Y1axis,
-            x_labels = Xaxis,
-            label_size = 20,
-            anim = True,
-            bars_radius = 5,
-            #colors
-            bars_color = "#4CD6D7",
-            bg_color = "#363E41",
-            lines_color= "#363E41",
-        )
+        plt.bar(Xaxis,Yaxis, color=colors)
+        plt.ylabel('samples')
+        plt.title('Cluster Density')
+        plt.text(answer['sampleColumn'],Yaxis[answer['sampleColumn']],'HERE', ha = 'center',bbox = dict(facecolor = 'blue', alpha =0.8))
+        plt.legend()
         
-        self.ids['table_place'].add_widget(barChart)
+        self.ids['plot_place'].add_widget(FigureCanvasKivyAgg(plt.gcf()))
         
 
     def on_back(self):
@@ -565,23 +560,16 @@ class ManageUsers(Screen):
         table_width = dp(Window.size[0]*9/50)
         Allusers=app.userController.GetListForManager()
         self.data=[]
-        print (Allusers)
         for user in Allusers:
             row = []
             row.append(user['name'])
             row.append(user['type'])
             self.data.append(row)
-        dataRows = len(self.data)
-        pagination = False
-        print (f'row of data = {dataRows}')
-        if (dataRows > 5):
-            pagination = True
-            dataRows = 5
         self.table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
             size_hint= (0.9, 0.9),
-            use_pagination = pagination,
-            rows_num = dataRows,
+            use_pagination = False,
+            rows_num = len(self.data),
             column_data = [
                 ("User-Name", dp (table_width*0.5)),
                 ("User-Type", dp (table_width*0.5)),
@@ -597,8 +585,6 @@ class ManageUsers(Screen):
         index = instance_row.index
         cols_num = len(instance_table.column_data)
         row_num = int(index/cols_num)
-        print (f'press on row_num is: {row_num}')
-        print (f'ID of pressed line is: {self.table.row_data[row_num][0]}')
         app = MDApp.get_running_app()
         app.dictionary =  {
             "name": self.table.row_data[row_num][0],
@@ -682,7 +668,6 @@ class ChooseModels(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
         app.modelsApplyList=[]
-        print ('model to choose form: ',app.modelsList)
         self.data=[]
         for model in app.modelsList:
             row = []
@@ -692,7 +677,6 @@ class ChooseModels(Screen):
             self.data.append(row)
         dataRows = len(self.data)
         pagination = False
-        print (f'row of data = {dataRows}')
         if (dataRows > 5):
             pagination = True
             dataRows = 5

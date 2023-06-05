@@ -121,7 +121,7 @@ ScreenManager:
     size: root.width, root.height
     canvas.before:
         Color:
-            rgba: (0,0.3,1,0.2)
+            rgba: (1,1,1,1)
         Rectangle:
             pos: self.pos
             size: self.size
@@ -266,7 +266,11 @@ ScreenManager:
             BoxLayout:
                 id: table_place
                 pos_hint: {"top": 0.95}
-                size_hint: (1, 0.95)
+                size_hint: (0.5, 0.95)
+            BoxLayout:
+                id: plot_place
+                pos_hint: {"x": 0.5, "top": 0.95}
+                size_hint: (0.5, 0.95)
         Footer:
             FooterButton:
                 text: 'Another query'

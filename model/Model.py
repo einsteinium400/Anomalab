@@ -153,58 +153,74 @@ class Model:
         return jsonData
 
     # Classify a new sample
-    def check_sample(self, vector, minPts):
+    def check_sample(self, vector, minPts, logFile):
         ##CALCULATE DO AND DM FOR ANOMALY DETECTION METHOD
-        def calculateDOandDM(distanceFunc, fieldTypes, hyperParams, vector, clusterDataSamples, minPts):
-            _time = datetime.now()
-            print("Start Calculate DO AND DM! Current Time =", _time.strftime("%H:%M:%S"))
+        def calculateDOandDM(distanceFunc, fieldTypes, hyperParams, vector, clusterDataSamples, minPts, logFile):
             ##calculate DO return 3 closest point and 3 closest distances
             def calculateDO(distanceFunc, fieldTypes, hyperParams, vector, clusterDataSamples, minPts=3, deleteMyself=False):            
                 closestDataSamples = []
                 for dataSample in clusterDataSamples:
                     distance, results = distanceFunc(vector, dataSample, fieldTypes, hyperParams)
-                    #print ("distance is:", distance)
                     if (distance==0 and deleteMyself==True):
                         deleteMyself=False
                     else:
-                        ## IF STILL DON'T HOLD ENOGH POINTS ADD POINT
+                        ## IF STILL DON'T HOLD ENOUGH POINTS ADD POINT
                         if len(closestDataSamples)<minPts:
                             closestDataSamples.append((dataSample,distance))
                             closestDataSamples = sorted(closestDataSamples,key=lambda x: x[1],reverse=True)
-                            #print ("SAVE DISTANCE - closestDataSamples",closestDataSamples)
                         ## IF HOLD ENOUGH CHECK IF NEED TO CHANGE POINTS
                         elif distance<closestDataSamples[0][1]:
                             closestDataSamples[0]=(dataSample,distance)
                             closestDataSamples = sorted(closestDataSamples,key=lambda x: x[1],reverse=True)
-                            #print ("SAVE DISTANCE - closestDataSamples",closestDataSamples)
-                print ("FINAL - closestDataSamples",closestDataSamples)                
                 return closestDataSamples
             
             ##DEAL WITH SMALL CLUSTER THAN MIN PTS
             if (len(clusterDataSamples)<minPts):
                 return -1,-1
             closestSamples=calculateDO(distanceFunc, fieldTypes, hyperParams, vector, clusterDataSamples, minPts)
+            logFile.write(f'closest neighbors of the query: {vector} are: {closestSamples}\n')
             dmArr=[]
             for sample in closestSamples:
                 closestneighbors = calculateDO(distanceFunc, fieldTypes, hyperParams, sample[0], clusterDataSamples, minPts, deleteMyself=True)
                 dmArr.append(sum(tupleObj[1] for tupleObj in closestneighbors))
+                logFile.write(f'closest neighbors of neighbor: {vector} are: {closestSamples}\n')
             do = sum(tupleObj[1] for tupleObj in closestSamples)/minPts
             dm = sum(dmArr)/(minPts**2)
-            print("FINISH Calculate DO AND DM- IT TOOK:", (datetime.now() - _time).seconds, "seconds")
             return do,dm
+        ## USED FOR GRAPH
+        def calculateDensities(distanceFunc, fieldTypes, hyperParams, center, clusterDataSamples, averageDistance, stdDev):
+            densities = {
+                            "lessThanAvg":0,
+                            "avgTo1stdDev":0,
+                            "1stdDevTo2stdDev":0,
+                            "2stdDevTo3stdDev":0,
+                            "moreThan3stdDev":0
+                        }
+            for dataSample in clusterDataSamples:
+                distance, results = distanceFunc(center, dataSample, fieldTypes, hyperParams)
+                standarizeDistance = (distance-averageDistance)/stdDev
+                if standarizeDistance<=0:
+                    densities['lessThanAvg']=densities['lessThanAvg']+1
+                elif standarizeDistance<=1:
+                    densities['avgTo1stdDev']=densities['avgTo1stdDev']+1
+                elif standarizeDistance<=2:
+                    densities['1stdDevTo2stdDev']=densities['1stdDevTo2stdDev']+1
+                elif standarizeDistance<=3:
+                    densities['2stdDevTo3stdDev']=densities['2stdDevTo3stdDev']+1
+                else:
+                    densities['moreThan3stdDev']=densities['moreThan3stdDev']+1
+            return densities
         
         means = self._meanValues
         clustersInfo = self._clusters
         returnObject = []
-        print ("query is:",vector)
         for index in range(len(means)):
-            print ('$$$$$$$$$$$$$$$$$$$$$   cluster number ',index,' $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
             mean = means[index]
-            print ('mean',mean)
+            logFile.write(f'cluster: {index} ,centroid: {mean}\n')
             distance, results = self._distanceFunctionRefrence(vector, mean, self._fieldTypes, self._hyperParams)
             for i in range(len(results)):
                 results[i]=abs(results[i])
-            print ('distance',distance,'results',results)
+            logFile.write(f'distance:{distance} ,results:{results}\n')
             averageDistance = clustersInfo[index]['averageDistance']
             maxDistance = clustersInfo[index]['maxDistance']
             stdDev = clustersInfo[index]['stdDev']
@@ -214,10 +230,11 @@ class Model:
             ##deal with the donut problem
             if standarizeDistance < 0 :
                 standarizeDistance = 0
-            print ("averageDistance",averageDistance,"maxDistance",maxDistance,"stdDev",stdDev,"standarizeDistance",standarizeDistance)
-            print ("attributesAverageDistances",attributesAverageDistances,"attributesStdDevs",attributesStdDevs)
-            do,dm = calculateDOandDM(self._distanceFunctionRefrence, self._fieldTypes, self._hyperParams ,vector,self._clustersValues[index],minPts)
-            print ("do",do,",dm",dm)
+            logFile.write(f'averageDistance: {averageDistance}, maxDistance: {maxDistance}, stdDev: {stdDev}, standarizeDistance: {standarizeDistance}\n')
+            logFile.write(f'attributesAverageDistances: {attributesAverageDistances}, attributesStdDevs: {attributesStdDevs}\n')
+            do,dm = calculateDOandDM(self._distanceFunctionRefrence, self._fieldTypes, self._hyperParams ,vector,self._clustersValues[index],minPts,logFile)
+            logFile.write(f'do: {do}, dm: {dm}\n')
+            densities = calculateDensities(self._distanceFunctionRefrence, self._fieldTypes, self._hyperParams ,mean, self._clustersValues[index], averageDistance, stdDev)
             clusterReturnObject = {
                 "num": index,
                 "mean": mean,
@@ -231,6 +248,7 @@ class Model:
                 "attributesStdDevs": attributesStdDevs,
                 "do": do,
                 "dm": dm,
+                "densities": densities,
             }
             returnObject.append(clusterReturnObject)
         return returnObject
