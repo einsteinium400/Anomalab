@@ -22,13 +22,14 @@ class Dataset:
     def __init__(
             self,
             name,
+            filling = "NONE",
             dataFrame=None
     ):
         if (dataFrame is not None):
             dfProccesor = DatasetPreProcessor()
 
             self._name = name
-            newData, attribuesInfo = dfProccesor.dataSetPreProcess(self._name,dataFrame)
+            newData, attribuesInfo = dfProccesor.dataSetPreProcess(self._name,dataFrame,filling)
             self._id = str(uuid.uuid1())
             self._timeStamp = time.time()
             self._featuresNumber = len(dataFrame.columns.values.tolist())

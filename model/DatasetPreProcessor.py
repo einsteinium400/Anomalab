@@ -2,7 +2,7 @@ import uuid
 from sklearn import preprocessing
 import pandas as pd
 import faker
-COMMON_MISSING_VALUES=['NA']
+
 
 
 
@@ -27,20 +27,16 @@ def create_unique_string(dataframe, columns):
 
 def apply_swap_function(dataframe, columns, function_name):
     switch_case = {
-        'most_frequent': fill_with_most_frequent,
-        'unique_string': create_unique_string
+        'COMMON': fill_with_most_frequent,
+        'UNIQUE': create_unique_string
     }
 
     function = switch_case.get(function_name)
     dataframe = function(dataframe, columns)
 
 class DatasetPreProcessor:
-    def dataSetPreProcess(self,name,df, method = 'unique_string'):
-        # Replace common missing values conventions with NaN
-        for item in COMMON_MISSING_VALUES:
-            df = df.replace(item, pd.NaT)
+    def dataSetPreProcess(self,name,df, method = 'NONE'):
         featuresInfo =[]
-        print(df)
         # Extract columns names
         cols = df.columns
 
@@ -59,9 +55,8 @@ class DatasetPreProcessor:
                 "stdDev":float(df[col].std())
             })
         categorical_cols = list(set(cols) - set(num_cols))
-
-        apply_swap_function(dataframe=df,columns=categorical_cols,function_name=method)
-        print(df)
+        if (method != "NONE"):
+            apply_swap_function(dataframe=df,columns=categorical_cols,function_name=method)
 
         for col in categorical_cols:
             le = preprocessing.LabelEncoder()
@@ -81,5 +76,4 @@ class DatasetPreProcessor:
                 "frequencies": value_counts
             })
         
-        print (featuresInfo)
         return df,featuresInfo
