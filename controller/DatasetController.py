@@ -40,12 +40,15 @@ class DatasetController:
             df = df.replace(item, pd.NaT)
         missing_values_count = df.isnull().sum().sum()
         if(missing_values_count > 0):
-            dataSet1 = Dataset(f'{name}-common-fillna',"COMMON", df)
+            df_copy_common_fill = df.copy()
+            df_copy_unique_fill = df.copy()
+            dataSet1 = Dataset(f'{name}-common-fillna',"COMMON", df_copy_common_fill)
             self.storage.Save(dataSet1.Name, dataSet1.JsonData, "DATASET")
-            dataSet2 = Dataset(f'{name}-unique-fillna',"UNIQUE" ,df )
+            dataSet2 = Dataset(f'{name}-unique-fillna',"UNIQUE" ,df_copy_unique_fill )
             self.storage.Save(dataSet2.Name, dataSet2.JsonData, "DATASET")
         else:
-            dataSet1 = Dataset(f'{name}',"NONE", df)
+            df_copy = df.copy()
+            dataSet1 = Dataset(f'{name}',"NONE", df_copy)
             self.storage.Save(dataSet1.Name, dataSet1.JsonData, "DATASET")
 
     def GetDataset(self, DatasetName):
