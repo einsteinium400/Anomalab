@@ -38,6 +38,8 @@ class Login(Screen):
         try:
             if (name == '' or password == ''):
                 raise Exception("Must enter user name and password")
+            if (len(name) > 30 or len(password) > 30):
+                raise Exception("Input field cannot be more than 30 characters")
             app.userType = app.userController.LoginUser(name, password)
         except Exception as e:
             self.resetForm()
@@ -230,7 +232,6 @@ class Results(Screen):
         plt.ylabel('samples')
         plt.title('Cluster Density')
         plt.text(answer['sampleColumn'],Yaxis[answer['sampleColumn']],'HERE', ha = 'center',bbox = dict(facecolor = 'blue', alpha =0.8))
-        plt.legend()
         
         self.ids['plot_place'].add_widget(FigureCanvasKivyAgg(plt.gcf()))
         
@@ -379,7 +380,7 @@ class ManageDistanceFunctions(Screen):
         self.data=[]
         for distanceFunction in distancesData:
             row = []
-            row.append(distanceFunction)
+            row.append(f'[size=32]{distanceFunction}[/size]')
             self.data.append(row)
         table_width = dp(Window.size[0]*9/50)
         self.table = MDDataTable(
@@ -388,7 +389,7 @@ class ManageDistanceFunctions(Screen):
             use_pagination = False,
             rows_num = len(self.data),
             column_data = [
-                ("Name", dp (table_width)),
+                ("[size=32]Name[/size]", dp (table_width)),
             ],
             row_data = self.data
         )
@@ -558,28 +559,33 @@ class ManageUsers(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
         table_width = dp(Window.size[0]*9/50)
-        Allusers=app.userController.GetListForManager()
-        self.data=[]
-        for user in Allusers:
-            row = []
-            row.append(user['name'])
-            row.append(user['type'])
-            self.data.append(row)
-        self.table = MDDataTable(
-            pos_hint = {'x': 0.05, 'top': 0.95},
-            size_hint= (0.9, 0.9),
-            use_pagination = False,
-            rows_num = len(self.data),
-            column_data = [
-                ("User-Name", dp (table_width*0.5)),
-                ("User-Type", dp (table_width*0.5)),
-            ],
-            row_data = self.data
-        )
-        # bind function to row press
-        self.ids['table_place'].clear_widgets()
-        self.ids['table_place'].add_widget(self.table)
-        self.table.bind(on_row_press=self.row_press)
+        try:
+            Allusers=app.userController.GetListForManager()
+            self.data=[]
+            for user in Allusers:
+                row = []
+                row.append(user['name'])
+                row.append(user['type'])
+                self.data.append(row)
+            self.table = MDDataTable(
+                pos_hint = {'x': 0.05, 'top': 0.95},
+                size_hint= (0.9, 0.9),
+                use_pagination = False,
+                rows_num = len(self.data),
+                column_data = [
+                    ("User-Name", dp (table_width*0.5)),
+                    ("User-Type", dp (table_width*0.5)),
+                ],
+                row_data = self.data
+            )
+            # bind function to row press
+            self.ids['table_place'].clear_widgets()
+            self.ids['table_place'].add_widget(self.table)
+            self.table.bind(on_row_press=self.row_press)
+        except Exception as e:
+            show_popup(str(e))
+            return
+        
     # Function for row presses
     def row_press(self, instance_table, instance_row):
         index = instance_row.index
@@ -592,11 +598,13 @@ class ManageUsers(Screen):
         }
         self.manager.transition = SlideTransition(direction="left")
         self.manager.current = 'uduser'
+
     def on_add(self):
         app = MDApp.get_running_app()
         app.dictionary = {}
         self.manager.transition = SlideTransition(direction="left")
         self.manager.current = 'adduser'
+
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
@@ -606,8 +614,11 @@ class AddUser(Screen):
         app = MDApp.get_running_app()
         try:
             if (name == '' or password == '' or type == 'Type'):
-                raise Exception(f"Must enter user name ,password and type")
+                raise Exception("Must enter user name ,password and type")
+            if (len(name) > 30 or len(password) > 30):
+                raise Exception("Input field cannot be more than 30 characters")
             app.userController.RegisterUser(name, password, type)
+            self.resetForm()
             show_popup(f"REGISTER USER {name} SUCCESS")
         except Exception as e:
             self.resetForm()
@@ -627,10 +638,12 @@ class AddUser(Screen):
         self.ids['type'].text = "Type"
 #---15---
 class UDUser(Screen):
+
     def on_enter(self):
         app = MDApp.get_running_app()
         self.ids['name'].text= str(app.dictionary['name'])
         self.ids['type'].text= str(app.dictionary['type'])
+        
     def on_delete(self, name):
         app = MDApp.get_running_app()
         try:
@@ -642,6 +655,7 @@ class UDUser(Screen):
             return
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'manageusers'
+
     def on_apply(self, name, type):
         app = MDApp.get_running_app()
         try:
@@ -653,12 +667,15 @@ class UDUser(Screen):
             return
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'manageusers'
+
     def on_back(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'manageusers'
+
     def logout(self):
         self.manager.transition = SlideTransition(direction="right")
         self.manager.current = 'login'
+
     def resetForm(self):
         app = MDApp.get_running_app()
         self.ids['name'].text= str(app.dictionary['name'])
