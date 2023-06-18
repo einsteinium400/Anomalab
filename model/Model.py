@@ -183,7 +183,7 @@ class Model:
             for sample in closestSamples:
                 closestneighbors = calculateDO(distanceFunc, fieldTypes, hyperParams, sample[0], clusterDataSamples, minPts, deleteMyself=True)
                 dmArr.append(sum(tupleObj[1] for tupleObj in closestneighbors))
-                logFile.write(f'closest neighbors of neighbor: {vector} are: {closestSamples}\n')
+                logFile.write(f'closest neighbors of neighbor: {sample[0]} are: {closestneighbors}\n')
             do = sum(tupleObj[1] for tupleObj in closestSamples)/minPts
             dm = sum(dmArr)/(minPts**2)
             return do,dm
