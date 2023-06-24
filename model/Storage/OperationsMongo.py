@@ -114,12 +114,7 @@ class OperationsMongo(Operations.Operations):
         for item in mongoList:
             finalNamesList.append(item)
         return finalNamesList
-        # if(self.__cacheRule() is True):
-        #     thread = threading.Thread(target=self.GetFullItemsList, args = (type,))
-        #     thread.start()
-            
-        # else:
-        #     return self.__LocalCache.GetListWithSpecificAttributes(type, attributeList)
+
     
     def GetListWithSpecificAttributesWithName(self, name, type, attributeList):
         collection = self.PROJECTDB[COLLECTION_DICT[type]]
@@ -129,13 +124,6 @@ class OperationsMongo(Operations.Operations):
         for item in mongoList:
             finalNamesList.append(item)
         return finalNamesList
-        # if(self.__cacheRule() is True):
-        #     thread = threading.Thread(target=self.GetFullItemsList, args = (type,))
-        #     thread.start()
-            
-        
-        # else:
-        #     return self.__LocalCache.GetListWithSpecificAttributesWithName(name,type,attributeList)
 
     def DeleteItemsByTypeAndFilter(self,itemType,filter):
         if itemType in COLLECTION_DICT:

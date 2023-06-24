@@ -380,7 +380,7 @@ class ManageDistanceFunctions(Screen):
         self.data=[]
         for distanceFunction in distancesData:
             row = []
-            row.append(f'[size=32]{distanceFunction}[/size]')
+            row.append(f'{distanceFunction}')
             self.data.append(row)
         table_width = dp(Window.size[0]*9/50)
         self.table = MDDataTable(

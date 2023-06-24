@@ -30,8 +30,8 @@ def Statistic(u, v, type_values, parameters):
             else:
                 specific_domain_size = parameters["domain sizes"][i]
                 f_v_ak = f_freq(specific_domain_size, theta1, betha, theta2, gamma)
-                fr_u = f_freq(parameters["frequencies"][str(i)][str(int(u[int(i)]))], theta1, betha, theta2, gamma)
-                fr_v = f_freq(parameters["frequencies"][str(i)][str(int(v[int(i)]))], theta1, betha, theta2, gamma)
+                fr_u = parameters["frequencies"][str(i)][str(int(u[int(i)]))]
+                fr_v = parameters["frequencies"][str(i)][str(int(v[int(i)]))]
                 m_fk = parameters["minimum_freq_of_each_attribute"][str(i)]
                 d_fr = (abs(fr_u - fr_v) + m_fk) / max(fr_u, fr_v)
                 results.append(abs(max(d_fr, theta, f_v_ak)))

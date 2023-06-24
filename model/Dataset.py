@@ -9,6 +9,18 @@ from model.DatasetPreProcessor import DatasetPreProcessor
 from model.RawDatasetData import RawDatasetData
 from model.Storage.StorageFactory import StorageFactory
 
+def remove_duplicates(objects):
+    unique_objects = {}
+    for obj in objects:
+        name = obj['name']
+        if name not in unique_objects:
+            unique_objects[name] = obj
+
+    # Extract the unique objects from the dictionary
+    unique_list = list(unique_objects.values())
+    return unique_list
+
+
 class Dataset:
     _id = 0
     _jsonData = 0
@@ -204,11 +216,17 @@ class Dataset:
         return finalList
 
     def addNewModel(self,model):
+        operationFactory = StorageFactory()
+        saver = operationFactory.CreateOperationItem()
+        returnDataFromMongo = saver.GetListWithSpecificAttributesWithName(self._name,"DATASET",['name','bestmodel'])
+        currentDatasetDataBestModel = returnDataFromMongo[0]['bestmodel']
         self._bestModel.append({
             'name':model['name'],
             'wcss':model['wcss'],
             'silhouette':model['silhouette']
         })
+        self._bestModel = self._bestModel + currentDatasetDataBestModel
+        self._bestModel = remove_duplicates(self._bestModel)
         self._bestModel = sorted(self._bestModel, key=lambda x: x['silhouette'],reverse=True)
         self.SaveDataset()
 

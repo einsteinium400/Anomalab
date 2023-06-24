@@ -32,23 +32,6 @@ class DistanceFunctionController:
 
         self.reload_functions_from_mongo()
 
-        # # upload dynamically all functions from mongoDB
-        # functions = self.mongo_operations.GetFullItemsList("FUNCTION")
-        #
-        # file_content = ""
-        #
-        # # iterate all functions and input them to string
-        # for json_obj in functions:
-        #     function_value = json_obj["function"]
-        #     file_content += base64.b64decode(function_value).decode('utf-8')
-        #     file_content+="\n\n"
-        #
-        # # copy the string content to a file
-        # with open(modular_distance_utils.DISTANCE_FUNCTIONS_PATH, "w") as file:
-        #     file.write(file_content)
-        #
-        # modular_distance_utils.refresh_functions_list()
-
     def reload_functions_from_mongo(self):
         # upload dynamically all functions from mongoDB
         functions = self.mongo_operations.GetFullItemsList("FUNCTION")

@@ -45,75 +45,82 @@ class ModelController:
         return self.storage.GetListWithSpecificAttributes("MODEL", attributesList)
 
     def CreateModel(self, dataset, distanceName):
-        _time = datetime.now()
-        print("Start Create Model! Current Time =", _time.strftime("%H:%M:%S"))
-        name = f'{dataset.Name}-{distanceName}'
-        modelsList = self.__GetAllModelsNamesList()
-        if name in modelsList:
-            raise Exception(f"Model named {name} exist")
-        dataSet = dataset
-        distanceFunction = modular_distance_utils.get_function_by_name(distanceName)
-        fieldsData = dataSet.getAttributesTypesAndValuesList()
-        types = [True if d['type'] == 'categorical' else False for d in fieldsData]
-        data = np.array(dataSet.Data)
-        hp, k = preProcess(data, fieldsData, distanceFunction, CLUSTERING_TRIES, REPEATS)
-        print("done preprocess")
-        modelsTries = []
-        for i in range(CLUSTERING_TRIES):
-            try:
-                modelsTries.append(KMeansClusterer(num_means=k,
-                                                   distance=distanceFunction,
-                                                   repeats=REPEATS,
-                                                   type_of_fields=types,
-                                                   hyper_params=hp))
-            except Exception as e:
-                print(f"Error {e}")
-                traceback.print_exc()
-                raise e
-        print('create k means models and start training')
-        for i in range(CLUSTERING_TRIES):
-            trained = 0
-            while trained == 0:
+        try:
+            _time = datetime.now()
+            print("Start Create Model! Current Time =", _time.strftime("%H:%M:%S"))
+            name = f'{dataset.Name}-{distanceName}'
+            modelsList = self.__GetAllModelsNamesList()
+            if name in modelsList:
+                raise Exception(f"Model named {name} exist")
+            dataSet = dataset
+            distanceFunction = modular_distance_utils.get_function_by_name(distanceName)
+            fieldsData = dataSet.getAttributesTypesAndValuesList()
+            types = [True if d['type'] == 'categorical' else False for d in fieldsData]
+            data = np.array(dataSet.Data)
+            hp, k = preProcess(data, fieldsData, distanceFunction, CLUSTERING_TRIES, REPEATS)
+            print("done preprocess")
+            modelsTries = []
+            for i in range(CLUSTERING_TRIES):
                 try:
-                    modelsTries[i].cluster_vectorspace(data)
-                    print("create model num", i, "wcss is:", modelsTries[i].get_wcss())
-                    trained = 1
+                    modelsTries.append(KMeansClusterer(num_means=k,
+                                                    distance=distanceFunction,
+                                                    repeats=REPEATS,
+                                                    type_of_fields=types,
+                                                    hyper_params=hp))
                 except Exception as e:
                     print(f"Error {e}")
                     traceback.print_exc()
-                    trained = 0
-        best = 0
-        for i in range(1, CLUSTERING_TRIES):
-            if (modelsTries[best].get_wcss() > modelsTries[i].get_wcss()):
-                best = i
-        print("FINISH TRAINING- IT TOOK:", (datetime.now() - _time).seconds, "seconds")
-        print('wcss is:', modelsTries[best].get_wcss())
-        print('silhouette is:', modelsTries[best].get_Silhouette())
-        modelsTries[best].metaDataCalculation()
-        modelsTries[best].createClusterJson()
-        modelJson = modelsTries[best].getModelData()
-        modelJson['datasetName'] = dataset.Name
-        modelJson['function'] = distanceName
-        modelJson['name'] = name
-        modelJson['id'] = str(uuid.uuid1())
-        modelJson['timestamp'] = time.time()
-        modelJson['fieldTypes'] = types
-        meanValues = []
-        for item in modelJson['clusters_info']:
-            meanValues.append(item['mean'])
-        modelJson['meanValues'] = meanValues
-        # print ("#### DEBUG #####")
-        print(modelJson['meanValues'])
-        self.storage.Save(name, modelJson, "MODEL")
-        # print ("#### DEBUG #####")
-        dataset.addNewModel({
-            'name': modelJson['name'],
-            'wcss':modelJson['wcss'],
-            'silhouette': modelJson['silhouette']
-        })
+                    raise e
+            print('create k means models and start training')
+            for i in range(CLUSTERING_TRIES):
+                trained = 0
+                while trained == 0:
+                    try:
+                        modelsTries[i].cluster_vectorspace(data)
+                        print("create model num", i, "wcss is:", modelsTries[i].get_wcss())
+                        trained = 1
+                    except Exception as e:
+                        print(f"Error {e}")
+                        traceback.print_exc()
+                        trained = 0
+            best = 0
+            for i in range(1, CLUSTERING_TRIES):
+                if (modelsTries[best].get_wcss() > modelsTries[i].get_wcss()):
+                    best = i
+            print("FINISH TRAINING- IT TOOK:", (datetime.now() - _time).seconds, "seconds")
+            print('wcss is:', modelsTries[best].get_wcss())
+            print('silhouette is:', modelsTries[best].get_Silhouette())
+            modelsTries[best].metaDataCalculation()
+            modelsTries[best].createClusterJson()
+            modelJson = modelsTries[best].getModelData()
+            modelJson['datasetName'] = dataset.Name
+            modelJson['function'] = distanceName
+            modelJson['name'] = name
+            modelJson['id'] = str(uuid.uuid1())
+            modelJson['timestamp'] = time.time()
+            modelJson['fieldTypes'] = types
+            meanValues = []
+            for item in modelJson['clusters_info']:
+                meanValues.append(item['mean'])
+            modelJson['meanValues'] = meanValues
+            # print ("#### DEBUG #####")
+            print(modelJson['meanValues'])
+            self.storage.Save(name, modelJson, "MODEL")
+            # print ("#### DEBUG #####")
+            dataset.addNewModel({
+                'name': modelJson['name'],
+                'wcss':modelJson['wcss'],
+                'silhouette': modelJson['silhouette']
+            })
 
-        print("########################## MODEL FINISHED#############################")
-        print("OVERALL IT TOOK:", (datetime.now() - _time).seconds, "seconds")
+            print("########################## MODEL FINISHED#############################")
+            print("OVERALL IT TOOK:", (datetime.now() - _time).seconds, "seconds")
+        except Exception as e:
+            print(f"Error {e}")
+            traceback.print_exc()
+            self.storage.Delete(name, "MODEL")
+            dataset.removeModel(name)
+            
 
     def GetModel(self, modelName):
         modelsList = self.__GetAllModelsNamesList()
@@ -151,13 +158,3 @@ class ModelController:
             # add the innerDict to the newDict with the current key as its key
             finalList.append(Item)
         return finalList
-
-    '''def GetListForManager(self):
-        return self.storage.GetListWithSpecificAttributes("MODEL",
-                                                          ['name', 'timestamp', 'wcss', 'datasetName',
-                                                           'function'])'''
-
-    '''def GetListOfModelsWithDistanceFunction(self, distanceFunctionName):
-        models = self.__GetAllModelsWithSpecificAttributes(['name', 'function'])
-        names = [model["name"] for model in models if model["function"] == distanceFunctionName]
-        return names'''

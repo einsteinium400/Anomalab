@@ -57,10 +57,3 @@ class UserController:
 
     def GetListForManager(self):
         return self.storage.GetListWithSpecificAttributes("USER",['name','type'])
-    
-    '''def GetAllInstances(self):
-            availableUsers = self.__GetAllUsers()
-            finalList = []
-            for item in availableUsers:
-                finalList.append(self.__GetUser(item))
-            return finalList'''

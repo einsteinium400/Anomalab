@@ -91,13 +91,3 @@ class DatasetController:
                 if f"-{name}" in modelName['name']:
                     dataset.removeModel(modelName['name'])
 
-    
-    # def GetAllDatasetsInfoList(self):
-    #     operationFactory = StorageFactory()
-    #     self.storage = operationFactory.CreateOperationItem()
-    #     fullList = self.storage.GetFullItemsList("DATASET")
-    #     finalList = []
-    #     for item in fullList:
-    #         finalList.append(list((item['id'],item['name'],len(item['featureNames']),len(item['data']),item['timestamp'])))
-    #     return finalList
-

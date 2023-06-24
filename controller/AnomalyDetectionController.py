@@ -14,6 +14,7 @@ def checkSampleForAnomaly(model,sample):
     anomaly=False
     sampleColumn=0
     for clusterData in data:
+        print ('densities of', clusterData['num'],'is:',clusterData['densities']) ## TO DELETE
         logFile.write(f'cluster num: {clusterData["num"]} ,distance: {clusterData["distance"]} ,normalizeDistance: {clusterData["standarizeDistance"]}\n')
         if clusterData['distance']<data[closestCluster]['distance']:
             closestCluster=clusterData['num']
