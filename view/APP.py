@@ -1,6 +1,7 @@
 #python imports
 from datetime import datetime
 import traceback
+import os
 
 #kivy imports
 from kivymd.app import MDApp
@@ -14,7 +15,6 @@ from kivy.metrics import dp
 # plots imports
 from kivy.garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
 from matplotlib import pyplot as plt
-import pandas as pd
 #forms imports
 from kivymd.uix.label import MDLabel
 from kivymd.uix.textfield import MDTextFieldRect
@@ -132,6 +132,8 @@ class Query(Screen):
                     self.attributesRefs.append(Spinner(text="", values=options))
                     self.attributesRefs[i].bind(text=self.on_text)
                 self.ids.attributes_box.add_widget(self.attributesRefs[i])
+            ##for i in range(20):
+                ##self.ids.attributes_box.add_widget(MDLabel(text='[size=20]'+'BLAH BLAH BLAH'+':[/size]', halign="center", markup= True))
         except Exception as e:
             show_popup(str(e))
     
@@ -318,6 +320,8 @@ class ManageDatasets(Screen):
         self.manager.current = 'login'
 #---7---
 class AddDataset(Screen):
+    def on_enter(self):
+        self.ids.filechooser.path = os.getcwd()
     def selected(self, filename):
         try:
             self.ids.path.text = filename[0]
@@ -421,6 +425,8 @@ class ManageDistanceFunctions(Screen):
         self.manager.current = 'login'
 #---10---
 class AddDistanceFunction(Screen):
+    def on_enter(self):
+        self.ids.filechooser.path = os.getcwd()
     def selected(self, filename):
         try:
             self.ids.path.text = filename[0]
