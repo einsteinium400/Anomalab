@@ -201,12 +201,12 @@ class Results(Screen):
             row.append('[size=20]'+str(answer['stadarizedResults'][i])+'[/size]')
             self.data.append(row)
         dataRows = len(self.data)
-        pagination = False
         self.table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
             size_hint= (0.9, 0.9),
-            use_pagination = pagination,
+            use_pagination = False,
             rows_num = dataRows,
+            check = False,
             column_data = [
                 ("[size=32]Attribute[/size]", dp (table_width*0.25)),
                 ("[size=32]Sample[/size]", dp (table_width*0.25)),
@@ -280,6 +280,7 @@ class ManageDatasets(Screen):
             pos_hint = {'x': 0.05, 'top': 0.95},
             size_hint= (0.9, 0.9),
             use_pagination = False,
+            check = False,
             rows_num = len(self.data),
             column_data = [
                 ("Attribute", dp (table_width*0.25)),
@@ -391,6 +392,7 @@ class ManageDistanceFunctions(Screen):
             pos_hint = {'x': 0.05, 'top': 0.95},
             size_hint= (0.9, 0.9),
             use_pagination = False,
+            check = False,
             rows_num = len(self.data),
             column_data = [
                 ("[size=32]Name[/size]", dp (table_width)),
@@ -491,17 +493,13 @@ class UpdateModels(Screen):
                 row.append(function[1])
                 self.data.append(row)
         dataRows = len(self.data)
-        pagination = False
-        if (dataRows > 5):
-            pagination = True
-            dataRows = 5
         table_width = dp(Window.size[0]*9/50)
         try:
             self.table = MDDataTable(
                 pos_hint = {'x': 0.05, 'top': 0.95},
                 size_hint= (0.9, 0.9),
                 check = True,
-                use_pagination = pagination,
+                use_pagination = False,
                 rows_num = dataRows,
                 column_data = [
                     #HERE COME CHECK MARK width
@@ -577,6 +575,7 @@ class ManageUsers(Screen):
                 pos_hint = {'x': 0.05, 'top': 0.95},
                 size_hint= (0.9, 0.9),
                 use_pagination = False,
+                check = False,
                 rows_num = len(self.data),
                 column_data = [
                     ("User-Name", dp (table_width*0.5)),
@@ -699,17 +698,13 @@ class ChooseModels(Screen):
             row.append(round(model['wcss'],2))   #wcss
             self.data.append(row)
         dataRows = len(self.data)
-        pagination = False
-        if (dataRows > 5):
-            pagination = True
-            dataRows = 5
         table_width = dp(Window.size[0]*9/50)
         try:
             self.table = MDDataTable(
                 pos_hint = {'x': 0.05, 'top': 0.95},
                 size_hint= (0.9, 0.9),
                 check = True,
-                use_pagination = pagination,
+                use_pagination = False,
                 rows_num = dataRows,
                 column_data = [
                     #HERE COME CHECK MARK width
@@ -784,7 +779,6 @@ class AnalystResults(Screen):
                 row.append('[size=20]'+str(round(result['stadarizedResults'][i],2))+'[/size]')
             self.data.append(row)
         dataRows = len(self.data)
-        pagination = False
         columnSize = table_width*(1/(modelsNum+2))
         columnNames = []
         columnNames.append(("[size=32]Attribute[/size]", dp (columnSize)))
@@ -794,7 +788,8 @@ class AnalystResults(Screen):
         self.table = MDDataTable(
             pos_hint = {'x': 0.05, 'top': 0.95},
             size_hint= (0.9, 0.9),
-            use_pagination = pagination,
+            use_pagination = False,
+            check = False,
             rows_num = dataRows,
             column_data = columnNames,
             row_data = self.data
