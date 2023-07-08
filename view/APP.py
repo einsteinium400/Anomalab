@@ -767,9 +767,9 @@ class AnalystResults(Screen):
         row.append('[size=20]-[/size]')
         for result in results:
             if result['anomaly']==True:
-                row.append('[size=20][color=ff3333][b]'+str(result['anomaly'])+'[/b][/color][/size]')
+                row.append('[size=20][color=FF0000][b]'+str(result['anomaly'])+'[/b][/color][/size]')
             else:
-                row.append('[size=20][color=00FF00][b]'+str(result['anomaly'])+'[/b][/color][/size]')
+                row.append('[size=20][color=33FF33][b]'+str(result['anomaly'])+'[/b][/color][/size]')
         self.data.append(row)
         for i in range(len(app.attributesList)):
             row = []

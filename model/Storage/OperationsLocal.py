@@ -22,7 +22,7 @@ FILEPATH_DICT = {
 
 class OperationsLocal(Operations.Operations):
     load_dotenv()
-    CACHE_TIME_IN_SEC = int(os.getenv('CACHE_TIME_IN_SEC',300))
+    CACHE_TIME_IN_SEC = int(os.getenv('CACHE_TIME_IN_SEC',7200))
     def __init__(self):
         self._name="Local"
 
@@ -30,7 +30,7 @@ class OperationsLocal(Operations.Operations):
         return DATAPATH
     def __checkFileCacheTime(self,fileName):
         if os.path.exists(fileName):
-            ctime = os.path.getctime(fileName)
+            ctime = os.path.getmtime(fileName)
             if (time.time() - ctime) < self.CACHE_TIME_IN_SEC:
                 return False
             return True
