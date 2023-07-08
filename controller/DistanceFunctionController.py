@@ -7,14 +7,8 @@ from controller.DatasetController import DatasetController
 
 from model.Storage.StorageFactory import StorageFactory
 from model import modular_distance_utils
-#from model.Storage.OperationsMongo import OperationsMongo
-#from model.Storage.OperationsMongo import Operations
 
 import base64
-#import inspect
-
-# path = modular_distance_utils.DISTANCE_FUNCTIONS_PATH
-
 
 class DistanceFunctionController:
 
@@ -62,8 +56,6 @@ class DistanceFunctionController:
         self.mongo_operations.Delete(name, "FUNCTION")
         self.mongo_operations.DeleteItemsByTypeAndFilter("MODEL",{"function":name})
         self.reload_functions_from_mongo()
-        # delete in functions list
-        #modular_distance_utils.delete_user_function(name)
 
     def add_function(self, file_dir):
         try:
@@ -84,10 +76,7 @@ class DistanceFunctionController:
             "name": new_func_name
         }
 
-        jsonData = data  # json.dumps(data)
+        jsonData = data
 
         # update database
         self.mongo_operations.Save(new_func_name, jsonData, "FUNCTION")
-
-        # update functions list
-        print(dir)

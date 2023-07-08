@@ -1,20 +1,26 @@
 from datetime import datetime
-ANOMALY_DEFINITION_STD_DEV = 1 ##STD DEV TO DEFINE SUSPECT OF ANOMALY
-MAX_ANOMALY_STD_DEV = 3 ##MAX STD DEV TO DEFINE SUSPECT OF ANOMALY
-MIN_PTS = 3 ##NEIGHBOR POINTS TO DETERMINE ANOMALY
+ANOMALY_DEFINITION_STD_DEV = 1  #STD DEV TO DEFINE SUSPECT OF ANOMALY
+MAX_ANOMALY_STD_DEV = 3         #MAX STD DEV
+MIN_PTS = 3                     #NEIGHBOR POINTS TO DETERMINE ANOMALY
 
 def checkSampleForAnomaly(model,sample):
+    #LOG FILE
     logFile = open("logger/anomalyLogger.txt", "a")
     logFile.write(f'#############################\n')
     logFile.write(f'Time is : {datetime.now().strftime("%d/%m/%Y, %H:%M:%S")}\n')
     logFile.write(f'check anomaly for {sample} in model {model.Name}\n')
+    
+    #CHECK SAMPLE
     data = model.check_sample(sample, MIN_PTS, logFile)
+    
+    #INIT VARIABLES
     closestCluster = 0
     closestStandarizeCluster = 0
     anomaly=False
     sampleColumn=0
+    
+    #FIND CLOSEST CLUSTER
     for clusterData in data:
-        print ('densities of', clusterData['num'],'is:',clusterData['densities']) ## TO DELETE
         logFile.write(f'cluster num: {clusterData["num"]} ,distance: {clusterData["distance"]} ,normalizeDistance: {clusterData["standarizeDistance"]}\n')
         if clusterData['distance']<data[closestCluster]['distance']:
             closestCluster=clusterData['num']
@@ -22,15 +28,20 @@ def checkSampleForAnomaly(model,sample):
             closestStandarizeCluster = clusterData['num']
     logFile.write(f'closestCluster: {closestCluster} ,closestStandarizeCluster: {closestStandarizeCluster} ,normalizeDistance: {clusterData["standarizeDistance"]}\n')
     closestClusterData = data[closestCluster]
-    ##CHECK ANOMALY
+    
+    #CHECK ANOMALY
     logFile.write(f'standarize distance: {closestClusterData["standarizeDistance"]} ,do: {closestClusterData["do"]} ,dm: {closestClusterData["dm"]}\n')
-    logFile.write('SAMPLE IS ANOMALY: # ')
+    logFile.write('SAMPLE IS ANOMALY: ')
+    #CHECK STANDARIZE DISTANCE
     if closestClusterData['standarizeDistance']>ANOMALY_DEFINITION_STD_DEV:
+        #COMPARE DO AND DM
         if (closestClusterData['do']>closestClusterData['dm']):
-            logFile.write('True # ')
+            logFile.write('True\n')
             anomaly = True
-    logFile.write('\n')
-    ##STANDARIZE RESULTS
+    if anomaly==False:
+        logFile.write('False\n')
+    
+    #STANDARIZE RESULTS FOR TABLE
     stdResults = []
     for i in range(len(data[closestCluster]['results'])):
         if closestClusterData['results'][i]<=closestClusterData['attributesAverageDistances'][i]:
@@ -40,7 +51,8 @@ def checkSampleForAnomaly(model,sample):
         else:
             delta=closestClusterData['results'][i]-closestClusterData['attributesAverageDistances'][i]
             stdResults.append(delta/closestClusterData['attributesStdDevs'][i])
-    ##CHECK WHICH COLUMN IN THE GRAPH TO MARK
+    
+    #CHECK WHICH COLUMN IN THE GRAPH TO MARK
     if closestClusterData['standarizeDistance']>3:
         sampleColumn = 4
     elif closestClusterData['standarizeDistance']>2:
@@ -50,6 +62,7 @@ def checkSampleForAnomaly(model,sample):
     elif closestClusterData['standarizeDistance']>0:
         sampleColumn = 1
     
+    #BUILD RETURN ANSWER
     answer = {
         'anomaly' : anomaly,
         'closestCluster' : closestCluster,
@@ -63,5 +76,6 @@ def checkSampleForAnomaly(model,sample):
         'densities': closestClusterData['densities'],
         'sampleColumn': sampleColumn,
     }
+    
     logFile.close()
     return answer

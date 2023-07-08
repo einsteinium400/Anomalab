@@ -13,7 +13,6 @@ from model import modular_distance_utils
 CLUSTERING_TRIES = 2
 REPEATS = 8
 
-
 class ModelController:
     operationFactory = StorageFactory()
     storage = operationFactory.CreateOperationItem()
@@ -45,10 +44,12 @@ class ModelController:
         return self.storage.GetListWithSpecificAttributes("MODEL", attributesList)
 
     def CreateModel(self, dataset, distanceName):
+        logFile = open("logger/createModelLogger.txt", "a")
         try:
             _time = datetime.now()
-            print("Start Create Model! Current Time =", _time.strftime("%H:%M:%S"))
+            logFile.write(f'################################################\n')
             name = f'{dataset.Name}-{distanceName}'
+            logFile.write(f'Start Create Model {name} Time is : {_time.strftime("%d/%m/%Y, %H:%M:%S")}\n')
             modelsList = self.__GetAllModelsNamesList()
             if name in modelsList:
                 raise Exception(f"Model named {name} exist")
@@ -58,7 +59,7 @@ class ModelController:
             types = [True if d['type'] == 'categorical' else False for d in fieldsData]
             data = np.array(dataSet.Data)
             hp, k = preProcess(data, fieldsData, distanceFunction, CLUSTERING_TRIES, REPEATS)
-            print("done preprocess")
+            logFile.write("done preprocess\n")
             modelsTries = []
             for i in range(CLUSTERING_TRIES):
                 try:
@@ -71,13 +72,13 @@ class ModelController:
                     print(f"Error {e}")
                     traceback.print_exc()
                     raise e
-            print('create k means models and start training')
+            logFile.write('create k means models and start training\n')
             for i in range(CLUSTERING_TRIES):
                 trained = 0
                 while trained == 0:
                     try:
                         modelsTries[i].cluster_vectorspace(data)
-                        print("create model num", i, "wcss is:", modelsTries[i].get_wcss())
+                        logFile.write(f"create model num {i} wcss is:{modelsTries[i].get_wcss()}\n")
                         trained = 1
                     except Exception as e:
                         print(f"Error {e}")
@@ -87,9 +88,9 @@ class ModelController:
             for i in range(1, CLUSTERING_TRIES):
                 if (modelsTries[best].get_wcss() > modelsTries[i].get_wcss()):
                     best = i
-            print("FINISH TRAINING- IT TOOK:", (datetime.now() - _time).seconds, "seconds")
-            print('wcss is:', modelsTries[best].get_wcss())
-            print('silhouette is:', modelsTries[best].get_Silhouette())
+            logFile.write(f"FINISH TRAINING- IT TOOK: {(datetime.now() - _time).seconds} seconds\n")
+            logFile.write(f'wcss is: {modelsTries[best].get_wcss()}\n')
+            logFile.write(f'silhouette is: {modelsTries[best].get_Silhouette()}\n')
             modelsTries[best].metaDataCalculation()
             modelsTries[best].createClusterJson()
             modelJson = modelsTries[best].getModelData()
@@ -103,18 +104,17 @@ class ModelController:
             for item in modelJson['clusters_info']:
                 meanValues.append(item['mean'])
             modelJson['meanValues'] = meanValues
-            # print ("#### DEBUG #####")
-            print(modelJson['meanValues'])
+            logFile.write(f"{modelJson['meanValues']}\n")
             self.storage.Save(name, modelJson, "MODEL")
-            # print ("#### DEBUG #####")
             dataset.addNewModel({
                 'name': modelJson['name'],
                 'wcss':modelJson['wcss'],
                 'silhouette': modelJson['silhouette']
             })
 
-            print("########################## MODEL FINISHED#############################")
-            print("OVERALL IT TOOK:", (datetime.now() - _time).seconds, "seconds")
+            logFile.write(f"OVERALL IT TOOK: {(datetime.now() - _time).seconds} seconds\n")
+            logFile.write("########################## MODEL FINISHED#############################\n")
+            
         except Exception as e:
             print(f"Error {e}")
             traceback.print_exc()

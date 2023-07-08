@@ -66,7 +66,7 @@ class ChooseDataset(Screen):
     def on_enter(self):
         app = MDApp.get_running_app()
         try:
-            ##get datasets with atleast one models
+            #get datasets with atleast one models
             self.datasets = app.datasetController.GetListForQuery()
             ##check if there are models in the system
             if (self.datasets == []):
