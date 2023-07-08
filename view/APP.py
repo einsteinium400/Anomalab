@@ -191,14 +191,14 @@ class Results(Screen):
         self.ids.result.text='Query is: '+string+ ' (Model: '+app.modelsList[0]["name"]+')'
         
         #TABLE
-        table_width = dp(Window.size[0]*9/50)
+        table_width = dp(Window.size[0]*9/50*0.5)
         self.data=[]
         for i in range(len(answer['results'])):
             row = []
             row.append('[size=20]'+app.attributesList[i]['name']+'[/size]')
             row.append('[size=20]'+str(app.originalQuery[i])+'[/size]')
-            row.append('[size=20]'+str(answer['results'][i])+'[/size]')
-            row.append('[size=20]'+str(answer['stadarizedResults'][i])+'[/size]')
+            row.append('[size=20]'+str(round(answer['results'][i],2))+'[/size]')
+            row.append('[size=20]'+str(round(answer['stadarizedResults'][i],2))+'[/size]')
             self.data.append(row)
         dataRows = len(self.data)
         self.table = MDDataTable(
@@ -231,6 +231,8 @@ class Results(Screen):
                
         #graph
         plt.bar(Xaxis,Yaxis, color=colors)
+        plt.axvline(x=1.5, color ='r')
+        plt.text(1.6,0.5,'anomaly suspect',rotation=90, color ='r')
         plt.ylabel('samples')
         plt.title('Cluster Density')
         plt.text(answer['sampleColumn'],Yaxis[answer['sampleColumn']],'HERE', ha = 'center',bbox = dict(facecolor = 'blue', alpha =0.8))

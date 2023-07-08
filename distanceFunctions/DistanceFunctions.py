@@ -66,3 +66,5 @@ def Euclidean(u, v, type_values, parameters):
         results.append(u[i] - v[i])
         distance += (u[i] - v[i])**2
     return distance**0.5, results
+
+
