@@ -162,7 +162,6 @@ class Query(Screen):
             else:
                 # numeric feature
                 app.numericQuery.append(float(self.attributesRefs[i].text))
-        print (f'query is {app.numericQuery}')
         if app.userType == 'regular':
             self.manager.transition = SlideTransition(direction="left")
             self.manager.current = 'results'
@@ -223,7 +222,6 @@ class Results(Screen):
             print(str(e))
         
         #data for graph
-        print ('densities:',answer['densities'])
         Xaxis = ['<AVG','AVG-1SD','1SD-2SD','2SD-3SD','3SD<']
         Yaxis = list(answer['densities'].values())
         colors = ['grey','grey','grey','grey','grey']
@@ -340,7 +338,6 @@ class AddDataset(Screen):
             show_popup(f"LOAD DATASET {name} SUCCESS")
         except Exception as e:
             self.resetForm()
-            print (traceback.print_exc())
             show_popup(str(e))
             return
         self.manager.transition = SlideTransition(direction="right")
@@ -364,7 +361,6 @@ class DeleteDataset(Screen):
         self.ids['timestamp'].text= 'time stamp: '+str(app.dictionary['timestamp'])
     def on_delete(self):
         app = MDApp.get_running_app()
-        print (f"delete dataset: {str(app.dictionary['name'])}")
         try:
             app.datasetController.DeleteDataset(str(app.dictionary['name']))
             show_popup(f"DELETE DATASET {str(app.dictionary['name'])} SUCCESS")
@@ -463,7 +459,6 @@ class DeleteDistanceFunction(Screen):
         app = MDApp.get_running_app()
         self.ids['name'].text= str(app.dictionary['name'])
     def on_delete(self, name):
-        print (f"delete distance function: {name}")
         app = MDApp.get_running_app()
         try:
             app.distanceController.delete_function(name)
@@ -527,25 +522,20 @@ class UpdateModels(Screen):
         self.toUpdate.append(current_row)
     # Function for row presses
     def row_checked(self, instance_table, instance_row):
-        #print(instance_table, instance_row)
         pass
 
     def on_update(self):
-        print (self.toUpdate)
         app = MDApp.get_running_app()
         for model in self.toUpdate:
             if model[2] == "":
                 try:
                     app.jobController.add_job(app.modelController.CreateModel, app.datasetController.GetDataset(model[0]), model[1])
-                    print ('building model for ', model[0], '-', model[1])
                 except Exception as e:
-                    print (traceback.print_exc())
                     show_popup(str(e))
                     return
                 self.manager.transition = SlideTransition(direction="right")
                 self.manager.current = 'updatemodels'
             else:
-                print (f'try to delete model {model[2]}')
                 app.modelController.DeleteModel(model[2], app.datasetController.GetDataset(model[0]))
                 show_popup(f'delete model {model[2]} success')
                 self.manager.transition = SlideTransition(direction="right")
@@ -734,7 +724,6 @@ class ChooseModels(Screen):
     def on_choose(self):
         try:
             app = MDApp.get_running_app()
-            print (app.modelsApplyList)
             if app.modelsApplyList == []:
                 show_popup('Must choose at least one model')
                 return

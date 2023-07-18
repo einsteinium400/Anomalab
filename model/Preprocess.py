@@ -12,7 +12,7 @@ MIN_CLUSTERS_IN_ELBOW = 1
 
 
 def apply_elbow_method(fields_data, vectors, distance_function, triesNumber, _repeats):
-    print("in elbow")
+
     wcss = []
     tries = 0
     i = MIN_CLUSTERS_IN_ELBOW
@@ -28,19 +28,15 @@ def apply_elbow_method(fields_data, vectors, distance_function, triesNumber, _re
                                         type_of_fields=fields_data, repeats=_repeats)
             model.cluster_vectorspace(vectors)
         except Exception as e:
-            print('exception is:', e, 'i:', i, 'tries:', tries)
             if str(e) == "bad seed":
                 if tries == 3:
                     if i < 3:
-                        print("three tries for",i,"clusters --> SOMETHING WRONG")
                         raise e
                     else:
-                        print('three tries with', i)
                         i = MAX_CLUSTERS_IN_ELBOW + 1
                         break
                 else:
                     tries += 1
-                    print('another try')
                     flag = True
             else:
                 raise e
@@ -48,9 +44,7 @@ def apply_elbow_method(fields_data, vectors, distance_function, triesNumber, _re
             wcss.append(model.get_wcss())
             tries = 0
             i += 1
-    print("wcss list is: ", wcss)
     elbow_point = elbowLocator(wcss)
-    print('elbow point is:', elbow_point)
     return elbow_point
 
 

@@ -37,7 +37,6 @@ class OperationsMongo(Operations.Operations):
         if self.__initialized:
             return
         self.__initialized = True
-        # initialization code here
         self._name = "Mongo"
         self.MONGO = os.getenv('MONGODB')
         self.CLIENT = pymongo.MongoClient(self.MONGO)

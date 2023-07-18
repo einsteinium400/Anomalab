@@ -78,12 +78,9 @@ class User:
 
     @Type.setter
     def Type(self, value):
-        print(f"Setting new type to {value} for ${self._username}")
         if(value not in USERS_TYPE_LIST):
             raise Exception("Not a valid user type")
-        print(f"Type valid")
         self._type = value
-        print(f"New type {self._type}")
         self.SaveUser()
 
     def TypeNum(self):
@@ -104,7 +101,6 @@ class User:
         }
         operationFactory = StorageFactory()
         saver = operationFactory.CreateOperationItem()
-        print(f"Gonna save ${self._jsonData}")
         saver.Save(self._username, self._jsonData, "USER")
 
     def LoadUser(self):

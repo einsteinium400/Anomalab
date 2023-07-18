@@ -40,7 +40,6 @@ class DatasetPreProcessor:
         # Extract columns names
         cols = df.columns
 
-        print (f'cols are: {cols}')
         # Takes only numerical colums
         num_cols = df._get_numeric_data().columns
 

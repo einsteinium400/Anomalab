@@ -69,7 +69,6 @@ class ModelController:
                                                     type_of_fields=types,
                                                     hyper_params=hp))
                 except Exception as e:
-                    print(f"Error {e}")
                     traceback.print_exc()
                     raise e
             logFile.write('create k means models and start training\n')
@@ -81,7 +80,6 @@ class ModelController:
                         logFile.write(f"create model num {i} wcss is:{modelsTries[i].get_wcss()}\n")
                         trained = 1
                     except Exception as e:
-                        print(f"Error {e}")
                         traceback.print_exc()
                         trained = 0
             best = 0
@@ -116,7 +114,6 @@ class ModelController:
             logFile.write("########################## MODEL FINISHED#############################\n")
             
         except Exception as e:
-            print(f"Error {e}")
             traceback.print_exc()
             self.storage.Delete(name, "MODEL")
             dataset.removeModel(name)

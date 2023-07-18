@@ -10,11 +10,6 @@ population_size = 4
 max_generations = 10
 
 
-# # Define the fitness function
-# def hello(theta1, theta2, beta, gamma):
-#     # Your implementation of the hello function here
-#     score=theta1+theta2+beta+gamma
-#     return score
 
 
 # Generate an initial population of solutions
@@ -49,7 +44,6 @@ def evaluate_population(params, vectors, population, distance_function, type_val
         # activate model
         model_for_population.cluster_vectorspace(vectors)
         fitness_scores.append(model_for_population.get_wcss())
-    print ('wcss: ',min(fitness_scores))
     return fitness_scores
 
 
@@ -95,11 +89,9 @@ def apply_genetic_operators(selected_parents, beta_space, gamma_space, z):
 
 def genetic_algorithm(params, distance_function, k, vectors, type_values, z):
     if distance_function.__name__ != "Statistic":
-        print("genetic_algorithm no matter")
 
         return (0, 0, 0, 0)
 
-    ##print("inside genetic_algoritm")    
 
     z = z
     # theta1_space = [0, z]
@@ -113,7 +105,6 @@ def genetic_algorithm(params, distance_function, k, vectors, type_values, z):
     # Repeat the genetic algorithm for a maximum of max_generations
 
     for generation in range(max_generations):
-        #print(generation, "###############out of", max_generations)
 
         # Evaluate the fitness of the current population
         fitness_scores = evaluate_population(params, vectors, population, distance_function, type_values, k)
