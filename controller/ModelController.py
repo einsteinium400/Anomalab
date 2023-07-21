@@ -31,14 +31,25 @@ class ModelController:
         # initialization code here
 
     def __GetAllModelsNamesList(self):
-        return self.storage.GetNamesList("MODEL")
+        try:
+            return self.storage.GetNamesList("MODEL")
+        except Exception as e:
+            traceback.print_exc()
+            raise Exception(f"Error Getting all models")
 
     def __GetAllInstances(self):
-        availableDatasets = self.__GetAllModelsNamesList()
-        finalList = []
-        for item in availableDatasets:
-            finalList.append(self.GetModel(item))
-        return finalList
+        try:
+            availableDatasets = self.__GetAllModelsNamesList()
+            finalList = []
+            for item in availableDatasets:
+                finalList.append(self.GetModel(item))
+            return finalList
+        except Exception as e:
+            traceback.print_exc()
+            raise Exception(f"Getting all models")
+
+
+        
 
     def __GetAllModelsWithSpecificAttributes(self, attributesList):
         return self.storage.GetListWithSpecificAttributes("MODEL", attributesList)
@@ -120,38 +131,53 @@ class ModelController:
             
 
     def GetModel(self, modelName):
-        modelsList = self.__GetAllModelsNamesList()
+        try:
+            modelsList = self.__GetAllModelsNamesList()
+        except Exception as e:
+            raise Exception("Error accured while getting all models")
         if modelName not in modelsList:
             raise Exception(f"Model named {modelName} Does not exist")
         return Model(modelName)
 
     def DeleteModel(self, modelName, dataset):
-        modelsList = self.__GetAllModelsNamesList()
+        try:
+            modelsList = self.__GetAllModelsNamesList()
+        except Exception as e:
+            raise Exception("Error accured while getting all models")
         if modelName not in modelsList:
             raise Exception(f"Model named {modelName} Does not exist")
-        dataset.removeModel(modelName)
-        self.storage.Delete(modelName, "MODEL")
+        try:
+            dataset.removeModel(modelName)
+            self.storage.Delete(modelName, "MODEL")
+        except Exception as e:
+            raise Exception("Error deleting model")
 
     def GetModelsStatus(self):
-        datasetList = self.storage.GetNamesList("DATASET")
-        functionNames = self.storage.GetNamesList("FUNCTION")
-        modelList = self.__GetAllInstances()
-        finalList = []
-        for dataset in datasetList:
-            # initialize an empty dictionary for the current key
-            Item = []
-            Item.append(dataset)
-            # iterate through each item in the modelList and add it to the innerDict with a value of False
-            _modelsList = []
-            for function in functionNames:
-                _model = []
-                _model.append(function)
-                _model.append("")
-                for model in modelList:
-                    if (model.DatasetName == dataset and model.DistanceFunction == function):
-                        _model[1] = model.Name
-                _modelsList.append(_model)
-            Item.append(_modelsList)
-            # add the innerDict to the newDict with the current key as its key
-            finalList.append(Item)
-        return finalList
+        try:
+            datasetList = self.storage.GetNamesList("DATASET")
+            functionNames = self.storage.GetNamesList("FUNCTION")
+            modelList = self.__GetAllInstances()
+        except Exception as e:
+            raise Exception("Error Getting data")
+        try:
+            finalList = []
+            for dataset in datasetList:
+                # initialize an empty dictionary for the current key
+                Item = []
+                Item.append(dataset)
+                # iterate through each item in the modelList and add it to the innerDict with a value of False
+                _modelsList = []
+                for function in functionNames:
+                    _model = []
+                    _model.append(function)
+                    _model.append("")
+                    for model in modelList:
+                        if (model.DatasetName == dataset and model.DistanceFunction == function):
+                            _model[1] = model.Name
+                    _modelsList.append(_model)
+                Item.append(_modelsList)
+                # add the innerDict to the newDict with the current key as its key
+                finalList.append(Item)
+            return finalList
+        except Exception as e:
+            raise Exception("Error getting model status")

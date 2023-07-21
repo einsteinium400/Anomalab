@@ -31,26 +31,29 @@ class DatasetController:
         return finalList
     
     def CreateDataset(self, name, csvFilePath):
-        dataSetsList = self.__GetAllDatasetsNamesList()
-        if any(item.startswith(name) for item in dataSetsList):
-            raise Exception(f'Dataset name {name} already taken')
-        df = pd.read_csv(csvFilePath)
-        # Replace common missing values conventions with NaN
-        for item in COMMON_MISSING_VALUES:
-            df = df.replace(item, pd.NaT)
-        missing_values_count = df.isnull().sum().sum()
-        if(missing_values_count > 0):
-            df_copy_common_fill = df.copy()
-            df_copy_unique_fill = df.copy()
-            dataSet1 = Dataset(f'{name}-common-fillna',"COMMON", df_copy_common_fill)
-            self.storage.Save(dataSet1.Name, dataSet1.JsonData, "DATASET")
-            dataSet2 = Dataset(f'{name}-unique-fillna',"UNIQUE" ,df_copy_unique_fill )
-            self.storage.Save(dataSet2.Name, dataSet2.JsonData, "DATASET")
-        else:
-            df_copy = df.copy()
-            dataSet1 = Dataset(f'{name}',"NONE", df_copy)
-            self.storage.Save(dataSet1.Name, dataSet1.JsonData, "DATASET")
-
+        try:
+            dataSetsList = self.__GetAllDatasetsNamesList()
+            if any(item.startswith(name) for item in dataSetsList):
+                raise Exception(f'Dataset name {name} already taken')
+            df = pd.read_csv(csvFilePath)
+            # Replace common missing values conventions with NaN
+            for item in COMMON_MISSING_VALUES:
+                df = df.replace(item, pd.NaT)
+            missing_values_count = df.isnull().sum().sum()
+            if(missing_values_count > 0):
+                df_copy_common_fill = df.copy()
+                df_copy_unique_fill = df.copy()
+                dataSet1 = Dataset(f'{name}-common-fillna',"COMMON", df_copy_common_fill)
+                self.storage.Save(dataSet1.Name, dataSet1.JsonData, "DATASET")
+                dataSet2 = Dataset(f'{name}-unique-fillna',"UNIQUE" ,df_copy_unique_fill )
+                self.storage.Save(dataSet2.Name, dataSet2.JsonData, "DATASET")
+            else:
+                df_copy = df.copy()
+                dataSet1 = Dataset(f'{name}',"NONE", df_copy)
+                self.storage.Save(dataSet1.Name, dataSet1.JsonData, "DATASET")
+        except Exception as e:
+            raise Exception(f"Error creating dataset") 
+        
     def GetDataset(self, DatasetName):
         dataSetsList = self.__GetAllDatasetsNamesList()
         if DatasetName not in dataSetsList:
@@ -58,36 +61,49 @@ class DatasetController:
         return Dataset(DatasetName)
 
     def DeleteDataset(self, DatasetName):
-        dataSetsList = self.__GetAllDatasetsNamesList()
-        if DatasetName not in dataSetsList:
-            raise Exception(f"Dataset named {DatasetName} Does not exist")
-        self.storage.Delete(DatasetName, "DATASET")
-        self.storage.DeleteItemsByTypeAndFilter("MODEL",{"datasetName":DatasetName})
-        self.storage.DeleteItemsByTypeAndFilter("RAW_DATASET",{"name":DatasetName})
+        try:
+            dataSetsList = self.__GetAllDatasetsNamesList()
+            if DatasetName not in dataSetsList:
+                raise Exception(f"Dataset named {DatasetName} Does not exist")
+            self.storage.Delete(DatasetName, "DATASET")
+            self.storage.DeleteItemsByTypeAndFilter("MODEL",{"datasetName":DatasetName})
+            self.storage.DeleteItemsByTypeAndFilter("RAW_DATASET",{"name":DatasetName})
+        except Exception as e:
+            raise Exception(f"Error deleting dataset") 
 
     def GetListForQuery(self):
-        dataSetList = self.storage.GetListWithSpecificAttributes("DATASET",['name','bestmodel'])
-        filtered_list = list(filter(lambda x: bool(x['bestmodel']), dataSetList))
-        return filtered_list
+        try:
+            dataSetList = self.storage.GetListWithSpecificAttributes("DATASET",['name','bestmodel'])
+            filtered_list = list(filter(lambda x: bool(x['bestmodel']), dataSetList))
+            return filtered_list
+        except Exception as e:
+                raise Exception(f"Error getting datasets") 
 
     def GetListForManager(self):
-        return self.storage.GetListWithSpecificAttributes("DATASET",['name','timestamp','featuresNumber','instancesNumber'])
-    
+        try:
+            return self.storage.GetListWithSpecificAttributes("DATASET",['name','timestamp','featuresNumber','instancesNumber'])
+        except Exception as e:
+            raise Exception(f"Error getting datasets") 
     def GetAttributesList(self,name):
-        preFilteredAttributesList = self.GetDataset(name).getAttributesTypesAndValuesList()
-        # Iterate over each object in the array
-        for item in preFilteredAttributesList:
-            if item['type'] == 'categorical':
-                values = item['values']
-                updated_values = {key: value for key, value in values.items() if not value.startswith('filledNa-')}
-                item['values'] = updated_values
-        # filter na fill in unique values
-        return preFilteredAttributesList
+        try:
+            preFilteredAttributesList = self.GetDataset(name).getAttributesTypesAndValuesList()
+            # Iterate over each object in the array
+            for item in preFilteredAttributesList:
+                if item['type'] == 'categorical':
+                    values = item['values']
+                    updated_values = {key: value for key, value in values.items() if not value.startswith('filledNa-')}
+                    item['values'] = updated_values
+            # filter na fill in unique values
+            return preFilteredAttributesList
+        except Exception as e:
+            raise Exception(f"Error getting attributes list") 
     
     def CleanModelsFromDatasetsByFunction(self,name):
-        allDataSets = self.__GetAllInstances()
-        for dataset in allDataSets:
-            for modelName in dataset.BestModel:
-                if f"-{name}" in modelName['name']:
-                    dataset.removeModel(modelName['name'])
-
+        try:
+            allDataSets = self.__GetAllInstances()
+            for dataset in allDataSets:
+                for modelName in dataset.BestModel:
+                    if f"-{name}" in modelName['name']:
+                        dataset.removeModel(modelName['name'])
+        except Exception as e:
+            raise Exception(f"Error cleaning models") 

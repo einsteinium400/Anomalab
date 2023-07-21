@@ -29,7 +29,6 @@ class DistanceFunctionController:
     def reload_functions_from_mongo(self):
         # upload dynamically all functions from mongoDB
         functions = self.mongo_operations.GetFullItemsList("FUNCTION")
-
         file_content = ""
 
         # iterate all functions and input them to string
@@ -59,7 +58,6 @@ class DistanceFunctionController:
 
     def add_function(self, file_dir):
         try:
-
             with open(file_dir, 'r') as source_file:
                 contents = source_file.read()
         except :   
@@ -77,6 +75,8 @@ class DistanceFunctionController:
         }
 
         jsonData = data
-
-        # update database
-        self.mongo_operations.Save(new_func_name, jsonData, "FUNCTION")
+        try:
+            # update database
+            self.mongo_operations.Save(new_func_name, jsonData, "FUNCTION")
+        except Exception as e:
+            raise Exception(f"Error saving function") 

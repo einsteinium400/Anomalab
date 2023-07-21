@@ -12,7 +12,8 @@ def checkSampleForAnomaly(model,sample):
     
     #CHECK SAMPLE
     data = model.check_sample(sample, MIN_PTS, logFile)
-    
+
+
     #INIT VARIABLES
     closestCluster = 0
     closestStandarizeCluster = 0
