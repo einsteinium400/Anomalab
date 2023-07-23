@@ -157,14 +157,6 @@ class Dataset:
     def __str__(self):
         return f"The dataset name is {self._name}"
 
-    def AddImportantFeature(self, value):
-        if value not in self._featureNames:
-            return
-        if value in self._importantFeatures:
-            return
-        self._importantFeatures.append(value)
-        self.SaveDataset()
-
     def SaveDataset(self):
         self._jsonData = {
             "name": self._name,

@@ -14,11 +14,6 @@ USERS_TYPE_LIST = ["regular"
     ,"analyst"
     ,"admin"]
 
-REVERSE_USERS_TYPE_DICT = {
-    "regular": 1,
-    "analyst":2,
-    "admin":3
-}
 
 
 class User:
@@ -83,8 +78,6 @@ class User:
         self._type = value
         self.SaveUser()
 
-    def TypeNum(self):
-        return REVERSE_USERS_TYPE_DICT[self._type]
 
     def VerifyPassword(self,value):
         valueHash = hashlib.md5(value.encode()).hexdigest()
