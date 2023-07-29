@@ -28,7 +28,6 @@ class ModelController:
         if self.__initialized:
             return
         self.__initialized = True
-        # initialization code here
 
     def __GetAllModelsNamesList(self):
         try:

@@ -48,7 +48,6 @@ class Model:
             self._id = self._jsonData['id']
             self._timeStamp = self._jsonData['timestamp']
             self._distanceFunction = self._jsonData['function']
-            self._silhouette=self._jsonData['silhouette']
             self._wcss = self._jsonData['wcss']
             self._silhouette=self._jsonData['silhouette']
             self._numberOfClusters = len(self._jsonData['clusters_info'])

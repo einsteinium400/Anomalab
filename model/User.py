@@ -14,8 +14,6 @@ USERS_TYPE_LIST = ["regular"
     ,"analyst"
     ,"admin"]
 
-
-
 class User:
     _id = 0
     _username = 0
@@ -77,7 +75,6 @@ class User:
             raise Exception("Not a valid user type")
         self._type = value
         self.SaveUser()
-
 
     def VerifyPassword(self,value):
         valueHash = hashlib.md5(value.encode()).hexdigest()
