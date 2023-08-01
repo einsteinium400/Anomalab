@@ -51,10 +51,10 @@ class Dataset:
             self._data = self._name
             self._importantFeatures = []
             self._bestModel = []
-            self._meanValues = []
+            self._maxValues = []
             # Get mean values
             for item in self._featureNames:
-               self._meanValues.append(int(newData[item].max()))
+               self._maxValues.append(int(newData[item].max()))
             self._jsonData = {
                 "name": self._name,
                 "id": self._id,
@@ -65,7 +65,7 @@ class Dataset:
                 "importantfeatures":self._importantFeatures,
                 "instancesNumber":self._instancesNumber,
                 "featuresInfo":self._featuresInfo,
-                "meanValues":self._meanValues,
+                "maxValues":self._maxValues,
                 "data": self._data
             }
             RawDatasetData(self._name,newData)
@@ -79,7 +79,7 @@ class Dataset:
             self._instancesNumber = self._jsonData['instancesNumber']
             self._data = self._jsonData['data']
             self._importantFeatures = self._jsonData['featureNames']
-            self._meanValues = self._jsonData['meanValues']
+            self._maxValues = self._jsonData['maxValues']
             self._bestModel = self._jsonData['bestmodel']
             self._featuresInfo = self._jsonData['featuresInfo']
 
@@ -151,8 +151,8 @@ class Dataset:
         return self._jsonData
 
     @property
-    def MeanValues(self):
-        return self._meanValues
+    def MaxValues(self):
+        return self._maxValues
 
     def __str__(self):
         return f"The dataset name is {self._name}"
@@ -168,7 +168,7 @@ class Dataset:
             "importantfeatures": self._importantFeatures,
             "instancesNumber": self._instancesNumber,
             "featuresInfo": self._featuresInfo,
-            "meanValues": self._meanValues,
+            "maxValues": self._maxValues,
             "data": self._data
         }
         operationFactory = StorageFactory()

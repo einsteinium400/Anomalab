@@ -1,6 +1,5 @@
 import pandas as pd
 from model.GeneticAlgorithm import genetic_algorithm
-from itertools import permutations
 from model.elbow import elbowLocator
 import matplotlib.pyplot as plt
 from distanceFunctions.Hamming import Hamming as hm

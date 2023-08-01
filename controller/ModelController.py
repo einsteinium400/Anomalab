@@ -51,9 +51,6 @@ class ModelController:
 
         
 
-    def __GetAllModelsWithSpecificAttributes(self, attributesList):
-        return self.storage.GetListWithSpecificAttributes("MODEL", attributesList)
-
     def CreateModel(self, dataset, distanceName):
         logFile = open("logger/createModelLogger.txt", "a")
         try:
