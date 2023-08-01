@@ -1,7 +1,6 @@
 import pandas as pd
 from model.GeneticAlgorithm import genetic_algorithm
 from model.elbow import elbowLocator
-import matplotlib.pyplot as plt
 from distanceFunctions.Hamming import Hamming as hm
 from model.KMeanClusterer import KMeansClusterer
 from datetime import datetime
