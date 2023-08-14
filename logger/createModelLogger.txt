@@ -1,0 +1,62 @@
+################################################
+Start Create Model num iris-Hamming Time is : 02/08/2023, 10:27:26
+done preprocess
+create k means models and start training
+create model num 0 wcss is:528
+create model num 1 wcss is:528
+FINISH TRAINING- IT TOOK: 0 seconds
+wcss is: 528
+silhouette is: 0.4510037880446569
+[[6.147368421052631, 2.833684210526315, 4.741052631578946, 1.6115789473684217], [5.318181818181816, 3.4345454545454546, 2.0618181818181816, 0.4854545454545454]]
+OVERALL IT TOOK: 1 seconds
+########################## MODEL FINISHED#############################
+################################################
+Start Create Model num iris-Statistic Time is : 02/08/2023, 10:27:56
+################################################
+Start Create Model num iris-Statistic Time is : 02/08/2023, 10:29:05
+################################################
+Start Create Model num iris-Euclidean Time is : 02/08/2023, 10:29:19
+done preprocess
+create k means models and start training
+create model num 0 wcss is:78.94084142614605
+create model num 1 wcss is:78.94084142614598
+FINISH TRAINING- IT TOOK: 4 seconds
+wcss is: 78.94084142614598
+silhouette is: 0.5525919445499755
+[[5.006, 3.418, 1.464, 0.244], [5.901612903225807, 2.7483870967741932, 4.393548387096775, 1.4338709677419355], [6.8500000000000005, 3.0736842105263156, 5.742105263157893, 2.0710526315789473]]
+OVERALL IT TOOK: 4 seconds
+########################## MODEL FINISHED#############################
+################################################
+Start Create Model num iris-Statistic Time is : 02/08/2023, 10:29:38
+################################################
+Start Create Model num iris-Hamming Time is : 02/08/2023, 10:46:19
+done preprocess
+create k means models and start training
+create model num 0 wcss is:1056
+create model num 1 wcss is:1056
+FINISH TRAINING- IT TOOK: 0 seconds
+wcss is: 1056
+silhouette is: 0.3414198731377549
+[[6.149473684210527, 2.8378947368421055, 4.747894736842106, 1.618421052631579], [5.316363636363637, 3.4445454545454552, 2.069090909090909, 0.49000000000000005]]
+OVERALL IT TOOK: 0 seconds
+########################## MODEL FINISHED#############################
+################################################
+Start Create Model num iris-Statistic Time is : 02/08/2023, 10:46:27
+################################################
+Start Create Model num iris-Euclidean Time is : 02/08/2023, 10:46:35
+done preprocess
+create k means models and start training
+create model num 0 wcss is:159.26098405690954
+create model num 1 wcss is:159.24931256830598
+FINISH TRAINING- IT TOOK: 7 seconds
+wcss is: 159.24931256830598
+silhouette is: 0.5542305300366883
+[[6.834615384615385, 3.0846153846153848, 5.732051282051283, 2.074358974358975], [5.006000000000001, 3.423, 1.4690000000000003, 0.25], [5.897540983606556, 2.7475409836065574, 4.390983606557378, 1.4311475409836065]]
+OVERALL IT TOOK: 7 seconds
+########################## MODEL FINISHED#############################
+################################################
+Start Create Model num iris-Statistic Time is : 02/08/2023, 10:48:16
+################################################
+Start Create Model num iris-Statistic Time is : 02/08/2023, 10:50:09
+################################################
+Start Create Model num iris-Statistic Time is : 02/08/2023, 10:52:33

@@ -27,7 +27,7 @@ def checkSampleForAnomaly(model,sample):
             closestCluster=clusterData['num']
         if clusterData['standarizeDistance']<data[closestStandarizeCluster]['standarizeDistance']:
             closestStandarizeCluster = clusterData['num']
-    logFile.write(f'closestCluster: {closestCluster} ,closestStandarizeCluster: {closestStandarizeCluster} ,normalizeDistance: {clusterData["standarizeDistance"]}\n')
+    logFile.write(f'closestCluster: {closestCluster} ,closestStandarizeCluster: {closestStandarizeCluster}\n')
     closestClusterData = data[closestCluster]
     
     #CHECK ANOMALY

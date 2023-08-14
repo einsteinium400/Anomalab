@@ -75,7 +75,7 @@ def preProcess(vectors, fieldsData, distance_function, triesNumber, repeats):
     params_dict["theta"] = 0.1
     time = datetime.now()
     k = apply_elbow_method(type_of_fields, vectors, distance_function, triesNumber, repeats)
-    print("ELBOW COMPLETED AND TOOK:", (datetime.now() - time).seconds, "seconds")
+    print("ELBOW COMPLETED K IS:", k,"TOOK:", (datetime.now() - time).seconds, "seconds")
     # activate the genetic algorithm
     # z = df.nunique().max()  # max domain size
     time = datetime.now()
