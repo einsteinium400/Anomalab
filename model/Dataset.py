@@ -226,3 +226,20 @@ class Dataset:
         self._bestModel = [m for m in self._bestModel if m['name'] != modelName]
         self.SaveDataset()
 
+    def sampleDecyper(self,sample):
+        decoded_sample = []
+        for i, value in enumerate(sample):
+            feature_name = self._featureNames[i]
+            feature_info = next(item for item in self._featuresInfo if item['name'] == feature_name)
+            
+            if 'values' in feature_info:
+                value_key = str(value)
+                if value_key in feature_info['values']:
+                    decoded_value = feature_info['values'][value_key]
+                    decoded_sample.append(decoded_value)
+                else:
+                    decoded_sample.append(value)  # Keep the original value if not found in 'values'
+            else:
+                decoded_sample.append(value)
+        return decoded_sample
+

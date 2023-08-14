@@ -52,7 +52,7 @@ class DatasetController:
                 dataSet1 = Dataset(f'{name}',"NONE", df_copy)
                 self.storage.Save(dataSet1.Name, dataSet1.JsonData, "DATASET")
         except Exception as e:
-            raise Exception(f"Error creating dataset") 
+            raise Exception(f"Error creating dataset {e}") 
         
     def GetDataset(self, DatasetName):
         dataSetsList = self.__GetAllDatasetsNamesList()
